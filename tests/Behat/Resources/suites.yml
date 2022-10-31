@@ -4,7 +4,7 @@ default:
     suites:
         greeting_customer:
             contexts:
-                - acme_sylius_example.context.ui.shop.welcome
+                - lruozzi9_sylius_elasticsearch.context.ui.shop.welcome
 
             filters:
                 tags: "@greeting_customer"

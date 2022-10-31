@@ -4,9 +4,9 @@
     </a>
 </p>
 
-<h1 align="center">Plugin Skeleton</h1>
+<h1 align="center">Sylius Elasticsearch Plugin</h1>
 
-<p align="center">Skeleton for starting Sylius plugins.</p>
+<p align="center">Plugin for searching in Sylius.</p>
 
 ## Documentation
 
