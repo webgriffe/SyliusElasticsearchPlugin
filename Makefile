@@ -17,6 +17,8 @@ install:
 	composer install --no-interaction --no-scripts
 
 backend:
+	tests/Application/bin/console doctrine:database:create --no-interaction
+	tests/Application/bin/console doctrine:migration:migrate --no-interaction
 	tests/Application/bin/console sylius:install --no-interaction
 	tests/Application/bin/console sylius:fixtures:load default --no-interaction
 
