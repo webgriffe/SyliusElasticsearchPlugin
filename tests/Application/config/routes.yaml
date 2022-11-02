@@ -1,9 +1,9 @@
-acme_sylius_example_shop:
-    resource: "@AcmeSyliusExamplePlugin/config/shop_routing.yml"
+lruozzi9_sylius_elasticsearch_shop:
+    resource: "@LRuozzi9SyliusElasticsearchPlugin/config/shop_routing.yml"
     prefix: /{_locale}
     requirements:
         _locale: ^[a-z]{2}(?:_[A-Z]{2})?$
 
-acme_sylius_example_admin:
-    resource: "@AcmeSyliusExamplePlugin/config/admin_routing.yml"
+lruozzi9_sylius_elasticsearch_admin:
+    resource: "@LRuozzi9SyliusElasticsearchPlugin/config/admin_routing.yml"
     prefix: /admin
