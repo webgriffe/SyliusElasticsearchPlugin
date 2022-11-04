@@ -35,6 +35,7 @@
         "polishsymfonycommunity/symfony-mocker-container": "^1.0",
         "sensiolabs/security-checker": "^6.0",
         "sylius-labs/coding-standard": "^4.0",
+        "sylius/mailer-bundle": "^1.8 || ^2.0@beta",
         "symfony/browser-kit": "^5.4 || ^6.0",
         "symfony/debug-bundle": "^5.4 || ^6.0",
         "symfony/dotenv": "^5.4 || ^6.0",
