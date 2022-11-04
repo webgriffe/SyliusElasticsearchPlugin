@@ -9,8 +9,9 @@
     "license": "MIT",
     "require": {
         "php": "^8.0",
+        "elasticsearch/elasticsearch": "^7.17",
+        "sylius/mailer-bundle": "^1.8 || ^2.0@beta",
         "sylius/sylius": "^1.12",
-        "sylius/mailer-bundle":  "^1.8 || ^2.0@beta",
         "symfony/webpack-encore-bundle": "^1.15"
     },
     "require-dev": {
