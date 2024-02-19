@@ -22,4 +22,21 @@ final readonly class ElasticsearchIndexManager implements IndexManagerInterface
             $body,
         );
     }
+
+    public function switchAlias(string $aliasName, string $toIndexName): void
+    {
+        $esClient = $this->clientBuilder->build();
+
+        $esClient->switchAlias(
+            $aliasName,
+            $toIndexName,
+        );
+    }
+
+    public function removeIndexes(string $wildcard, array $skips = []): void
+    {
+        $esClient = $this->clientBuilder->build();
+
+        $esClient->removeIndexes($wildcard, $skips);
+    }
 }

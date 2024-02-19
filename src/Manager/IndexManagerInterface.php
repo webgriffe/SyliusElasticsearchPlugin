@@ -14,4 +14,11 @@ interface IndexManagerInterface
      * @throws CreateIndexException
      */
     public function create(string $indexName, array $body): void;
+
+    public function switchAlias(string $aliasName, string $toIndexName): void;
+
+    /**
+     * @param string[] $skips List of indexes to skip from removal
+     */
+    public function removeIndexes(string $wildcard, array $skips = []): void;
 }

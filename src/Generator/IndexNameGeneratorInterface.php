@@ -11,4 +11,6 @@ interface IndexNameGeneratorInterface
     public function generateName(ChannelInterface $channel): string;
 
     public function generateAlias(ChannelInterface $channel): string;
+
+    public function generateWildcardPattern(ChannelInterface $channel): string;
 }

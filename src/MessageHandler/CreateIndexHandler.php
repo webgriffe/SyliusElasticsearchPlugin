@@ -34,7 +34,11 @@ final readonly class CreateIndexHandler
             ));
         }
         $indexName = $this->indexNameGenerator->generateName($channel);
+        $aliasName = $this->indexNameGenerator->generateAlias($channel);
+        $indexesToRemoveWildcard = $this->indexNameGenerator->generateWildcardPattern($channel);
 
         $this->indexManager->create($indexName, []);
+        $this->indexManager->switchAlias($aliasName, $indexName);
+        $this->indexManager->removeIndexes($indexesToRemoveWildcard, [$indexName]);
     }
 }
