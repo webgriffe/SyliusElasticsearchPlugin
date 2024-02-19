@@ -1,13 +1,9 @@
 # Delete these routes and define your own shop routes here
 
-lruozzi9_sylius_elasticsearch_static_welcome:
-    path: /static-welcome/{name}
+sylius_shop_product_index:
+    path: /taxons/{slug}
+    methods: [GET]
     defaults:
-        _controller: LRuozzi9\SyliusElasticsearchPlugin\Controller\GreetingController::staticallyGreetAction
-        name: ~
-
-lruozzi9_sylius_elasticsearch_dynamic_welcome:
-    path: /dynamic-welcome/{name}
-    defaults:
-        _controller: LRuozzi9\SyliusElasticsearchPlugin\Controller\GreetingController::dynamicallyGreetAction
-        name: ~
+        _controller: lruozzi9.sylius_elasticsearch_plugin.controller.elasticsearch::taxonAction
+    requirements:
+        slug: .+(?<!/)
