@@ -23,11 +23,25 @@ services:
         platform: linux/amd64
         environment:
             MYSQL_ROOT_PASSWORD: mysql
+        volumes:
+            - mysql-data:/var/lib/mysql:rw
         networks:
             - sylius
     
     elasticsearch:
-        image: elasticsearch:8.5.0
+        build:
+            context: ./.docker/elasticsearch
+        environment:
+            - discovery.type=single-node
+            - bootstrap.memory_lock=true
+            - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+            - "xpack.security.enabled=false"
+        volumes:
+            - es-data:/usr/share/elasticsearch/data:rw
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
         networks:
             - sylius
 
@@ -39,3 +53,7 @@ services:
 networks:
     sylius:
         driver: bridge
+
+volumes:
+    mysql-data:
+    es-data:
