@@ -9,8 +9,8 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
-        "elasticsearch/elasticsearch": "^8.0",
-        "sylius/sylius": "dev-apiplatform-3"
+        "elasticsearch/elasticsearch": "^7.17",
+        "sylius/sylius": "^1.12"
     },
     "require-dev": {
         "behat/behat": "^3.6.1",
@@ -47,8 +47,7 @@
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": false,
             "phpstan/extension-installer": true,
-            "symfony/flex": true,
-            "php-http/discovery": true
+            "symfony/flex": true
         }
     },
     "extra": {
@@ -70,12 +69,6 @@
             "tests/Application/Kernel.php"
         ]
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/lruozzi9/Sylius.git"
-        }
-    ],
     "scripts": {
         "post-install-cmd": [
             "php bin/create_node_symlink.php"
