@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LRuozzi9\SyliusElasticsearchPlugin\Client;
 
 use Elasticsearch\Client;
+use LRuozzi9\SyliusElasticsearchPlugin\Client\Exception\BulkException;
 use LRuozzi9\SyliusElasticsearchPlugin\Client\Exception\CreateIndexException;
 use LRuozzi9\SyliusElasticsearchPlugin\Client\Exception\RemoveIndexesException;
 use LRuozzi9\SyliusElasticsearchPlugin\Client\Exception\SwitchAliasException;
@@ -37,6 +38,46 @@ final readonly class ElasticsearchClient implements ClientInterface
 
         if ($response['acknowledged'] !== true) {
             throw new CreateIndexException('The index was not created. Acknowledged is not true.');
+        }
+    }
+
+    public function bulk(string $indexName, array $actions): void
+    {
+        $params = ['body' => []];
+
+        $count = 1;
+        foreach ($actions as $action) {
+            $params['body'][] = [
+                'index' => [
+                    '_index' => $indexName,
+                ]
+            ];
+
+            $params['body'][] = $action;
+
+            // Every 1000 actions stop and send the bulk request
+            if ($count % 1000 === 0) {
+                /** @var array{took: int, errors: bool, items: array} $result */
+                $result = $this->client->bulk($params);
+                if ($result['errors'] === true) {
+                    throw new BulkException('An error occurred while populating the index.');
+                }
+
+                // erase the old bulk request
+                $params = ['body' => []];
+
+                // unset the bulk response when you are done to save memory
+                unset($result);
+            }
+        }
+
+        // Send the last batch if it exists
+        if ($params['body'] !== []) {
+            /** @var array{took: int, errors: bool, items: array} $result */
+            $result = $this->client->bulk($params);
+            if ($result['errors'] === true) {
+                throw new BulkException('An error occurred while populating the index.');
+            }
         }
     }
 

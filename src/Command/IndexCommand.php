@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LRuozzi9\SyliusElasticsearchPlugin\Command;
 
 use LRuozzi9\SyliusElasticsearchPlugin\Message\CreateIndex;
+use LRuozzi9\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
 use Sylius\Component\Channel\Repository\ChannelRepositoryInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,6 +17,7 @@ final class IndexCommand extends Command
     public function __construct(
         private readonly ChannelRepositoryInterface $channelRepository,
         private readonly MessageBusInterface $messageBus,
+        private readonly DocumentTypeProviderInterface $documentTypeProvider,
         string $name = null,
     ) {
         parent::__construct($name);
@@ -25,7 +27,9 @@ final class IndexCommand extends Command
     {
         $channels = $this->channelRepository->findAll();
         foreach ($channels as $channel) {
-            $this->messageBus->dispatch(new CreateIndex($channel->getId()));
+            foreach ($this->documentTypeProvider->getDocumentsType() as $documentType) {
+                $this->messageBus->dispatch(new CreateIndex($channel->getId(), $documentType->getCode()));
+            }
         }
 
         return Command::SUCCESS;

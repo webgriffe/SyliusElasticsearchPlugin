@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LRuozzi9\SyliusElasticsearchPlugin\Client;
 
+use LRuozzi9\SyliusElasticsearchPlugin\Client\Exception\BulkException;
 use LRuozzi9\SyliusElasticsearchPlugin\Client\Exception\CreateIndexException;
 use LRuozzi9\SyliusElasticsearchPlugin\Client\Exception\RemoveIndexesException;
 use LRuozzi9\SyliusElasticsearchPlugin\Client\Exception\SwitchAliasException;
@@ -26,4 +27,11 @@ interface ClientInterface
      * @throws RemoveIndexesException
      */
     public function removeIndexes(string $wildcard = null, array $skips = []): void;
+
+    /**
+     * @param array<array-key, array> $documents
+     *
+     * @throws BulkException
+     */
+    public function bulk(string $indexName, array $actions): void;
 }

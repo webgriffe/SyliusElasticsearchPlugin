@@ -11,7 +11,7 @@ return static function (ContainerConfigurator $containerConfigurator) {
 
     $services->set('lruozzi9.sylius_elasticsearch_plugin.generator.index_name', IndexNameGenerator::class)
         ->args([
-            '<CHANNEL>_<DATE>_<TIME>',
+            '<CHANNEL>_<DOCUMENT_TYPE>_<DATE>_<TIME>',
         ])
     ;
 };

@@ -13,6 +13,7 @@ return static function (ContainerConfigurator $containerConfigurator) {
         ->args([
             service('sylius.repository.channel'),
             service('lruozzi9_sylius_elasticsearch_plugin.command_bus'),
+            service('lruozzi9.sylius_elasticsearch_plugin.provider.document_type'),
             'lruozzi9.elasticsearch.index',
         ])
         ->tag('console.command')

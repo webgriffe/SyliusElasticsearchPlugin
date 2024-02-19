@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace LRuozzi9\SyliusElasticsearchPlugin\Manager;
 
 use LRuozzi9\SyliusElasticsearchPlugin\ClientBuilder\ClientBuilderInterface;
+use LRuozzi9\SyliusElasticsearchPlugin\DocumentType\DocumentTypeInterface;
+use LRuozzi9\SyliusElasticsearchPlugin\Model\DocumentableInterface;
 
 final readonly class ElasticsearchIndexManager implements IndexManagerInterface
 {
@@ -13,13 +15,23 @@ final readonly class ElasticsearchIndexManager implements IndexManagerInterface
     ) {
     }
 
-    public function create(string $indexName, array $body): void
+    public function create(string $indexName, DocumentTypeInterface $documentType): void
     {
         $esClient = $this->clientBuilder->build();
 
         $esClient->createIndex(
             $indexName,
-            $body,
+            ['mappings' => $documentType->getMappings()],
+        );
+    }
+
+    public function populate(string $indexName, DocumentTypeInterface $documentType): void
+    {
+        $esClient = $this->clientBuilder->build();
+
+        $esClient->bulk(
+            $indexName,
+            $documentType->getDocuments(),
         );
     }
 

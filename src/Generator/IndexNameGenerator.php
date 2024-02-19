@@ -6,6 +6,7 @@ namespace LRuozzi9\SyliusElasticsearchPlugin\Generator;
 
 use DateTimeImmutable;
 use DateTimeZone;
+use LRuozzi9\SyliusElasticsearchPlugin\DocumentType\DocumentTypeInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Webmozart\Assert\Assert;
 
@@ -15,12 +16,15 @@ final readonly class IndexNameGenerator implements IndexNameGeneratorInterface
     {
     }
 
-    public function generateName(ChannelInterface $channel): string
-    {
+    public function generateName(
+        ChannelInterface $channel,
+        DocumentTypeInterface $documentType,
+    ): string {
         $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
 
         $replacement = [
             '<CHANNEL>' => $this->getChannelCodeInLowerCase($channel),
+            '<DOCUMENT_TYPE>' => $this->getDocumentTypeCodeInLowerCase($documentType),
             '<DATE>' => $now->format('Ymd'),
             '<TIME>' => $now->format('His'),
         ];
@@ -32,15 +36,24 @@ final readonly class IndexNameGenerator implements IndexNameGeneratorInterface
         );
     }
 
-    public function generateAlias(ChannelInterface $channel): string
-    {
-        return $this->getChannelCodeInLowerCase($channel);
+    public function generateAlias(
+        ChannelInterface $channel,
+        DocumentTypeInterface $documentType,
+    ): string {
+        return sprintf(
+            '%s_%s',
+            $this->getChannelCodeInLowerCase($channel),
+            $this->getDocumentTypeCodeInLowerCase($documentType)
+        );
     }
 
-    public function generateWildcardPattern(ChannelInterface $channel): string
-    {
+    public function generateWildcardPattern(
+        ChannelInterface $channel,
+        DocumentTypeInterface $documentType,
+    ): string {
         $replacement = [
             '<CHANNEL>' => $this->getChannelCodeInLowerCase($channel),
+            '<DOCUMENT_TYPE>' => $this->getDocumentTypeCodeInLowerCase($documentType),
             '<DATE>' => '*',
             '<TIME>' => '*',
         ];
@@ -58,5 +71,10 @@ final readonly class IndexNameGenerator implements IndexNameGeneratorInterface
         Assert::stringNotEmpty($channelCode);
 
         return strtolower($channelCode);
+    }
+
+    private function getDocumentTypeCodeInLowerCase(DocumentTypeInterface $documentType): string
+    {
+        return strtolower($documentType->getCode());
     }
 }
