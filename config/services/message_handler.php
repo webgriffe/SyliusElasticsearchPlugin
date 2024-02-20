@@ -13,7 +13,7 @@ return static function (ContainerConfigurator $containerConfigurator) {
         ->args([
             service('sylius.repository.channel'),
             service('lruozzi9.sylius_elasticsearch_plugin.generator.index_name'),
-            service('lruozzi9.sylius_elasticsearch_plugin.manager.index'),
+            service('lruozzi9.sylius_elasticsearch_plugin.client'),
             service('lruozzi9.sylius_elasticsearch_plugin.provider.document_type'),
         ])
         ->tag('messenger.message_handler')

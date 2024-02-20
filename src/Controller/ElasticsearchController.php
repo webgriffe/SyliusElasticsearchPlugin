@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace LRuozzi9\SyliusElasticsearchPlugin\Controller;
 
+use LRuozzi9\SyliusElasticsearchPlugin\Client\ClientInterface;
 use LRuozzi9\SyliusElasticsearchPlugin\DocumentType\ProductDocumentType;
 use LRuozzi9\SyliusElasticsearchPlugin\Generator\IndexNameGeneratorInterface;
-use LRuozzi9\SyliusElasticsearchPlugin\Manager\IndexManagerInterface;
+use LRuozzi9\SyliusElasticsearchPlugin\Model\QueryResult;
 use LRuozzi9\SyliusElasticsearchPlugin\Pagerfanta\ElasticsearchAdapter;
 use LRuozzi9\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
 use Pagerfanta\Pagerfanta;
@@ -24,7 +25,7 @@ final class ElasticsearchController extends AbstractController
     public function __construct(
         private readonly TaxonRepositoryInterface $taxonRepository,
         private readonly LocaleContextInterface $localeContext,
-        private readonly IndexManagerInterface $indexManager,
+        private readonly ClientInterface $indexManager,
         private readonly ChannelContextInterface $channelContext,
         private readonly IndexNameGeneratorInterface $indexNameGenerator,
         private readonly DocumentTypeProviderInterface $documentTypeProvider,
@@ -54,7 +55,7 @@ final class ElasticsearchController extends AbstractController
                 ],
             ],
         ], $this->indexNameGenerator->generateAlias($channel, $this->documentTypeProvider->getDocumentType(ProductDocumentType::CODE)));
-        $products = new Pagerfanta(new ElasticsearchAdapter($result));
+        $products = new Pagerfanta(new ElasticsearchAdapter(new QueryResult($result['hits']['hits'])));
 
         return $this->render('@LRuozzi9SyliusElasticsearchPlugin/Product/index.html.twig', [
             'taxon' => $taxon,

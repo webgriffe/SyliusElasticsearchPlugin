@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace LRuozzi9\SyliusElasticsearchPlugin\Client;
 
 use Elasticsearch\Client;
+use Elasticsearch\ClientBuilder;
 use LRuozzi9\SyliusElasticsearchPlugin\Client\Exception\BulkException;
 use LRuozzi9\SyliusElasticsearchPlugin\Client\Exception\CreateIndexException;
 use LRuozzi9\SyliusElasticsearchPlugin\Client\Exception\RemoveIndexesException;
 use LRuozzi9\SyliusElasticsearchPlugin\Client\Exception\SwitchAliasException;
+use LRuozzi9\SyliusElasticsearchPlugin\ClientBuilder\Exception\ClientConnectionException;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -16,8 +18,11 @@ final class ElasticsearchClient implements ClientInterface
 {
     private ?LoggerInterface $logger = null;
 
+    private ?Client $client = null;
+
     public function __construct(
-        private readonly Client $client,
+        private readonly string $host,
+        private readonly string $port,
     ) {
     }
 
@@ -31,16 +36,16 @@ final class ElasticsearchClient implements ClientInterface
         return $this->logger;
     }
 
-    public function createIndex(string $name, array $body): void
+    public function createIndex(string $name, array $mappings): void
     {
         $params = [
             'index' => $name,
-            'body' => $body,
+            'body' => ['mappings' => $mappings],
         ];
 
         try {
             /** @var array{acknowledged: bool, shards_acknowledged: bool, index: string} $response */
-            $response = $this->client->indices()->create($params);
+            $response = $this->getClient()->indices()->create($params);
         } catch (Throwable $e) {
             throw new CreateIndexException(
                 'An error occurred while creating the index.',
@@ -58,12 +63,13 @@ final class ElasticsearchClient implements ClientInterface
     {
         $params = ['body' => []];
 
-        $count = 1;
+        $count = 0;
         foreach ($actions as $action) {
+            ++$count;
             $params['body'][] = [
                 'index' => [
                     '_index' => $indexName,
-                ]
+                ],
             ];
 
             $params['body'][] = $action;
@@ -71,7 +77,7 @@ final class ElasticsearchClient implements ClientInterface
             // Every 1000 actions stop and send the bulk request
             if ($count % 1000 === 0) {
                 /** @var array{took: int, errors: bool, items: array} $result */
-                $result = $this->client->bulk($params);
+                $result = $this->getClient()->bulk($params);
                 if ($result['errors'] === true) {
                     $this->getLogger()?->error('An error occurred while populating the index.', $result);
 
@@ -83,13 +89,14 @@ final class ElasticsearchClient implements ClientInterface
 
                 // unset the bulk response when you are done to save memory
                 unset($result);
+                $count = 0;
             }
         }
 
         // Send the last batch if it exists
         if ($params['body'] !== []) {
             /** @var array{took: int, errors: bool, items: array} $result */
-            $result = $this->client->bulk($params);
+            $result = $this->getClient()->bulk($params);
             if ($result['errors'] === true) {
                 $this->getLogger()?->error('An error occurred while populating the index.', $result);
 
@@ -100,13 +107,13 @@ final class ElasticsearchClient implements ClientInterface
 
     public function switchAlias(string $aliasName, string $toIndexName): void
     {
-        $aliasExists = $this->client->indices()->existsAlias([
+        $aliasExists = $this->getClient()->indices()->existsAlias([
             'name' => $aliasName,
         ]);
 
         if (!$aliasExists) {
             /** @var array{acknowledged: bool} $result */
-            $result = $this->client->indices()->putAlias([
+            $result = $this->getClient()->indices()->putAlias([
                 'name' => $aliasName,
                 'index' => $toIndexName,
             ]);
@@ -116,8 +123,8 @@ final class ElasticsearchClient implements ClientInterface
 
             return;
         }
-        /** @var array<string, array{aliases: array<string, array>}> $currentIndex */
-        $currentIndexes = $this->client->indices()->getAlias([
+        /** @var array<string, array{aliases: array<string, array>}> $currentIndexes */
+        $currentIndexes = $this->getClient()->indices()->getAlias([
             'name' => $aliasName,
         ]);
         $actions = [];
@@ -137,10 +144,10 @@ final class ElasticsearchClient implements ClientInterface
         ];
 
         /** @var array{acknowledged: bool} $result */
-        $result = $this->client->indices()->updateAliases([
+        $result = $this->getClient()->indices()->updateAliases([
             'body' => [
                 'actions' => $actions,
-            ]
+            ],
         ]);
         if ($result['acknowledged'] !== true) {
             throw new SwitchAliasException('Switch of alias not performed. Acknowledged is not true.');
@@ -150,13 +157,13 @@ final class ElasticsearchClient implements ClientInterface
     public function removeIndexes(string $wildcard = null, array $skips = []): void
     {
         /** @var array<string, array> $indexesToDelete */
-        $indexesToDelete = $this->client->indices()->get(['index' => $wildcard ?? '_all']);
+        $indexesToDelete = $this->getClient()->indices()->get(['index' => $wildcard ?? '_all']);
         $indexesToDelete = array_diff(array_keys($indexesToDelete), $skips);
 
         foreach ($indexesToDelete as $indexName) {
             try {
                 /** @var array{acknowledged: bool} $result */
-                $result = $this->client->indices()->delete(['index' => $indexName]);
+                $result = $this->getClient()->indices()->delete(['index' => $indexName]);
             } catch (Throwable $e) {
                 throw new RemoveIndexesException(
                     'An error occurred while removing the indexes.',
@@ -172,9 +179,31 @@ final class ElasticsearchClient implements ClientInterface
 
     public function query(array $query, ?string $indexName = null): array
     {
-        return $this->client->search([
+        /** @var array{took: int, timed_out: bool, _shards: array, hits: array{total: array, max_score: ?int, hits: array}} $results */
+        $results = $this->getClient()->search([
             'index' => $indexName,
             'body' => $query,
         ]);
+
+        return $results;
+    }
+
+    private function getClient(): Client
+    {
+        if ($this->client === null) {
+            try {
+                $this->client = ClientBuilder::create()
+                    ->setHosts([$this->host . ':' . $this->port])
+                    ->build();
+            } catch (Throwable $e) {
+                throw new ClientConnectionException(
+                    'Could not connect to Elasticsearch server',
+                    $e->getCode(),
+                    $e,
+                );
+            }
+        }
+
+        return $this->client;
     }
 }

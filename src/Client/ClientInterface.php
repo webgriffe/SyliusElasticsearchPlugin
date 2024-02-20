@@ -15,7 +15,7 @@ interface ClientInterface extends LoggerAwareInterface
     /**
      * @throws CreateIndexException
      */
-    public function createIndex(string $name, array $body): void;
+    public function createIndex(string $name, array $mappings): void;
 
     /**
      * @throws SwitchAliasException
@@ -30,8 +30,6 @@ interface ClientInterface extends LoggerAwareInterface
     public function removeIndexes(string $wildcard = null, array $skips = []): void;
 
     /**
-     * @param array<array-key, array> $documents
-     *
      * @throws BulkException
      */
     public function bulk(string $indexName, array $actions): void;
