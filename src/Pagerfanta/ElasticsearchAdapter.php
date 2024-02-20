@@ -20,7 +20,7 @@ final readonly class ElasticsearchAdapter implements AdapterInterface
 
     public function getNbResults(): int
     {
-        return $this->queryResult->getTotalHits();
+        return max(0, $this->queryResult->getTotalHits());
     }
 
     public function getSlice(int $offset, int $length): iterable

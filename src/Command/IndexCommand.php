@@ -7,6 +7,7 @@ namespace LRuozzi9\SyliusElasticsearchPlugin\Command;
 use LRuozzi9\SyliusElasticsearchPlugin\Message\CreateIndex;
 use LRuozzi9\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
 use Sylius\Component\Channel\Repository\ChannelRepositoryInterface;
+use Sylius\Component\Core\Model\ChannelInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -25,6 +26,7 @@ final class IndexCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        /** @var ChannelInterface[] $channels */
         $channels = $this->channelRepository->findAll();
         foreach ($channels as $channel) {
             foreach ($this->documentTypeProvider->getDocumentsType() as $documentType) {

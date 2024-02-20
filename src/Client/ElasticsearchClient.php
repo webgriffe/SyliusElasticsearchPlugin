@@ -49,7 +49,7 @@ final class ElasticsearchClient implements ClientInterface
         } catch (Throwable $e) {
             throw new CreateIndexException(
                 'An error occurred while creating the index.',
-                $e->getCode(),
+                (int) $e->getCode(),
                 $e,
             );
         }
@@ -64,6 +64,7 @@ final class ElasticsearchClient implements ClientInterface
         $params = ['body' => []];
 
         $count = 0;
+        /** @var array $action */
         foreach ($actions as $action) {
             ++$count;
             $params['body'][] = [
@@ -128,7 +129,7 @@ final class ElasticsearchClient implements ClientInterface
             'name' => $aliasName,
         ]);
         $actions = [];
-        foreach ($currentIndexes as $indexName => $aliases) {
+        foreach (array_keys($currentIndexes) as $indexName) {
             $actions[] = [
                 'remove' => [
                     'index' => $indexName,
@@ -167,7 +168,7 @@ final class ElasticsearchClient implements ClientInterface
             } catch (Throwable $e) {
                 throw new RemoveIndexesException(
                     'An error occurred while removing the indexes.',
-                    $e->getCode(),
+                    (int) $e->getCode(),
                     $e,
                 );
             }
@@ -198,7 +199,7 @@ final class ElasticsearchClient implements ClientInterface
             } catch (Throwable $e) {
                 throw new ClientConnectionException(
                     'Could not connect to Elasticsearch server',
-                    $e->getCode(),
+                    (int) $e->getCode(),
                     $e,
                 );
             }

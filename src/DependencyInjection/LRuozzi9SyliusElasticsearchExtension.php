@@ -36,8 +36,8 @@ final class LRuozzi9SyliusElasticsearchExtension extends Extension
         $documentTypeProviderServiceDefinition = $container->findDefinition('lruozzi9.sylius_elasticsearch_plugin.provider.document_type');
         $taggedServices = $container->findTaggedServiceIds('lruozzi9.sylius_elasticsearch_plugin.document_type');
 
-        foreach ($taggedServices as $id => $tags) {
-            $documentTypeProviderServiceDefinition->addMethodCall('addDocumentType', [new Reference($id)]);
+        foreach (array_keys($taggedServices) as $serviceId) {
+            $documentTypeProviderServiceDefinition->addMethodCall('addDocumentType', [new Reference($serviceId)]);
         }
     }
 }

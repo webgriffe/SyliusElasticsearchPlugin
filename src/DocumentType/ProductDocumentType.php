@@ -167,7 +167,6 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         if ($mainTaxon instanceof TaxonInterface) {
             $normalizedProduct['main_taxon'] = $this->normalizeTaxon($mainTaxon);
         }
-        /** @var TaxonInterface $taxon */
         foreach ($product->getTaxons() as $taxon) {
             $normalizedProduct['taxons'][] = $this->normalizeTaxon($taxon);
         }

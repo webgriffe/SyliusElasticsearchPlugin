@@ -6,6 +6,9 @@ namespace LRuozzi9\SyliusElasticsearchPlugin\Model;
 
 final class ProductResponse implements ProductResponseInterface
 {
+    /**
+     * @param array<string, string>|null $routeParams
+     */
     public function __construct(
         private ?string $routeName = null,
         private ?array $routeParams = [],
@@ -14,31 +17,31 @@ final class ProductResponse implements ProductResponseInterface
 
     public function getImage(): string
     {
-        // TODO: Implement getImage() method.
+        return 'TODO';
     }
 
     public function getName(): string
     {
-        // TODO: Implement getName() method.
+        return 'TODO';
     }
 
     public function getPrice(): int
     {
-        // TODO: Implement getPrice() method.
+        return 0;
     }
 
     public function getOriginalPrice(): int
     {
-        // TODO: Implement getOriginalPrice() method.
+        return 0;
     }
 
     public function getRouteName(): string
     {
-        return $this->routeName;
+        return (string) $this->routeName;
     }
 
     public function getRouteParams(): array
     {
-        return $this->routeParams;
+        return $this->routeParams ?? [];
     }
 }
