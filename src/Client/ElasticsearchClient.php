@@ -9,13 +9,26 @@ use LRuozzi9\SyliusElasticsearchPlugin\Client\Exception\BulkException;
 use LRuozzi9\SyliusElasticsearchPlugin\Client\Exception\CreateIndexException;
 use LRuozzi9\SyliusElasticsearchPlugin\Client\Exception\RemoveIndexesException;
 use LRuozzi9\SyliusElasticsearchPlugin\Client\Exception\SwitchAliasException;
+use Psr\Log\LoggerInterface;
 use Throwable;
 
-final readonly class ElasticsearchClient implements ClientInterface
+final class ElasticsearchClient implements ClientInterface
 {
+    private ?LoggerInterface $logger = null;
+
     public function __construct(
-        private Client $client,
+        private readonly Client $client,
     ) {
+    }
+
+    public function setLogger(?LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
+    }
+
+    private function getLogger(): ?LoggerInterface
+    {
+        return $this->logger;
     }
 
     public function createIndex(string $name, array $body): void
@@ -60,7 +73,9 @@ final readonly class ElasticsearchClient implements ClientInterface
                 /** @var array{took: int, errors: bool, items: array} $result */
                 $result = $this->client->bulk($params);
                 if ($result['errors'] === true) {
-                    throw new BulkException('An error occurred while populating the index.');
+                    $this->getLogger()?->error('An error occurred while populating the index.', $result);
+
+                    throw new BulkException('An error occurred while populating the index. Check logs for more information.');
                 }
 
                 // erase the old bulk request
@@ -76,7 +91,9 @@ final readonly class ElasticsearchClient implements ClientInterface
             /** @var array{took: int, errors: bool, items: array} $result */
             $result = $this->client->bulk($params);
             if ($result['errors'] === true) {
-                throw new BulkException('An error occurred while populating the index.');
+                $this->getLogger()?->error('An error occurred while populating the index.', $result);
+
+                throw new BulkException('An error occurred while populating the index. Check logs for more information.');
             }
         }
     }
@@ -151,5 +168,13 @@ final readonly class ElasticsearchClient implements ClientInterface
                 throw new RemoveIndexesException('Remove of indexes not completed. Acknowledged is not true.');
             }
         }
+    }
+
+    public function query(array $query, ?string $indexName = null): array
+    {
+        return $this->client->search([
+            'index' => $indexName,
+            'body' => $query,
+        ]);
     }
 }

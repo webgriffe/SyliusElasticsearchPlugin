@@ -8,8 +8,9 @@ use LRuozzi9\SyliusElasticsearchPlugin\Client\Exception\BulkException;
 use LRuozzi9\SyliusElasticsearchPlugin\Client\Exception\CreateIndexException;
 use LRuozzi9\SyliusElasticsearchPlugin\Client\Exception\RemoveIndexesException;
 use LRuozzi9\SyliusElasticsearchPlugin\Client\Exception\SwitchAliasException;
+use Psr\Log\LoggerAwareInterface;
 
-interface ClientInterface
+interface ClientInterface extends LoggerAwareInterface
 {
     /**
      * @throws CreateIndexException
@@ -34,4 +35,9 @@ interface ClientInterface
      * @throws BulkException
      */
     public function bulk(string $indexName, array $actions): void;
+
+    /**
+     * @return array{took: int, timed_out: bool, _shards: array, hits: array{total: array, max_score: ?int, hits: array}}
+     */
+    public function query(array $query, ?string $indexName = null): array;
 }

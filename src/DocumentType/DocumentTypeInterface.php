@@ -11,7 +11,7 @@ interface DocumentTypeInterface
     public function getCode(): string;
 
     /**
-     * @return array<array-key, array>
+     * @return array<array-key, mixed>
      */
     public function getDocuments(): array;
 

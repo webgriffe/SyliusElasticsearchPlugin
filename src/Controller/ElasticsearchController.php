@@ -4,22 +4,30 @@ declare(strict_types=1);
 
 namespace LRuozzi9\SyliusElasticsearchPlugin\Controller;
 
-use LRuozzi9\SyliusElasticsearchPlugin\Model\QueryResult;
+use LRuozzi9\SyliusElasticsearchPlugin\DocumentType\ProductDocumentType;
+use LRuozzi9\SyliusElasticsearchPlugin\Generator\IndexNameGeneratorInterface;
+use LRuozzi9\SyliusElasticsearchPlugin\Manager\IndexManagerInterface;
 use LRuozzi9\SyliusElasticsearchPlugin\Pagerfanta\ElasticsearchAdapter;
+use LRuozzi9\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
 use Pagerfanta\Pagerfanta;
+use Sylius\Component\Channel\Context\ChannelContextInterface;
+use Sylius\Component\Core\Model\ChannelInterface;
 use Sylius\Component\Core\Model\TaxonInterface;
-use Sylius\Component\Core\Repository\ProductRepositoryInterface;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
 use Sylius\Component\Taxonomy\Repository\TaxonRepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Webmozart\Assert\Assert;
 
 final class ElasticsearchController extends AbstractController
 {
     public function __construct(
         private readonly TaxonRepositoryInterface $taxonRepository,
         private readonly LocaleContextInterface $localeContext,
-        private readonly ProductRepositoryInterface $productRepository,
+        private readonly IndexManagerInterface $indexManager,
+        private readonly ChannelContextInterface $channelContext,
+        private readonly IndexNameGeneratorInterface $indexNameGenerator,
+        private readonly DocumentTypeProviderInterface $documentTypeProvider,
     ) {
     }
 
@@ -30,9 +38,23 @@ final class ElasticsearchController extends AbstractController
         if (!$taxon instanceof TaxonInterface) {
             throw $this->createNotFoundException();
         }
-        $products = $this->productRepository->findByTaxon($taxon);
+        $channel = $this->channelContext->getChannel();
+        Assert::isInstanceOf($channel, ChannelInterface::class);
 
-        $products = new Pagerfanta(new ElasticsearchAdapter(new QueryResult()));
+        $result = $this->indexManager->query([
+            'query' => [
+                'bool' => [
+                    'must' => [
+                        [
+                            'match' => [
+                                'taxons.sylius-id' => $taxon->getId(),
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ], $this->indexNameGenerator->generateAlias($channel, $this->documentTypeProvider->getDocumentType(ProductDocumentType::CODE)));
+        $products = new Pagerfanta(new ElasticsearchAdapter($result));
 
         return $this->render('@LRuozzi9SyliusElasticsearchPlugin/Product/index.html.twig', [
             'taxon' => $taxon,

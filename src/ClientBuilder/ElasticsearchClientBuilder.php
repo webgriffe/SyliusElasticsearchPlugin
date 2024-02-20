@@ -8,6 +8,7 @@ use Elasticsearch\ClientBuilder;
 use LRuozzi9\SyliusElasticsearchPlugin\Client\ClientInterface;
 use LRuozzi9\SyliusElasticsearchPlugin\Client\ElasticsearchClient;
 use LRuozzi9\SyliusElasticsearchPlugin\ClientBuilder\Exception\ClientConnectionException;
+use Psr\Log\LoggerInterface;
 use Throwable;
 
 final class ElasticsearchClientBuilder implements ClientBuilderInterface
@@ -17,6 +18,7 @@ final class ElasticsearchClientBuilder implements ClientBuilderInterface
     public function __construct(
         private readonly string $host,
         private readonly string $port,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -37,6 +39,7 @@ final class ElasticsearchClientBuilder implements ClientBuilderInterface
         }
 
         $this->client = new ElasticsearchClient($esClient);
+        $this->client->setLogger($this->logger);
 
         return $this->client;
     }

@@ -6,6 +6,7 @@ namespace LRuozzi9\SyliusElasticsearchPlugin\Manager;
 
 use LRuozzi9\SyliusElasticsearchPlugin\Client\Exception\CreateIndexException;
 use LRuozzi9\SyliusElasticsearchPlugin\DocumentType\DocumentTypeInterface;
+use LRuozzi9\SyliusElasticsearchPlugin\Model\QueryResultInterface;
 
 interface IndexManagerInterface
 {
@@ -22,4 +23,6 @@ interface IndexManagerInterface
      * @param string[] $skips List of indexes to skip from removal
      */
     public function removeIndexes(string $wildcard, array $skips = []): void;
+
+    public function query(array $query, ?string $indexName = null): QueryResultInterface;
 }

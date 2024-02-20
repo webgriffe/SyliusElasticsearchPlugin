@@ -13,7 +13,10 @@ return static function (ContainerConfigurator $containerConfigurator) {
         ->args([
             service('sylius.repository.taxon'),
             service('sylius.context.locale'),
-            service('sylius.repository.product'),
+            service('lruozzi9.sylius_elasticsearch_plugin.manager.index'),
+            service('sylius.context.channel'),
+            service('lruozzi9.sylius_elasticsearch_plugin.generator.index_name'),
+            service('lruozzi9.sylius_elasticsearch_plugin.provider.document_type'),
         ])
         ->call('setContainer', [service('service_container')])
         ->tag('controller.service_arguments')

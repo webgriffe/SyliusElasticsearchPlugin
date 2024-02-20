@@ -6,7 +6,9 @@ namespace LRuozzi9\SyliusElasticsearchPlugin\Manager;
 
 use LRuozzi9\SyliusElasticsearchPlugin\ClientBuilder\ClientBuilderInterface;
 use LRuozzi9\SyliusElasticsearchPlugin\DocumentType\DocumentTypeInterface;
-use LRuozzi9\SyliusElasticsearchPlugin\Model\DocumentableInterface;
+use LRuozzi9\SyliusElasticsearchPlugin\Model\ProductResponse;
+use LRuozzi9\SyliusElasticsearchPlugin\Model\QueryResult;
+use LRuozzi9\SyliusElasticsearchPlugin\Model\QueryResultInterface;
 
 final readonly class ElasticsearchIndexManager implements IndexManagerInterface
 {
@@ -50,5 +52,21 @@ final readonly class ElasticsearchIndexManager implements IndexManagerInterface
         $esClient = $this->clientBuilder->build();
 
         $esClient->removeIndexes($wildcard, $skips);
+    }
+
+    public function query(array $query, ?string $indexName = null): QueryResultInterface
+    {
+        $esClient = $this->clientBuilder->build();
+
+        $result = $esClient->query($query, $indexName);
+        $hints = [];
+        foreach ($result['hits']['hits'] as $hit) {
+            $hints[] = new ProductResponse(
+                'sylius_product_show',
+                ['slug' => 'TODO'],
+            );
+        }
+
+        return new QueryResult($hints);
     }
 }

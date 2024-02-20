@@ -13,6 +13,7 @@ return static function (ContainerConfigurator $containerConfigurator) {
         ->args([
             '127.0.0.1',
             '9200',
+            service('logger'),
         ])
     ;
 };
