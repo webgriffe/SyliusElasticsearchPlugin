@@ -41,5 +41,4 @@ final class ProductResponse implements ProductResponseInterface
     {
         return $this->routeParams;
     }
-
 }

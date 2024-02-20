@@ -32,7 +32,7 @@ final readonly class IndexNameGenerator implements IndexNameGeneratorInterface
         return str_replace(
             array_keys($replacement),
             array_values($replacement),
-            $this->indexPattern
+            $this->indexPattern,
         );
     }
 
@@ -43,7 +43,7 @@ final readonly class IndexNameGenerator implements IndexNameGeneratorInterface
         return sprintf(
             '%s_%s',
             $this->getChannelCodeInLowerCase($channel),
-            $this->getDocumentTypeCodeInLowerCase($documentType)
+            $this->getDocumentTypeCodeInLowerCase($documentType),
         );
     }
 
@@ -61,7 +61,7 @@ final readonly class IndexNameGenerator implements IndexNameGeneratorInterface
         return str_replace(
             array_keys($replacement),
             array_values($replacement),
-            $this->indexPattern
+            $this->indexPattern,
         );
     }
 

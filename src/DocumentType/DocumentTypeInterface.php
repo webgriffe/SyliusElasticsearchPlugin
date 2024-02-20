@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace LRuozzi9\SyliusElasticsearchPlugin\DocumentType;
 
-use LRuozzi9\SyliusElasticsearchPlugin\Model\DocumentableInterface;
-
 interface DocumentTypeInterface
 {
     public function getCode(): string;
