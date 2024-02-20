@@ -6,9 +6,11 @@ namespace LRuozzi9\SyliusElasticsearchPlugin\Model;
 
 interface ProductResponseInterface extends ResponseInterface
 {
-    public function getImage(): string;
+    public function getName(): ?string;
 
-    public function getName(): string;
+    public function setName(?string $name): void;
+
+    public function getImage(): string;
 
     public function getPrice(): int;
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LRuozzi9\SyliusElasticsearchPlugin\Command;
 
+use InvalidArgumentException;
 use LRuozzi9\SyliusElasticsearchPlugin\Message\CreateIndex;
 use LRuozzi9\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
 use Sylius\Component\Channel\Repository\ChannelRepositoryInterface;
@@ -30,7 +31,11 @@ final class IndexCommand extends Command
         $channels = $this->channelRepository->findAll();
         foreach ($channels as $channel) {
             foreach ($this->documentTypeProvider->getDocumentsType() as $documentType) {
-                $this->messageBus->dispatch(new CreateIndex($channel->getId(), $documentType->getCode()));
+                $channelId = $channel->getId();
+                if (!is_string($channelId) && !is_int($channelId)) {
+                    throw new InvalidArgumentException('Channel id must be a string or an integer');
+                }
+                $this->messageBus->dispatch(new CreateIndex($channelId, $documentType->getCode()));
             }
         }
 

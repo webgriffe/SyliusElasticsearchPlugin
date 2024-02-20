@@ -9,6 +9,7 @@ use LRuozzi9\SyliusElasticsearchPlugin\DocumentType\ProductDocumentType;
 use LRuozzi9\SyliusElasticsearchPlugin\Generator\IndexNameGeneratorInterface;
 use LRuozzi9\SyliusElasticsearchPlugin\Model\QueryResult;
 use LRuozzi9\SyliusElasticsearchPlugin\Pagerfanta\ElasticsearchAdapter;
+use LRuozzi9\SyliusElasticsearchPlugin\Parser\DocumentParserInterface;
 use LRuozzi9\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
 use Pagerfanta\Pagerfanta;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
@@ -20,6 +21,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Webmozart\Assert\Assert;
 
+/**
+ * @psalm-suppress PropertyNotSetInConstructor
+ */
 final class ElasticsearchController extends AbstractController
 {
     public function __construct(
@@ -29,6 +33,7 @@ final class ElasticsearchController extends AbstractController
         private readonly ChannelContextInterface $channelContext,
         private readonly IndexNameGeneratorInterface $indexNameGenerator,
         private readonly DocumentTypeProviderInterface $documentTypeProvider,
+        private readonly DocumentParserInterface $documentParser,
     ) {
     }
 
@@ -42,7 +47,8 @@ final class ElasticsearchController extends AbstractController
         $channel = $this->channelContext->getChannel();
         Assert::isInstanceOf($channel, ChannelInterface::class);
 
-        $result = $this->indexManager->query([
+        $aliasName = $this->indexNameGenerator->generateAlias($channel, $this->documentTypeProvider->getDocumentType(ProductDocumentType::CODE));
+        $query = [
             'query' => [
                 'bool' => [
                     'must' => [
@@ -54,8 +60,15 @@ final class ElasticsearchController extends AbstractController
                     ],
                 ],
             ],
-        ], $this->indexNameGenerator->generateAlias($channel, $this->documentTypeProvider->getDocumentType(ProductDocumentType::CODE)));
-        $products = new Pagerfanta(new ElasticsearchAdapter(new QueryResult($result['hits']['hits'])));
+        ];
+        $result = $this->indexManager->query($query, $aliasName);
+        $responses = [];
+        /** @var array{_index: string, _id: string, score: float, _source: array} $hit */
+        foreach ($result['hits']['hits'] as $hit) {
+            $responses[] = $this->documentParser->parse($hit);
+        }
+        $queryResult = new QueryResult($responses);
+        $products = new Pagerfanta(new ElasticsearchAdapter($queryResult));
 
         return $this->render('@LRuozzi9SyliusElasticsearchPlugin/Product/index.html.twig', [
             'taxon' => $taxon,

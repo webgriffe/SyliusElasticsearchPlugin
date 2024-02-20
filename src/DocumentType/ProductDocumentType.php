@@ -78,6 +78,20 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
                         ],
                     ],
                 ],
+                'slug' => [
+                    'type' => 'nested',
+                    'dynamic' => 'false',
+                    'include_in_parent' => true,
+                    'properties' => [
+                        'locale' => [
+                            'type' => 'text',
+                            'index' => false,
+                        ],
+                        'value' => [
+                            'type' => 'keyword',
+                        ],
+                    ],
+                ],
                 'main_taxon' => [
                     'type' => 'object',
                     'dynamic' => false,
@@ -150,6 +164,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
             'code' => $product->getCode(),
             'name' => [],
             'description' => [],
+            'slug' => [],
             'taxons' => [],
         ];
         /** @var ProductTranslationInterface $productTranslation */
@@ -161,6 +176,10 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
             $normalizedProduct['description'][] = [
                 'locale' => $productTranslation->getLocale(),
                 'value' => $productTranslation->getDescription(),
+            ];
+            $normalizedProduct['slug'][] = [
+                'locale' => $productTranslation->getLocale(),
+                'value' => $productTranslation->getSlug(),
             ];
         }
         $mainTaxon = $product->getMainTaxon();
