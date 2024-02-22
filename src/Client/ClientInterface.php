@@ -39,5 +39,9 @@ interface ClientInterface extends LoggerAwareInterface
      *
      * @return array{took: int, timed_out: bool, _shards: array, hits: array{total: array, max_score: ?int, hits: array}}
      */
-    public function query(array $query, array $indexes = []): array;
+    public function query(
+        array $query,
+        array $indexes = [],
+        ?string $timeout = null,
+    ): array;
 }

@@ -178,12 +178,16 @@ final class ElasticsearchClient implements ClientInterface
         }
     }
 
-    public function query(array $query, array $indexes = []): array
-    {
+    public function query(
+        array $query,
+        array $indexes = [],
+        ?string $timeout = null,
+    ): array {
         /** @var array{took: int, timed_out: bool, _shards: array, hits: array{total: array, max_score: ?int, hits: array}} $results */
         $results = $this->getClient()->search([
             'index' => implode(',', $indexes),
             'body' => $query,
+            'timeout' => $timeout,
         ]);
 
         return $results;
