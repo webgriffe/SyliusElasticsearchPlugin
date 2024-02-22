@@ -1,0 +1,19 @@
+{% set searchForm = get_search_form() %}
+
+{% form_theme searchForm '@SyliusShop/Form/theme.html.twig' %}
+
+{{ form_start(searchForm, {'attr': {'class': 'ui form align'}}) }}
+<div class="fields">
+
+    <div>
+        {{ form_row(searchForm.query, {attr: {class: 'ui'}}) }}
+    </div>
+
+    <div>
+        {{ form_row(searchForm.search, {attr: {class: 'ui circular button'}}) }}
+    </div>
+
+    {{ sylius_template_event('sylius.shop.search.form', {'form': searchForm}) }}
+
+</div>
+{{ form_end(searchForm, {'render_rest': true}) }}

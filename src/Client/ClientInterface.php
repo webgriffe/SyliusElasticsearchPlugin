@@ -35,7 +35,9 @@ interface ClientInterface extends LoggerAwareInterface
     public function bulk(string $indexName, array $actions): void;
 
     /**
+     * @param string[] $indexes
+     *
      * @return array{took: int, timed_out: bool, _shards: array, hits: array{total: array, max_score: ?int, hits: array}}
      */
-    public function query(array $query, ?string $indexName = null): array;
+    public function query(array $query, array $indexes = []): array;
 }

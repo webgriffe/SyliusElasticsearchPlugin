@@ -18,6 +18,7 @@ return static function (ContainerConfigurator $containerConfigurator) {
             service('lruozzi9.sylius_elasticsearch_plugin.generator.index_name'),
             service('lruozzi9.sylius_elasticsearch_plugin.provider.document_type'),
             service('lruozzi9.sylius_elasticsearch_plugin.parser.elasticsearch_document'),
+            service('form.factory'),
         ])
         ->call('setContainer', [service('service_container')])
         ->tag('controller.service_arguments')

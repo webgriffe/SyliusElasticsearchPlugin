@@ -7,3 +7,12 @@ sylius_shop_product_index:
         _controller: lruozzi9.sylius_elasticsearch_plugin.controller.elasticsearch::taxonAction
     requirements:
         slug: .+(?<!/)
+
+sylius_shop_search:
+    path: /search/{query}
+    methods: [GET, POST]
+    defaults:
+        _controller: lruozzi9.sylius_elasticsearch_plugin.controller.elasticsearch::searchAction
+        query: null
+    requirements:
+        query: .+(?<!/)
