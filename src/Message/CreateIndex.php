@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LRuozzi9\SyliusElasticsearchPlugin\Message;
+namespace Webgriffe\SyliusElasticsearchPlugin\Message;
 
 final readonly class CreateIndex
 {

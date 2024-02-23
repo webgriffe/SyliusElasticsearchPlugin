@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace LRuozzi9\SyliusElasticsearchPlugin\Provider;
+namespace Webgriffe\SyliusElasticsearchPlugin\Provider;
 
 use InvalidArgumentException;
-use LRuozzi9\SyliusElasticsearchPlugin\DocumentType\DocumentTypeInterface;
+use Webgriffe\SyliusElasticsearchPlugin\DocumentType\DocumentTypeInterface;
 
 final class DocumentTypeProvider implements DocumentTypeProviderInterface
 {

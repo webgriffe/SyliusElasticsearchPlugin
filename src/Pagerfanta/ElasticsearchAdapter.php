@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace LRuozzi9\SyliusElasticsearchPlugin\Pagerfanta;
+namespace Webgriffe\SyliusElasticsearchPlugin\Pagerfanta;
 
-use LRuozzi9\SyliusElasticsearchPlugin\Model\QueryResultInterface;
-use LRuozzi9\SyliusElasticsearchPlugin\Model\ResponseInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Model\QueryResultInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Model\ResponseInterface;
 use Pagerfanta\Adapter\AdapterInterface;
 
 /**

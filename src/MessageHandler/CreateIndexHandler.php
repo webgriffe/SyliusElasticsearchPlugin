@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace LRuozzi9\SyliusElasticsearchPlugin\MessageHandler;
+namespace Webgriffe\SyliusElasticsearchPlugin\MessageHandler;
 
 use InvalidArgumentException;
-use LRuozzi9\SyliusElasticsearchPlugin\Client\ClientInterface;
-use LRuozzi9\SyliusElasticsearchPlugin\Generator\IndexNameGeneratorInterface;
-use LRuozzi9\SyliusElasticsearchPlugin\Message\CreateIndex;
-use LRuozzi9\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Client\ClientInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Generator\IndexNameGeneratorInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Message\CreateIndex;
+use Webgriffe\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
 use Sylius\Component\Channel\Repository\ChannelRepositoryInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
 

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace LRuozzi9\SyliusElasticsearchPlugin\Parser;
+namespace Webgriffe\SyliusElasticsearchPlugin\Parser;
 
-use LRuozzi9\SyliusElasticsearchPlugin\Model\ResponseInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Model\ResponseInterface;
 
 interface DocumentParserInterface
 {

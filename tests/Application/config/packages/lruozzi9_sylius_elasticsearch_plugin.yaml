@@ -1,2 +1,2 @@
 imports:
-    - { resource: "@LRuozzi9SyliusElasticsearchPlugin/config/config.php" }
+    - { resource: "@WebgriffeSyliusElasticsearchPlugin/config/config.php" }

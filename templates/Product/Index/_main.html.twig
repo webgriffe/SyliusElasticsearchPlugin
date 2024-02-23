@@ -10,7 +10,7 @@
 {% if products|length > 0 %}
     <div class="ui three cards" id="products" {{ sylius_test_html_attribute('products') }}>
         {% for product in products %}
-            {% include '@LRuozzi9SyliusElasticsearchPlugin/Product/_box.html.twig' %}
+            {% include '@WebgriffeSyliusElasticsearchPlugin/Product/_box.html.twig' %}
         {% endfor %}
     </div>
     <div class="ui hidden divider"></div>

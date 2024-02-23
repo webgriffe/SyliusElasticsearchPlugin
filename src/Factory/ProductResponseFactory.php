@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace LRuozzi9\SyliusElasticsearchPlugin\Factory;
+namespace Webgriffe\SyliusElasticsearchPlugin\Factory;
 
-use LRuozzi9\SyliusElasticsearchPlugin\Model\ProductResponseInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Model\ProductResponseInterface;
 use Webmozart\Assert\Assert;
 
 final readonly class ProductResponseFactory implements ProductResponseFactoryInterface

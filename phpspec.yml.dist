@@ -1,4 +1,4 @@
 suites:
     main:
-        namespace: LRuozzi9\SyliusElasticsearchPlugin
-        psr4_prefix: LRuozzi9\SyliusElasticsearchPlugin
+        namespace: Webgriffe\SyliusElasticsearchPlugin
+        psr4_prefix: Webgriffe\SyliusElasticsearchPlugin

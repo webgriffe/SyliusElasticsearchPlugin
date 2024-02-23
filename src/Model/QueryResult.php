@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LRuozzi9\SyliusElasticsearchPlugin\Model;
+namespace Webgriffe\SyliusElasticsearchPlugin\Model;
 
 final readonly class QueryResult implements QueryResultInterface
 {

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace LRuozzi9\SyliusElasticsearchPlugin\Command;
+namespace Webgriffe\SyliusElasticsearchPlugin\Command;
 
 use InvalidArgumentException;
-use LRuozzi9\SyliusElasticsearchPlugin\Message\CreateIndex;
-use LRuozzi9\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Message\CreateIndex;
+use Webgriffe\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
 use Sylius\Component\Channel\Repository\ChannelRepositoryInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Symfony\Component\Console\Command\Command;

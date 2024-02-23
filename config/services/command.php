@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use LRuozzi9\SyliusElasticsearchPlugin\Command\IndexCommand;
+use Webgriffe\SyliusElasticsearchPlugin\Command\IndexCommand;
 
 return static function (ContainerConfigurator $containerConfigurator) {
     $services = $containerConfigurator->services();
 
-    $services->set('lruozzi9.sylius_elasticsearch_plugin.command.index', IndexCommand::class)
+    $services->set('webgriffe.sylius_elasticsearch_plugin.command.index', IndexCommand::class)
         ->args([
             service('sylius.repository.channel'),
-            service('lruozzi9_sylius_elasticsearch_plugin.command_bus'),
-            service('lruozzi9.sylius_elasticsearch_plugin.provider.document_type'),
-            'lruozzi9.elasticsearch.index',
+            service('webgriffe_sylius_elasticsearch_plugin.command_bus'),
+            service('webgriffe.sylius_elasticsearch_plugin.provider.document_type'),
+            'webgriffe.elasticsearch.index',
         ])
         ->tag('console.command')
     ;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LRuozzi9\SyliusElasticsearchPlugin\Model;
+namespace Webgriffe\SyliusElasticsearchPlugin\Model;
 
 abstract class AbstractResponse implements ResponseInterface
 {

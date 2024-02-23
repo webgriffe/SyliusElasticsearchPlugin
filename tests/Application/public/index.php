@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Tests\LRuozzi9\SyliusElasticsearchPlugin\Application\Kernel;
+use Tests\Webgriffe\SyliusElasticsearchPlugin\Application\Kernel;
 use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Component\HttpFoundation\Request;
 

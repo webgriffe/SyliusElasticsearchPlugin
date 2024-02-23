@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace LRuozzi9\SyliusElasticsearchPlugin\Client;
+namespace Webgriffe\SyliusElasticsearchPlugin\Client;
 
 use Elasticsearch\Client;
 use Elasticsearch\ClientBuilder;
-use LRuozzi9\SyliusElasticsearchPlugin\Client\Exception\BulkException;
-use LRuozzi9\SyliusElasticsearchPlugin\Client\Exception\CreateIndexException;
-use LRuozzi9\SyliusElasticsearchPlugin\Client\Exception\RemoveIndexesException;
-use LRuozzi9\SyliusElasticsearchPlugin\Client\Exception\SwitchAliasException;
-use LRuozzi9\SyliusElasticsearchPlugin\ClientBuilder\Exception\ClientConnectionException;
+use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\BulkException;
+use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\CreateIndexException;
+use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\RemoveIndexesException;
+use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\SwitchAliasException;
+use Webgriffe\SyliusElasticsearchPlugin\ClientBuilder\Exception\ClientConnectionException;
 use Psr\Log\LoggerInterface;
 use Throwable;
 

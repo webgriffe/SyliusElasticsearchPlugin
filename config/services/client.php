@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use LRuozzi9\SyliusElasticsearchPlugin\Client\ElasticsearchClient;
+use Webgriffe\SyliusElasticsearchPlugin\Client\ElasticsearchClient;
 
 return static function (ContainerConfigurator $containerConfigurator) {
     $services = $containerConfigurator->services();
 
-    $services->set('lruozzi9.sylius_elasticsearch_plugin.client', ElasticsearchClient::class)
+    $services->set('webgriffe.sylius_elasticsearch_plugin.client', ElasticsearchClient::class)
         ->args([
             '127.0.0.1',
             '9200',

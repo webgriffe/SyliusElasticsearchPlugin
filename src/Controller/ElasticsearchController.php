@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace LRuozzi9\SyliusElasticsearchPlugin\Controller;
+namespace Webgriffe\SyliusElasticsearchPlugin\Controller;
 
-use LRuozzi9\SyliusElasticsearchPlugin\Client\ClientInterface;
-use LRuozzi9\SyliusElasticsearchPlugin\DocumentType\ProductDocumentType;
-use LRuozzi9\SyliusElasticsearchPlugin\Form\SearchType;
-use LRuozzi9\SyliusElasticsearchPlugin\Generator\IndexNameGeneratorInterface;
-use LRuozzi9\SyliusElasticsearchPlugin\Model\QueryResult;
-use LRuozzi9\SyliusElasticsearchPlugin\Pagerfanta\ElasticsearchAdapter;
-use LRuozzi9\SyliusElasticsearchPlugin\Parser\DocumentParserInterface;
-use LRuozzi9\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Client\ClientInterface;
+use Webgriffe\SyliusElasticsearchPlugin\DocumentType\ProductDocumentType;
+use Webgriffe\SyliusElasticsearchPlugin\Form\SearchType;
+use Webgriffe\SyliusElasticsearchPlugin\Generator\IndexNameGeneratorInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Model\QueryResult;
+use Webgriffe\SyliusElasticsearchPlugin\Pagerfanta\ElasticsearchAdapter;
+use Webgriffe\SyliusElasticsearchPlugin\Parser\DocumentParserInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
 use Pagerfanta\Pagerfanta;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
@@ -85,7 +85,7 @@ final class ElasticsearchController extends AbstractController
         $queryResult = new QueryResult($responses);
         $results = new Pagerfanta(new ElasticsearchAdapter($queryResult));
 
-        return $this->render('@LRuozzi9SyliusElasticsearchPlugin/Search/results.html.twig', [
+        return $this->render('@WebgriffeSyliusElasticsearchPlugin/Search/results.html.twig', [
             'query' => $query,
             'results' => $results,
         ]);
@@ -124,7 +124,7 @@ final class ElasticsearchController extends AbstractController
         $queryResult = new QueryResult($responses);
         $products = new Pagerfanta(new ElasticsearchAdapter($queryResult));
 
-        return $this->render('@LRuozzi9SyliusElasticsearchPlugin/Product/index.html.twig', [
+        return $this->render('@WebgriffeSyliusElasticsearchPlugin/Product/index.html.twig', [
             'taxon' => $taxon,
             'products' => $products,
         ]);

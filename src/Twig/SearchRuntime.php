@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace LRuozzi9\SyliusElasticsearchPlugin\Twig;
+namespace Webgriffe\SyliusElasticsearchPlugin\Twig;
 
-use LRuozzi9\SyliusElasticsearchPlugin\Form\SearchType;
+use Webgriffe\SyliusElasticsearchPlugin\Form\SearchType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormView;
 use Twig\Extension\RuntimeExtensionInterface;

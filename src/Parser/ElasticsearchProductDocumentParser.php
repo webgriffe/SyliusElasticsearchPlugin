@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace LRuozzi9\SyliusElasticsearchPlugin\Parser;
+namespace Webgriffe\SyliusElasticsearchPlugin\Parser;
 
-use LRuozzi9\SyliusElasticsearchPlugin\Factory\ProductResponseFactoryInterface;
-use LRuozzi9\SyliusElasticsearchPlugin\Model\ProductResponseInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Factory\ProductResponseFactoryInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Model\ProductResponseInterface;
 use RuntimeException;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
 use Sylius\Component\Core\Model\ChannelInterface;

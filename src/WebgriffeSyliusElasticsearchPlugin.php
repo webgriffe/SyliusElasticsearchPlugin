@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace LRuozzi9\SyliusElasticsearchPlugin;
+namespace Webgriffe\SyliusElasticsearchPlugin;
 
 use function dirname;
 use Sylius\Bundle\CoreBundle\Application\SyliusPluginTrait;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-final class LRuozzi9SyliusElasticsearchPlugin extends Bundle
+final class WebgriffeSyliusElasticsearchPlugin extends Bundle
 {
     use SyliusPluginTrait;
 

@@ -8,7 +8,7 @@ use Symfony\Config\FrameworkConfig;
 
 /** @psalm-suppress UndefinedClass */
 return static function (FrameworkConfig $framework): void {
-    $commandBus = $framework->messenger()->bus('lruozzi9_sylius_elasticsearch_plugin.command_bus');
+    $commandBus = $framework->messenger()->bus('webgriffe_sylius_elasticsearch_plugin.command_bus');
 
     $commandBus->middleware()
         ->id('validation')

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LRuozzi9\SyliusElasticsearchPlugin\Twig;
+namespace Webgriffe\SyliusElasticsearchPlugin\Twig;
 
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;

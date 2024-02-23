@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use LRuozzi9\SyliusElasticsearchPlugin\Twig\SearchExtension;
-use LRuozzi9\SyliusElasticsearchPlugin\Twig\SearchRuntime;
+use Webgriffe\SyliusElasticsearchPlugin\Twig\SearchExtension;
+use Webgriffe\SyliusElasticsearchPlugin\Twig\SearchRuntime;
 
 return static function (ContainerConfigurator $containerConfigurator) {
     $services = $containerConfigurator->services();
 
-    $services->set('lruozzi9.sylius_elasticsearch_plugin.twig.extension.search', SearchExtension::class)
+    $services->set('webgriffe.sylius_elasticsearch_plugin.twig.extension.search', SearchExtension::class)
         ->tag('twig.extension')
     ;
 
-    $services->set('lruozzi9.sylius_elasticsearch_plugin.twig.runtime.search', SearchRuntime::class)
+    $services->set('webgriffe.sylius_elasticsearch_plugin.twig.runtime.search', SearchRuntime::class)
         ->args([
             service('form.factory'),
         ])

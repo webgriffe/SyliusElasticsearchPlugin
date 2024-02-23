@@ -10,7 +10,7 @@ use Symfony\Config\SyliusUiConfig;
 return static function (SyliusUiConfig $syliusUi): void {
     $syliusUi->event('sylius.shop.layout.header.content', [
         'blocks' => [
-            '_search' => '@LRuozzi9SyliusElasticsearchPlugin/Layout/Header/_search.html.twig',
+            '_search' => '@WebgriffeSyliusElasticsearchPlugin/Layout/Header/_search.html.twig',
         ]
     ]);
 };

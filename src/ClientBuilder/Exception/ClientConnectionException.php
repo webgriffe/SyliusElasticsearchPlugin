@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LRuozzi9\SyliusElasticsearchPlugin\ClientBuilder\Exception;
+namespace Webgriffe\SyliusElasticsearchPlugin\ClientBuilder\Exception;
 
 use RuntimeException;
 
