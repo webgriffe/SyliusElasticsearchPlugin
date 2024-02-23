@@ -6,17 +6,10 @@ namespace Webgriffe\SyliusElasticsearchPlugin\Model;
 
 interface ResponseInterface
 {
-    public function getRouteName(): ?string;
-
-    public function setRouteName(?string $routeName): void;
+    public function getRouteName(): string;
 
     /**
      * @return array<string, mixed>
      */
-    public function getRouteParams(): ?array;
-
-    /**
-     * @param array<string, mixed> $routeParams
-     */
-    public function setRouteParams(?array $routeParams): void;
+    public function getRouteParams(): array;
 }

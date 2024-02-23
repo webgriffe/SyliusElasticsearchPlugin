@@ -4,18 +4,20 @@ declare(strict_types=1);
 
 namespace Webgriffe\SyliusElasticsearchPlugin\Parser;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use RuntimeException;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
-use Sylius\Component\Core\Model\CatalogPromotion;
+use Sylius\Component\Core\Model\CatalogPromotionInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
-use Sylius\Component\Core\Model\ProductTranslation;
+use Sylius\Component\Core\Model\ChannelPricingInterface;
+use Sylius\Component\Core\Model\ProductImageInterface;
+use Sylius\Component\Core\Model\ProductVariantInterface;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
 use Sylius\Component\Locale\Model\LocaleInterface;
-use Sylius\Component\Promotion\Model\CatalogPromotionTranslation;
+use Sylius\Component\Product\Factory\ProductVariantFactoryInterface;
+use Sylius\Component\Resource\Factory\FactoryInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Factory\ProductResponseFactoryInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Model\ProductResponseInterface;
-use Webgriffe\SyliusElasticsearchPlugin\Model\ProductVariantResponse;
+use Webmozart\Assert\Assert;
 
 /**
  * @psalm-type LocalizedField = array<array-key, array{locale: string, value: string}>
@@ -24,10 +26,19 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
 {
     private ?string $defaultLocale = null;
 
+    /**
+     * @param FactoryInterface<ProductImageInterface> $productImageFactory
+     * @param FactoryInterface<ChannelPricingInterface> $channelPricingFactory
+     * @param FactoryInterface<CatalogPromotionInterface> $catalogPromotionFactory
+     */
     public function __construct(
         private readonly ProductResponseFactoryInterface $productResponseFactory,
         private readonly LocaleContextInterface $localeContext,
         private readonly ChannelContextInterface $channelContext,
+        private readonly FactoryInterface $productImageFactory,
+        private readonly ProductVariantFactoryInterface $productVariantFactory,
+        private readonly FactoryInterface $channelPricingFactory,
+        private readonly FactoryInterface $catalogPromotionFactory,
         private readonly string $fallbackLocaleCode,
     ) {
     }
@@ -44,42 +55,48 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
                 $this->defaultLocale = $defaultLocaleCode;
             }
         }
-        /** @var array{sylius-id: int, code: string, name: LocalizedField, description: LocalizedField, taxons: array, main_taxon: array, slug: LocalizedField} $source */
+        /** @var array{sylius-id: int, code: string, name: LocalizedField, description: LocalizedField, short-description: LocalizedField, taxons: array, main_taxon: array, slug: LocalizedField, images: array, variants: array} $source */
         $source = $document['_source'];
         $localeCode = $this->localeContext->getLocaleCode();
-        $slug = $this->getSlug($source['slug'], $localeCode);
         $productResponse = $this->productResponseFactory->createNew();
-        $productResponse->setRouteName('sylius_shop_product_show');
-        $productResponse->setRouteParams(['slug' => $slug, '_locale' => $localeCode]);
+        $productResponse->setCurrentLocale($localeCode);
         $productResponse->setName($this->getValueFromLocalizedField($source['name'], $localeCode));
-        $productResponse->setSlug($this->getValueFromLocalizedField($source['slug'], $localeCode));
-        $translation = new ProductTranslation();
-        $translation->setLocale($localeCode);
-        $productResponse->setTranslation($translation);
-        $productResponse->setImages($source['images']);
+        $productResponse->setSlug($this->getSlug($source['slug'], $localeCode));
+        $productResponse->setDescription($this->getValueFromLocalizedField($source['description'], $localeCode));
+        $productResponse->setShortDescription($this->getValueFromLocalizedField($source['short-description'], $localeCode));
 
-        $variantsCollections = new ArrayCollection();
-        foreach ($source['variants'] as $variant) {
-            $productVariantResponse = new ProductVariantResponse();
-            $productVariantResponse->setEnabled($variant['enabled']);
-            $productVariantResponse->setPosition($variant['position']);
-            $productVariantResponse->setPrice($variant['price']['price']);
-            $productVariantResponse->setOriginalPrice($variant['price']['original-price']);
-            $appliedPromotions = new ArrayCollection();
-            foreach ($variant['price']['applied-promotions'] as $appliedPromotion) {
-                $catalogPromotionTranslation = new CatalogPromotionTranslation();
-                $catalogPromotionTranslation->setLocale($localeCode);
-                $catalogPromotionTranslation->setLabel($this->getValueFromLocalizedField($appliedPromotion['label'], $localeCode));
-                $catalogPromotion = new CatalogPromotion();
-                $catalogPromotion->setCurrentLocale($localeCode);
-                $catalogPromotion->addTranslation($catalogPromotionTranslation);
-                $appliedPromotions->add($catalogPromotion);
-            }
-            $productVariantResponse->setAppliedPromotionsForChannel($appliedPromotions);
-
-            $variantsCollections->add($productVariantResponse);
+        /** @var array{path: ?string, type: ?string} $esImage */
+        foreach ($source['images'] as $esImage) {
+            $productImage = $this->productImageFactory->createNew();
+            $productImage->setPath($esImage['path']);
+            $productImage->setType($esImage['type']);
+            $productResponse->addImage($productImage);
         }
-        $productResponse->setVariants($variantsCollections);
+
+        /** @var array{code: ?string, enabled: ?bool, price: array{price: ?int, original-price: ?int, applied-promotions: array}} $esVariant */
+        foreach ($source['variants'] as $esVariant) {
+            $productVariant = $this->productVariantFactory->createForProduct($productResponse);
+            Assert::isInstanceOf($productVariant, ProductVariantInterface::class);
+            $productVariant->setCode($esVariant['code']);
+            $productVariant->setEnabled($esVariant['enabled']);
+
+            $channelPricing = $this->channelPricingFactory->createNew();
+            $channelPricing->setPrice($esVariant['price']['price']);
+            $channelPricing->setOriginalPrice($esVariant['price']['original-price']);
+            $channelPricing->setChannelCode($channel->getCode());
+            /** @var array{label: LocalizedField} $esAppliedPromotion */
+            foreach ($esVariant['price']['applied-promotions'] as $esAppliedPromotion) {
+                $catalogPromotion = $this->catalogPromotionFactory->createNew();
+                $catalogPromotion->setCurrentLocale($localeCode);
+                $catalogPromotion->setLabel($this->getValueFromLocalizedField($esAppliedPromotion['label'], $localeCode));
+
+                $channelPricing->addAppliedPromotion($catalogPromotion);
+            }
+
+            $productVariant->addChannelPricing($channelPricing);
+
+            $productResponse->addVariant($productVariant);
+        }
 
         return $productResponse;
     }

@@ -4,101 +4,20 @@ declare(strict_types=1);
 
 namespace Webgriffe\SyliusElasticsearchPlugin\Model;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Sylius\Component\Core\Model\ProductTranslationInterface;
+use Sylius\Component\Core\Model\Product;
 
-final class ProductResponse extends AbstractResponse implements ProductResponseInterface
+final class ProductResponse extends Product implements ProductResponseInterface
 {
-    private ?string $name = null;
-
-    private array $images = [];
-
-    /**
-     * @var Collection<array-key, ProductVariantResponseInterface>
-     */
-    private Collection $variants;
-
-    private ?string $slug = null;
-
-    private ?ProductTranslationInterface $translation = null;
-
-    public function __construct()
+    public function getRouteName(): string
     {
-        $this->variants = new ArrayCollection();
+        return 'sylius_shop_product_show';
     }
 
-    public function getName(): ?string
+    public function getRouteParams(): array
     {
-        return $this->name;
-    }
-
-    public function setName(?string $name): void
-    {
-        $this->name = $name;
-    }
-
-    public function getPrice(): int
-    {
-        return 0;
-    }
-
-    public function getOriginalPrice(): int
-    {
-        return 0;
-    }
-
-    public function getImages(): Collection
-    {
-        return new ArrayCollection($this->images);
-    }
-
-    public function getImagesByType(string $type): Collection
-    {
-        return $this->getImages()->filter(function (array $image) use ($type): bool {
-            return $type === $image['type'];
-        });
-    }
-
-    public function setImages(array $images): void
-    {
-        $this->images = $images;
-    }
-
-    public function getVariants(): Collection
-    {
-        return $this->variants;
-    }
-
-    public function getEnabledVariants(): Collection
-    {
-        return $this->getVariants()->filter(function (ProductVariantResponseInterface $variant): bool {
-            return $variant->isEnabled();
-        });
-    }
-
-    public function setVariants(Collection $variants): void
-    {
-        $this->variants = $variants;
-    }
-
-    public function getSlug(): ?string
-    {
-        return $this->slug;
-    }
-
-    public function setSlug(?string $slug): void
-    {
-        $this->slug = $slug;
-    }
-
-    public function getTranslation(): ?ProductTranslationInterface
-    {
-        return $this->translation;
-    }
-
-    public function setTranslation(?ProductTranslationInterface $translation): void
-    {
-        $this->translation = $translation;
+        return [
+            'slug' => $this->getSlug(),
+            '_locale' => $this->getTranslation()->getLocale(),
+        ];
     }
 }

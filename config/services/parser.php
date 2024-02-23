@@ -14,6 +14,10 @@ return static function (ContainerConfigurator $containerConfigurator) {
             service('webgriffe.sylius_elasticsearch_plugin.factory.product_response'),
             service('sylius.context.locale'),
             service('sylius.context.channel'),
+            service('sylius.factory.product_image'),
+            service('sylius.factory.product_variant'),
+            service('sylius.factory.channel_pricing'),
+            service('sylius.factory.catalog_promotion'),
             param('sylius_locale.locale'),
         ])
     ;
