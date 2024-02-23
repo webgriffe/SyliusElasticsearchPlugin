@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Webgriffe\SyliusElasticsearchPlugin\Twig;
 
-use Webgriffe\SyliusElasticsearchPlugin\Form\SearchType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormView;
 use Twig\Extension\RuntimeExtensionInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Form\SearchType;
 
 final readonly class SearchRuntime implements RuntimeExtensionInterface
 {

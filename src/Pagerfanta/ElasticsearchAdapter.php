@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Webgriffe\SyliusElasticsearchPlugin\Pagerfanta;
 
+use Pagerfanta\Adapter\AdapterInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Model\QueryResultInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Model\ResponseInterface;
-use Pagerfanta\Adapter\AdapterInterface;
 
 /**
  * @implements AdapterInterface<ResponseInterface>

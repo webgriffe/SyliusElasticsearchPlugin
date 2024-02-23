@@ -6,13 +6,13 @@ namespace Webgriffe\SyliusElasticsearchPlugin\Client;
 
 use Elasticsearch\Client;
 use Elasticsearch\ClientBuilder;
+use Psr\Log\LoggerInterface;
+use Throwable;
 use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\BulkException;
 use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\CreateIndexException;
 use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\RemoveIndexesException;
 use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\SwitchAliasException;
 use Webgriffe\SyliusElasticsearchPlugin\ClientBuilder\Exception\ClientConnectionException;
-use Psr\Log\LoggerInterface;
-use Throwable;
 
 final class ElasticsearchClient implements ClientInterface
 {

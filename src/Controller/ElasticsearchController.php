@@ -4,14 +4,6 @@ declare(strict_types=1);
 
 namespace Webgriffe\SyliusElasticsearchPlugin\Controller;
 
-use Webgriffe\SyliusElasticsearchPlugin\Client\ClientInterface;
-use Webgriffe\SyliusElasticsearchPlugin\DocumentType\ProductDocumentType;
-use Webgriffe\SyliusElasticsearchPlugin\Form\SearchType;
-use Webgriffe\SyliusElasticsearchPlugin\Generator\IndexNameGeneratorInterface;
-use Webgriffe\SyliusElasticsearchPlugin\Model\QueryResult;
-use Webgriffe\SyliusElasticsearchPlugin\Pagerfanta\ElasticsearchAdapter;
-use Webgriffe\SyliusElasticsearchPlugin\Parser\DocumentParserInterface;
-use Webgriffe\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
 use Pagerfanta\Pagerfanta;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
@@ -22,6 +14,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Webgriffe\SyliusElasticsearchPlugin\Client\ClientInterface;
+use Webgriffe\SyliusElasticsearchPlugin\DocumentType\ProductDocumentType;
+use Webgriffe\SyliusElasticsearchPlugin\Form\SearchType;
+use Webgriffe\SyliusElasticsearchPlugin\Generator\IndexNameGeneratorInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Model\QueryResult;
+use Webgriffe\SyliusElasticsearchPlugin\Pagerfanta\ElasticsearchAdapter;
+use Webgriffe\SyliusElasticsearchPlugin\Parser\DocumentParserInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
 use Webmozart\Assert\Assert;
 
 /**

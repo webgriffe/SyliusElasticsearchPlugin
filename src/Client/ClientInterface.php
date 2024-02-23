@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Webgriffe\SyliusElasticsearchPlugin\Client;
 
+use Psr\Log\LoggerAwareInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\BulkException;
 use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\CreateIndexException;
 use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\RemoveIndexesException;
 use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\SwitchAliasException;
-use Psr\Log\LoggerAwareInterface;
 
 interface ClientInterface extends LoggerAwareInterface
 {

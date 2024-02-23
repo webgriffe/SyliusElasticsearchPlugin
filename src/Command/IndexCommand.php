@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Webgriffe\SyliusElasticsearchPlugin\Command;
 
 use InvalidArgumentException;
-use Webgriffe\SyliusElasticsearchPlugin\Message\CreateIndex;
-use Webgriffe\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
 use Sylius\Component\Channel\Repository\ChannelRepositoryInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Message\CreateIndex;
+use Webgriffe\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
 
 final class IndexCommand extends Command
 {

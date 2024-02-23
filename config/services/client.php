@@ -14,6 +14,7 @@ return static function (ContainerConfigurator $containerConfigurator) {
             '127.0.0.1',
             '9200',
         ])
+        ->call('setLogger', [service('logger')->ignoreOnInvalid()])
         ->tag('monolog.logger')
     ;
 };

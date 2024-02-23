@@ -6,8 +6,8 @@ namespace Webgriffe\SyliusElasticsearchPlugin\Generator;
 
 use DateTimeImmutable;
 use DateTimeZone;
-use Webgriffe\SyliusElasticsearchPlugin\DocumentType\DocumentTypeInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
+use Webgriffe\SyliusElasticsearchPlugin\DocumentType\DocumentTypeInterface;
 use Webmozart\Assert\Assert;
 
 final readonly class IndexNameGenerator implements IndexNameGeneratorInterface

@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Webgriffe\SyliusElasticsearchPlugin\MessageHandler;
 
 use InvalidArgumentException;
+use Sylius\Component\Channel\Repository\ChannelRepositoryInterface;
+use Sylius\Component\Core\Model\ChannelInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Client\ClientInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Generator\IndexNameGeneratorInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Message\CreateIndex;
 use Webgriffe\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
-use Sylius\Component\Channel\Repository\ChannelRepositoryInterface;
-use Sylius\Component\Core\Model\ChannelInterface;
 
 final readonly class CreateIndexHandler
 {

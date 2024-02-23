@@ -4,17 +4,26 @@ declare(strict_types=1);
 
 namespace Webgriffe\SyliusElasticsearchPlugin\DocumentType;
 
+use RuntimeException;
+use Sylius\Component\Core\Model\CatalogPromotionInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Sylius\Component\Core\Model\ChannelPricingInterface;
+use Sylius\Component\Core\Model\ProductImageInterface;
 use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Core\Model\ProductTranslationInterface;
 use Sylius\Component\Core\Model\ProductVariantInterface;
 use Sylius\Component\Core\Model\TaxonInterface;
 use Sylius\Component\Core\Repository\ProductRepositoryInterface;
+use Sylius\Component\Product\Model\ProductAttributeInterface;
+use Sylius\Component\Product\Model\ProductAttributeTranslationInterface;
 use Sylius\Component\Product\Model\ProductAttributeValueInterface;
 use Sylius\Component\Product\Model\ProductOptionInterface;
+use Sylius\Component\Product\Model\ProductOptionValueInterface;
+use Sylius\Component\Product\Model\ProductOptionValueTranslationInterface;
 use Sylius\Component\Product\Model\ProductVariantTranslationInterface;
+use Sylius\Component\Promotion\Model\CatalogPromotionTranslationInterface;
 use Sylius\Component\Taxonomy\Model\TaxonTranslationInterface;
+use Webmozart\Assert\Assert;
 
 final readonly class ProductDocumentType implements DocumentTypeInterface
 {
@@ -170,7 +179,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
             'code' => $product->getCode(),
             'enabled' => $product->isEnabled(),
             'variant-selection-method' => $product->getVariantSelectionMethod(),
-            'variant-selection-method-abel' => $product->getVariantSelectionMethodLabel(),
+            'variant-selection-method-label' => $product->getVariantSelectionMethodLabel(),
             'name' => [],
             'description' => [],
             'short-description' => [],
@@ -180,6 +189,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
             'main-taxon' => null,
             'attributes' => [],
             'options' => [],
+            'images' => [],
         ];
         /** @var ProductTranslationInterface $productTranslation */
         foreach ($product->getTranslations() as $productTranslation) {
@@ -211,12 +221,37 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         foreach ($product->getVariants() as $variant) {
             $normalizedProduct['variants'][] = $this->normalizeProductVariant($variant, $channel);
         }
-        /** @var ProductAttributeValueInterface $attribute */
-        foreach ($product->getAttributes() as $attribute) {
-            $normalizedProduct['attributes'][] = $this->normalizeProductAttributeValue($attribute);
+
+        /** @var array<string|int, array{attribute: ProductAttributeInterface, values: ProductAttributeValueInterface[]}> $attributes */
+        $attributes = [];
+
+        /** @var ProductAttributeValueInterface $attributeValue */
+        foreach ($product->getAttributes() as $attributeValue) {
+            $attribute = $attributeValue->getAttribute();
+            Assert::isInstanceOf($attribute, ProductAttributeInterface::class);
+
+            $attributeId = $attribute->getId();
+            if (!is_string($attributeId) && !is_int($attributeId)) {
+                throw new RuntimeException('Attribute ID different from string or integer is not supported.');
+            }
+            if (!array_key_exists($attributeId, $attributes)) {
+                $attributes[$attributeId] = [
+                    'attribute' => $attribute,
+                    'values' => [],
+                ];
+            }
+            $attributes[$attributeId]['values'][] = $attributeValue;
         }
+        foreach ($attributes as $attribute) {
+            $normalizedProduct['attributes'][] = $this->normalizeAttribute($attribute);
+        }
+
         foreach ($product->getOptions() as $option) {
             $normalizedProduct['options'][] = $this->normalizeProductOption($option);
+        }
+        /** @var ProductImageInterface $image */
+        foreach ($product->getImages() as $image) {
+            $normalizedProduct['images'][] = $this->normalizeProductImage($image);
         }
 
         return $normalizedProduct;
@@ -265,18 +300,49 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         return $normalizedVariant;
     }
 
-    private function normalizeProductAttributeValue(ProductAttributeValueInterface $attributeValue): array
+    /**
+     * @param array{attribute: ProductAttributeInterface, values: ProductAttributeValueInterface[]} $attributeWithValues
+     */
+    private function normalizeAttribute(array $attributeWithValues): array
     {
+        $attribute = $attributeWithValues['attribute'];
         $normalizedAttributeValue = [
-            'sylius-id' => $attributeValue->getId(),
-            'code' => $attributeValue->getCode(),
-            'type' => $attributeValue->getType(),
-            'value' => $attributeValue->getValue(),
-            'name' => $attributeValue->getName(),
-            'localeCode' => $attributeValue->getLocaleCode(),
+            'sylius-id' => $attribute->getId(),
+            'code' => $attribute->getCode(),
+            'type' => $attribute->getType(),
+            'storage-type' => $attribute->getStorageType(),
+            'position' => $attribute->getPosition(),
+            'translatable' => $attribute->isTranslatable(),
+            'name' => [],
+            'values' => [],
         ];
+        /** @var ProductAttributeTranslationInterface $attributeTranslation */
+        foreach ($attribute->getTranslations() as $attributeTranslation) {
+            $normalizedAttributeValue['name'][] = [
+                'locale' => $attributeTranslation->getLocale(),
+                'value' => $attributeTranslation->getName(),
+            ];
+        }
+        foreach ($attributeWithValues['values'] as $attributeValue) {
+            $normalizedAttributeValue['values'][] = $this->normalizeAttributeValue($attributeValue);
+        }
 
         return $normalizedAttributeValue;
+    }
+
+    private function normalizeAttributeValue(ProductAttributeValueInterface $attributeValue): array
+    {
+        $attribute = $attributeValue->getAttribute();
+        Assert::isInstanceOf($attribute, ProductAttributeInterface::class);
+        $storageType = $attribute->getStorageType();
+        Assert::stringNotEmpty($storageType);
+
+        return [
+            'sylius-id' => $attributeValue->getId(),
+            'code' => $attributeValue->getCode(),
+            'locale' => $attributeValue->getLocaleCode(),
+            $storageType . '-value' => $attributeValue->getValue(),
+        ];
     }
 
     private function normalizeProductOption(ProductOptionInterface $option): array
@@ -284,8 +350,24 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         $normalizedOption = [
             'sylius-id' => $option->getId(),
             'code' => $option->getCode(),
-            'values' => $option->getValues()->toArray(),
+            'values' => [],
         ];
+        foreach ($option->getValues() as $optionValue) {
+            $normalizedOptionValue = [
+                'sylius-id' => $optionValue->getId(),
+                'code' => $optionValue->getCode(),
+                'value' => $optionValue->getValue(),
+                'name' => [],
+            ];
+            /** @var ProductOptionValueTranslationInterface $optionValueTranslation */
+            foreach ($optionValue->getTranslations() as $optionValueTranslation) {
+                $normalizedOptionValue['name'][] = [
+                    'locale' => $optionValueTranslation->getLocale(),
+                    'value' => $optionValueTranslation->getValue(),
+                ];
+            }
+            $normalizedOption['values'][] = $normalizedOptionValue;
+        }
 
         return $normalizedOption;
     }
@@ -295,10 +377,52 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         if ($channelPricing === null) {
             return null;
         }
-
-        return [
+        $normalizedChannelPricing = [
             'price' => $channelPricing->getPrice(),
             'original-price' => $channelPricing->getOriginalPrice(),
+            'applied-promotions' => [],
         ];
+        /** @var CatalogPromotionInterface $catalogPromotion */
+        foreach ($channelPricing->getAppliedPromotions() as $catalogPromotion) {
+            $normalizedCatalogPromotion = [
+                'sylius-id' => $catalogPromotion->getId(),
+                'code' => $catalogPromotion->getCode(),
+                'label' => [],
+                'description' => [],
+            ];
+            /** @var CatalogPromotionTranslationInterface $catalogPromotionTranslation */
+            foreach ($catalogPromotion->getTranslations() as $catalogPromotionTranslation) {
+                $normalizedCatalogPromotion['label'][] = [
+                    'locale' => $catalogPromotionTranslation->getLocale(),
+                    'value' => $catalogPromotionTranslation->getLabel(),
+                ];
+                $normalizedCatalogPromotion['description'][] = [
+                    'locale' => $catalogPromotionTranslation->getLocale(),
+                    'value' => $catalogPromotionTranslation->getDescription(),
+                ];
+            }
+
+            $normalizedChannelPricing['applied-promotions'][] = $normalizedCatalogPromotion;
+        }
+
+        return $normalizedChannelPricing;
+    }
+
+    private function normalizeProductImage(ProductImageInterface $image): array
+    {
+        $normalizedImage = [
+            'sylius-id' => $image->getId(),
+            'type' => $image->getType(),
+            'path' => $image->getPath(),
+            'variants' => [],
+        ];
+        foreach ($image->getProductVariants() as $productVariant) {
+            $normalizedImage['variants'][] = [
+                'sylius-id' => $productVariant->getId(),
+                'code' => $productVariant->getCode(),
+            ];
+        }
+
+        return $normalizedImage;
     }
 }

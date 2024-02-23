@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Webgriffe\SyliusElasticsearchPlugin\Generator;
 
-use Webgriffe\SyliusElasticsearchPlugin\DocumentType\DocumentTypeInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
+use Webgriffe\SyliusElasticsearchPlugin\DocumentType\DocumentTypeInterface;
 
 interface IndexNameGeneratorInterface
 {

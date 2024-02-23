@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Webgriffe\SyliusElasticsearchPlugin\Parser;
 
-use Webgriffe\SyliusElasticsearchPlugin\Factory\ProductResponseFactoryInterface;
-use Webgriffe\SyliusElasticsearchPlugin\Model\ProductResponseInterface;
 use RuntimeException;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
 use Sylius\Component\Locale\Model\LocaleInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Factory\ProductResponseFactoryInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Model\ProductResponseInterface;
 
 /**
  * @psalm-type LocalizedField = array<array-key, array{locale: string, value: string}>
