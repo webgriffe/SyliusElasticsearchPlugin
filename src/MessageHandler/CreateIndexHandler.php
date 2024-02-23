@@ -39,7 +39,7 @@ final readonly class CreateIndexHandler
         $indexesToRemoveWildcard = $this->indexNameGenerator->generateWildcardPattern($channel, $documentType);
 
         $this->indexManager->createIndex($indexName, $documentType->getMappings());
-        $this->indexManager->bulk($indexName, $documentType->getDocuments());
+        $this->indexManager->bulk($indexName, $documentType->getDocuments($channel));
         $this->indexManager->switchAlias($aliasName, $indexName);
         $this->indexManager->removeIndexes($indexesToRemoveWildcard, [$indexName]);
     }

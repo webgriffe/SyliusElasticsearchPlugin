@@ -4,10 +4,16 @@ declare(strict_types=1);
 
 namespace LRuozzi9\SyliusElasticsearchPlugin\DocumentType;
 
+use Sylius\Component\Core\Model\ChannelInterface;
+use Sylius\Component\Core\Model\ChannelPricingInterface;
 use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Core\Model\ProductTranslationInterface;
+use Sylius\Component\Core\Model\ProductVariantInterface;
 use Sylius\Component\Core\Model\TaxonInterface;
 use Sylius\Component\Core\Repository\ProductRepositoryInterface;
+use Sylius\Component\Product\Model\ProductAttributeValueInterface;
+use Sylius\Component\Product\Model\ProductOptionInterface;
+use Sylius\Component\Product\Model\ProductVariantTranslationInterface;
 use Sylius\Component\Taxonomy\Model\TaxonTranslationInterface;
 
 final readonly class ProductDocumentType implements DocumentTypeInterface
@@ -28,12 +34,12 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
      * @TODO Add custom method on repository to get products to index
      * @TODO Use serializer to transform product to array
      */
-    public function getDocuments(): array
+    public function getDocuments(ChannelInterface $channel): array
     {
         $documents = [];
         /** @var ProductInterface $product */
         foreach ($this->productRepository->findAll() as $product) {
-            $documents[] = $this->normalizeProduct($product);
+            $documents[] = $this->normalizeProduct($product, $channel);
         }
 
         return $documents;
@@ -157,15 +163,23 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         ];
     }
 
-    private function normalizeProduct(ProductInterface $product): array
+    private function normalizeProduct(ProductInterface $product, ChannelInterface $channel): array
     {
         $normalizedProduct = [
             'sylius-id' => $product->getId(),
             'code' => $product->getCode(),
+            'enabled' => $product->isEnabled(),
+            'variant-selection-method' => $product->getVariantSelectionMethod(),
+            'variant-selection-method-abel' => $product->getVariantSelectionMethodLabel(),
             'name' => [],
             'description' => [],
+            'short-description' => [],
             'slug' => [],
             'taxons' => [],
+            'variants' => [],
+            'main-taxon' => null,
+            'attributes' => [],
+            'options' => [],
         ];
         /** @var ProductTranslationInterface $productTranslation */
         foreach ($product->getTranslations() as $productTranslation) {
@@ -177,6 +191,10 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
                 'locale' => $productTranslation->getLocale(),
                 'value' => $productTranslation->getDescription(),
             ];
+            $normalizedProduct['short-description'][] = [
+                'locale' => $productTranslation->getLocale(),
+                'value' => $productTranslation->getShortDescription(),
+            ];
             $normalizedProduct['slug'][] = [
                 'locale' => $productTranslation->getLocale(),
                 'value' => $productTranslation->getSlug(),
@@ -184,10 +202,21 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         }
         $mainTaxon = $product->getMainTaxon();
         if ($mainTaxon instanceof TaxonInterface) {
-            $normalizedProduct['main_taxon'] = $this->normalizeTaxon($mainTaxon);
+            $normalizedProduct['main-taxon'] = $this->normalizeTaxon($mainTaxon);
         }
         foreach ($product->getTaxons() as $taxon) {
             $normalizedProduct['taxons'][] = $this->normalizeTaxon($taxon);
+        }
+        /** @var ProductVariantInterface $variant */
+        foreach ($product->getVariants() as $variant) {
+            $normalizedProduct['variants'][] = $this->normalizeProductVariant($variant, $channel);
+        }
+        /** @var ProductAttributeValueInterface $attribute */
+        foreach ($product->getAttributes() as $attribute) {
+            $normalizedProduct['attributes'][] = $this->normalizeProductAttributeValue($attribute);
+        }
+        foreach ($product->getOptions() as $option) {
+            $normalizedProduct['options'][] = $this->normalizeProductOption($option);
         }
 
         return $normalizedProduct;
@@ -209,5 +238,67 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         }
 
         return $normalizedTaxon;
+    }
+
+    private function normalizeProductVariant(ProductVariantInterface $variant, ChannelInterface $channel): array
+    {
+        $normalizedVariant = [
+            'sylius-id' => $variant->getId(),
+            'code' => $variant->getCode(),
+            'weight' => $variant->getWeight(),
+            'width' => $variant->getWidth(),
+            'height' => $variant->getHeight(),
+            'depth' => $variant->getDepth(),
+            'shipping-required' => $variant->isShippingRequired(),
+            'name' => [],
+            'price' => $this->normalizeChannelPricing($variant->getChannelPricingForChannel($channel)),
+        ];
+
+        /** @var ProductVariantTranslationInterface $variantTranslation */
+        foreach ($variant->getTranslations() as $variantTranslation) {
+            $normalizedVariant['name'][] = [
+                'locale' => $variantTranslation->getLocale(),
+                'value' => $variantTranslation->getName(),
+            ];
+        }
+
+        return $normalizedVariant;
+    }
+
+    private function normalizeProductAttributeValue(ProductAttributeValueInterface $attributeValue): array
+    {
+        $normalizedAttributeValue = [
+            'sylius-id' => $attributeValue->getId(),
+            'code' => $attributeValue->getCode(),
+            'type' => $attributeValue->getType(),
+            'value' => $attributeValue->getValue(),
+            'name' => $attributeValue->getName(),
+            'localeCode' => $attributeValue->getLocaleCode(),
+        ];
+
+        return $normalizedAttributeValue;
+    }
+
+    private function normalizeProductOption(ProductOptionInterface $option): array
+    {
+        $normalizedOption = [
+            'sylius-id' => $option->getId(),
+            'code' => $option->getCode(),
+            'values' => $option->getValues()->toArray(),
+        ];
+
+        return $normalizedOption;
+    }
+
+    private function normalizeChannelPricing(?ChannelPricingInterface $channelPricing): ?array
+    {
+        if ($channelPricing === null) {
+            return null;
+        }
+
+        return [
+            'price' => $channelPricing->getPrice(),
+            'original-price' => $channelPricing->getOriginalPrice(),
+        ];
     }
 }

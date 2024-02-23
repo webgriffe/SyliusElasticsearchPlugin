@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace LRuozzi9\SyliusElasticsearchPlugin\DocumentType;
 
+use Sylius\Component\Core\Model\ChannelInterface;
+
 interface DocumentTypeInterface
 {
     public function getCode(): string;
@@ -11,7 +13,7 @@ interface DocumentTypeInterface
     /**
      * @return array<array-key, mixed>
      */
-    public function getDocuments(): array;
+    public function getDocuments(ChannelInterface $channel): array;
 
     /** @return array<string, array> */
     public function getMappings(): array;
