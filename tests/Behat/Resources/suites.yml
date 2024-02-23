@@ -2,9 +2,3 @@
 
 default:
     suites:
-        greeting_customer:
-            contexts:
-                - lruozzi9_sylius_elasticsearch.context.ui.shop.welcome
-
-            filters:
-                tags: "@greeting_customer"

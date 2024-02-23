@@ -94,8 +94,7 @@
             "@phpstan",
             "@psalm",
             "@phpspec",
-            "@unit",
-            "@behat"
+            "@unit"
         ]
     }
 }
