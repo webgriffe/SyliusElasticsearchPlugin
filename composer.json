@@ -1,12 +1,13 @@
 {
-    "name": "lruozzi9/sylius-elasticsearch-plugin",
+    "name": "webgriffe/sylius-elasticsearch-plugin",
     "type": "sylius-plugin",
     "description": "Plugin allowing to search products in Sylius.",
     "keywords": [
         "sylius",
-        "sylius-plugin"
+        "sylius-plugin",
+        "elasticsearch"
     ],
-    "license": "MIT",
+    "license": "proprietary",
     "require": {
         "php": "^8.2",
         "elasticsearch/elasticsearch": "^7.17",
@@ -51,11 +52,8 @@
         }
     },
     "extra": {
-        "branch-alias": {
-            "dev-master": "1.12-dev"
-        },
         "symfony": {
-            "require": "^6.4 || ^7.0"
+            "require": "^6.4"
         }
     },
     "autoload": {
