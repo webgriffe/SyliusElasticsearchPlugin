@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace Webgriffe\SyliusElasticsearchPlugin\Parser;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use RuntimeException;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
+use Sylius\Component\Core\Model\CatalogPromotion;
 use Sylius\Component\Core\Model\ChannelInterface;
+use Sylius\Component\Core\Model\ProductTranslation;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
 use Sylius\Component\Locale\Model\LocaleInterface;
+use Sylius\Component\Promotion\Model\CatalogPromotionTranslation;
 use Webgriffe\SyliusElasticsearchPlugin\Factory\ProductResponseFactoryInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Model\ProductResponseInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Model\ProductVariantResponse;
 
 /**
  * @psalm-type LocalizedField = array<array-key, array{locale: string, value: string}>
@@ -47,6 +52,34 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
         $productResponse->setRouteName('sylius_shop_product_show');
         $productResponse->setRouteParams(['slug' => $slug, '_locale' => $localeCode]);
         $productResponse->setName($this->getValueFromLocalizedField($source['name'], $localeCode));
+        $productResponse->setSlug($this->getValueFromLocalizedField($source['slug'], $localeCode));
+        $translation = new ProductTranslation();
+        $translation->setLocale($localeCode);
+        $productResponse->setTranslation($translation);
+        $productResponse->setImages($source['images']);
+
+        $variantsCollections = new ArrayCollection();
+        foreach ($source['variants'] as $variant) {
+            $productVariantResponse = new ProductVariantResponse();
+            $productVariantResponse->setEnabled($variant['enabled']);
+            $productVariantResponse->setPosition($variant['position']);
+            $productVariantResponse->setPrice($variant['price']['price']);
+            $productVariantResponse->setOriginalPrice($variant['price']['original-price']);
+            $appliedPromotions = new ArrayCollection();
+            foreach ($variant['price']['applied-promotions'] as $appliedPromotion) {
+                $catalogPromotionTranslation = new CatalogPromotionTranslation();
+                $catalogPromotionTranslation->setLocale($localeCode);
+                $catalogPromotionTranslation->setLabel($this->getValueFromLocalizedField($appliedPromotion['label'], $localeCode));
+                $catalogPromotion = new CatalogPromotion();
+                $catalogPromotion->setCurrentLocale($localeCode);
+                $catalogPromotion->addTranslation($catalogPromotionTranslation);
+                $appliedPromotions->add($catalogPromotion);
+            }
+            $productVariantResponse->setAppliedPromotionsForChannel($appliedPromotions);
+
+            $variantsCollections->add($productVariantResponse);
+        }
+        $productResponse->setVariants($variantsCollections);
 
         return $productResponse;
     }

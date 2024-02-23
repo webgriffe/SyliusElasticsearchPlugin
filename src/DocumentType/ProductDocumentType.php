@@ -18,7 +18,6 @@ use Sylius\Component\Product\Model\ProductAttributeInterface;
 use Sylius\Component\Product\Model\ProductAttributeTranslationInterface;
 use Sylius\Component\Product\Model\ProductAttributeValueInterface;
 use Sylius\Component\Product\Model\ProductOptionInterface;
-use Sylius\Component\Product\Model\ProductOptionValueInterface;
 use Sylius\Component\Product\Model\ProductOptionValueTranslationInterface;
 use Sylius\Component\Product\Model\ProductVariantTranslationInterface;
 use Sylius\Component\Promotion\Model\CatalogPromotionTranslationInterface;
@@ -280,6 +279,8 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         $normalizedVariant = [
             'sylius-id' => $variant->getId(),
             'code' => $variant->getCode(),
+            'enabled' => $variant->isEnabled(),
+            'position' => $variant->getPosition(),
             'weight' => $variant->getWeight(),
             'width' => $variant->getWidth(),
             'height' => $variant->getHeight(),
