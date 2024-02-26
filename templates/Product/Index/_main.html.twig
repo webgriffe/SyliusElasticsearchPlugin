@@ -1,11 +1,11 @@
 {% import '@SyliusUi/Macro/messages.html.twig' as messages %}
 {% import '@SyliusUi/Macro/pagination.html.twig' as pagination %}
 
-{# {{ sylius_template_event('sylius.shop.product.index.search', _context) }} #}
+{{ sylius_template_event('sylius.shop.product.index.search', _context) }}
 
 <div class="ui clearing hidden divider"></div>
 
-{# {{ sylius_template_event('sylius.shop.product.index.before_list', {'products': resources.data}) }} #}
+{{ sylius_template_event('sylius.shop.product.index.before_list', {'products': products}) }}
 
 {% if products|length > 0 %}
     <div class="ui three cards" id="products" {{ sylius_test_html_attribute('products') }}>
@@ -15,7 +15,7 @@
     </div>
     <div class="ui hidden divider"></div>
 
-    {# {{ sylius_template_event('sylius.shop.product.index.before_pagination', {'products': resources.data}) }} #}
+    {{ sylius_template_event('sylius.shop.product.index.before_pagination', {'products': products}) }}
 
     {{ pagination.simple(products) }}
 {% else %}

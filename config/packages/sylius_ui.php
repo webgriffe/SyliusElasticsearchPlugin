@@ -13,4 +13,12 @@ return static function (SyliusUiConfig $syliusUi): void {
             '_search' => '@WebgriffeSyliusElasticsearchPlugin/Layout/Header/_search.html.twig',
         ]
     ]);
+
+    $syliusUi->event('sylius.shop.product.index.search', [
+        'blocks' => [
+            'search' => '@WebgriffeSyliusElasticsearchPlugin/Product/Index/_search.html.twig',
+            'pagination' => '@WebgriffeSyliusElasticsearchPlugin/Product/Index/_pagination.html.twig',
+            'sorting' => '@WebgriffeSyliusElasticsearchPlugin/Product/Index/_sorting.html.twig',
+        ]
+    ]);
 };
