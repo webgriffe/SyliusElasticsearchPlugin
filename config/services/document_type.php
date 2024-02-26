@@ -12,6 +12,7 @@ return static function (ContainerConfigurator $containerConfigurator) {
     $services->set('webgriffe.sylius_elasticsearch_plugin.document_type.product', ProductDocumentType::class)
         ->args([
             service('sylius.repository.product'),
+            service('serializer'),
         ])
         ->tag('webgriffe.sylius_elasticsearch_plugin.document_type')
     ;
