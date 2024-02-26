@@ -10,6 +10,7 @@ use Sylius\Component\Core\Model\ChannelInterface;
 use Sylius\Component\Core\Model\ChannelPricingInterface;
 use Sylius\Component\Core\Model\ProductImageInterface;
 use Sylius\Component\Core\Model\ProductInterface;
+use Sylius\Component\Core\Model\ProductTaxonInterface;
 use Sylius\Component\Core\Model\ProductTranslationInterface;
 use Sylius\Component\Core\Model\ProductVariantInterface;
 use Sylius\Component\Core\Model\TaxonInterface;
@@ -17,6 +18,7 @@ use Sylius\Component\Product\Model\ProductAttributeInterface;
 use Sylius\Component\Product\Model\ProductAttributeTranslationInterface;
 use Sylius\Component\Product\Model\ProductAttributeValueInterface;
 use Sylius\Component\Product\Model\ProductOptionInterface;
+use Sylius\Component\Product\Model\ProductOptionTranslationInterface;
 use Sylius\Component\Product\Model\ProductOptionValueTranslationInterface;
 use Sylius\Component\Product\Model\ProductVariantTranslationInterface;
 use Sylius\Component\Promotion\Model\CatalogPromotionTranslationInterface;
@@ -26,6 +28,9 @@ use Webmozart\Assert\Assert;
 
 final class ProductNormalizer implements NormalizerInterface
 {
+    /**
+     * @param ProductInterface|mixed $object
+     */
     public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
         $channel = $context['channel'];
@@ -73,8 +78,8 @@ final class ProductNormalizer implements NormalizerInterface
         if ($mainTaxon instanceof TaxonInterface) {
             $normalizedProduct['main-taxon'] = $this->normalizeTaxon($mainTaxon);
         }
-        foreach ($product->getTaxons() as $taxon) {
-            $normalizedProduct['taxons'][] = $this->normalizeTaxon($taxon);
+        foreach ($product->getProductTaxons() as $productTaxon) {
+            $normalizedProduct['taxons'][] = $this->normalizeProductTaxon($productTaxon);
         }
         /** @var ProductVariantInterface $variant */
         foreach ($product->getVariants() as $variant) {
@@ -145,6 +150,17 @@ final class ProductNormalizer implements NormalizerInterface
         }
 
         return $normalizedTaxon;
+    }
+
+    private function normalizeProductTaxon(ProductTaxonInterface $productTaxon): array
+    {
+        $taxon = $productTaxon->getTaxon();
+        Assert::isInstanceOf($taxon, TaxonInterface::class);
+
+        return array_merge(
+            $this->normalizeTaxon($taxon),
+            ['position' => $productTaxon->getPosition()]
+        );
     }
 
     private function normalizeProductVariant(ProductVariantInterface $variant, ChannelInterface $channel): array
@@ -224,8 +240,16 @@ final class ProductNormalizer implements NormalizerInterface
         $normalizedOption = [
             'sylius-id' => $option->getId(),
             'code' => $option->getCode(),
+            'name' => [],
             'values' => [],
         ];
+        /** @var ProductOptionTranslationInterface $optionTranslation */
+        foreach ($option->getTranslations() as $optionTranslation) {
+            $normalizedOption['name'][] = [
+                'locale' => $optionTranslation->getLocale(),
+                'value' => $optionTranslation->getName(),
+            ];
+        }
         foreach ($option->getValues() as $optionValue) {
             $normalizedOptionValue = [
                 'sylius-id' => $optionValue->getId(),
