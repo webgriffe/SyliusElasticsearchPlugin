@@ -55,6 +55,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
                 'slug' => self::nestedTranslationValues(),
                 'variant-selection-method' => self::text(),
                 'variant-selection-method-label' => self::text(),
+                'created-at' => self::date(),
                 'main-taxon' => [
                     'type' => 'object',
                     'dynamic' => false,
@@ -132,6 +133,14 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
     {
         return [
             'type' => 'float',
+            'index' => $index,
+        ];
+    }
+
+    private static function date(bool $index = true): array
+    {
+        return [
+            'type' => 'date',
             'index' => $index,
         ];
     }

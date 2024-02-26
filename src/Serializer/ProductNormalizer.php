@@ -44,6 +44,7 @@ final class ProductNormalizer implements NormalizerInterface
             'enabled' => $product->isEnabled(),
             'variant-selection-method' => $product->getVariantSelectionMethod(),
             'variant-selection-method-label' => $product->getVariantSelectionMethodLabel(),
+            'created-at' => $product->getCreatedAt()?->format('c'),
             'name' => [],
             'description' => [],
             'short-description' => [],

@@ -107,13 +107,38 @@ final class ElasticsearchController extends AbstractController
                 'bool' => [
                     'must' => [
                         [
-                            'match' => [
-                                'taxons.sylius-id' => $taxon->getId(),
+                            'nested' => [
+                                'path' => 'taxons',
+                                'query' => [
+                                    'bool' => [
+                                        'must' => [
+                                            [
+                                                'term' => [
+                                                    'taxons.sylius-id' => $taxon->getId(),
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
                             ],
                         ],
+                        [
+                            'term' => [
+                                'enabled' => true,
+                            ],
+                        ]
                     ],
                 ],
             ],
+            'sort' => [
+                ['taxons.position' => [
+                    'order' => 'asc',
+                    'mode' => 'min',
+                    'nested' => [
+                        'path' => 'taxons',
+                    ],
+                ]]
+            ]
         ];
         $result = $this->indexManager->query($query, [$productIndexAliasName]);
         $responses = [];
