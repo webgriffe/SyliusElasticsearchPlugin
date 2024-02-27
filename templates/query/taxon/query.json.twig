@@ -1,0 +1,27 @@
+{
+    "bool": {
+        "must": [
+            {
+                "nested": {
+                    "path": "taxons",
+                    "query": {
+                        "bool": {
+                            "must": [
+                                {
+                                    "term": {
+                                        "taxons.sylius-id": "{{ taxon.id }}"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            {
+                "term": {
+                    "enabled": true
+                }
+            }
+        ]
+    }
+}

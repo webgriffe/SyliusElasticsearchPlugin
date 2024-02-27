@@ -36,11 +36,14 @@ final class ElasticsearchClient implements ClientInterface
         return $this->logger;
     }
 
-    public function createIndex(string $name, array $mappings): void
+    public function createIndex(string $name, array $mappings, array $settings): void
     {
         $params = [
             'index' => $name,
-            'body' => ['mappings' => $mappings],
+            'body' => [
+                'mappings' => $mappings,
+                'settings' => $settings,
+            ],
         ];
 
         try {

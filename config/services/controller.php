@@ -19,6 +19,7 @@ return static function (ContainerConfigurator $containerConfigurator) {
             service('webgriffe.sylius_elasticsearch_plugin.provider.document_type'),
             service('webgriffe.sylius_elasticsearch_plugin.parser.elasticsearch_document'),
             service('form.factory'),
+            service('webgriffe.sylius_elasticsearch_plugin.builder.query'),
         ])
         ->call('setContainer', [service('service_container')])
         ->tag('controller.service_arguments')

@@ -15,7 +15,7 @@ interface ClientInterface extends LoggerAwareInterface
     /**
      * @throws CreateIndexException
      */
-    public function createIndex(string $name, array $mappings): void;
+    public function createIndex(string $name, array $mappings, array $settings): void;
 
     /**
      * @throws SwitchAliasException

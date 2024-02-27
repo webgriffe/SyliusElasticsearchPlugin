@@ -17,4 +17,7 @@ interface DocumentTypeInterface
 
     /** @return array<string, array> */
     public function getMappings(): array;
+
+    /** @return array<string, array> */
+    public function getSettings(): array;
 }

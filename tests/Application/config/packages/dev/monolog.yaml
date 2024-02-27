@@ -7,3 +7,8 @@ monolog:
         firephp:
             type: firephp
             level: info
+        elasticsearch_plugin:
+            type: stream
+            path: "%kernel.logs_dir%/es_%kernel.environment%.log"
+            level: debug
+            channels: ["webgriffe_sylius_elasticsearch_plugin"]

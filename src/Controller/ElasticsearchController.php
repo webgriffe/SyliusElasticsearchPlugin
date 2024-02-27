@@ -14,6 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Webgriffe\SyliusElasticsearchPlugin\Builder\QueryBuilderInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Client\ClientInterface;
 use Webgriffe\SyliusElasticsearchPlugin\DocumentType\ProductDocumentType;
 use Webgriffe\SyliusElasticsearchPlugin\Form\SearchType;
@@ -38,6 +39,7 @@ final class ElasticsearchController extends AbstractController
         private readonly DocumentTypeProviderInterface $documentTypeProvider,
         private readonly DocumentParserInterface $documentParser,
         private readonly FormFactoryInterface $formFactory,
+        private readonly QueryBuilderInterface $queryBuilder,
     ) {
     }
 
@@ -91,7 +93,7 @@ final class ElasticsearchController extends AbstractController
         ]);
     }
 
-    public function taxonAction(string $slug): Response
+    public function taxonAction(Request $request, string $slug): Response
     {
         $localeCode = $this->localeContext->getLocaleCode();
         $taxon = $this->taxonRepository->findOneBySlug($slug, $localeCode);
@@ -102,44 +104,14 @@ final class ElasticsearchController extends AbstractController
         Assert::isInstanceOf($channel, ChannelInterface::class);
 
         $productIndexAliasName = $this->indexNameGenerator->generateAlias($channel, $this->documentTypeProvider->getDocumentType(ProductDocumentType::CODE));
-        $query = [
-            'query' => [
-                'bool' => [
-                    'must' => [
-                        [
-                            'nested' => [
-                                'path' => 'taxons',
-                                'query' => [
-                                    'bool' => [
-                                        'must' => [
-                                            [
-                                                'term' => [
-                                                    'taxons.sylius-id' => $taxon->getId(),
-                                                ],
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                        ],
-                        [
-                            'term' => [
-                                'enabled' => true,
-                            ],
-                        ]
-                    ],
-                ],
-            ],
-            'sort' => [
-                ['taxons.position' => [
-                    'order' => 'asc',
-                    'mode' => 'min',
-                    'nested' => [
-                        'path' => 'taxons',
-                    ],
-                ]]
-            ]
-        ];
+
+        /** @var array<string, string> $sorting */
+        $sorting = $request->query->all('sorting');
+        if ($sorting === []) {
+            $sorting = ['position' => 'asc'];
+        }
+
+        $query = $this->queryBuilder->buildTaxonQuery($taxon, $sorting);
         $result = $this->indexManager->query($query, [$productIndexAliasName]);
         $responses = [];
         /** @var array{_index: string, _id: string, score: float, _source: array} $hit */

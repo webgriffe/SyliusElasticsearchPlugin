@@ -21,6 +21,7 @@ use Sylius\Component\Product\Model\ProductOptionInterface;
 use Sylius\Component\Product\Model\ProductOptionTranslationInterface;
 use Sylius\Component\Product\Model\ProductOptionValueTranslationInterface;
 use Sylius\Component\Product\Model\ProductVariantTranslationInterface;
+use Sylius\Component\Product\Resolver\ProductVariantResolverInterface;
 use Sylius\Component\Promotion\Model\CatalogPromotionTranslationInterface;
 use Sylius\Component\Taxonomy\Model\TaxonTranslationInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -28,6 +29,11 @@ use Webmozart\Assert\Assert;
 
 final class ProductNormalizer implements NormalizerInterface
 {
+    public function __construct(
+        private ProductVariantResolverInterface $productVariantResolver,
+    ) {
+    }
+
     /**
      * @param ProductInterface|mixed $object
      */
@@ -51,6 +57,7 @@ final class ProductNormalizer implements NormalizerInterface
             'slug' => [],
             'taxons' => [],
             'variants' => [],
+            'default-variant' => null,
             'main-taxon' => null,
             'attributes' => [],
             'options' => [],
@@ -74,6 +81,10 @@ final class ProductNormalizer implements NormalizerInterface
                 'locale' => $productTranslation->getLocale(),
                 'value' => $productTranslation->getSlug(),
             ];
+        }
+        $defaultVariant = $this->productVariantResolver->getVariant($product);
+        if ($defaultVariant instanceof ProductVariantInterface) {
+            $normalizedProduct['default-variant'] = $this->normalizeProductVariant($defaultVariant, $channel);
         }
         $mainTaxon = $product->getMainTaxon();
         if ($mainTaxon instanceof TaxonInterface) {
@@ -160,7 +171,7 @@ final class ProductNormalizer implements NormalizerInterface
 
         return array_merge(
             $this->normalizeTaxon($taxon),
-            ['position' => $productTaxon->getPosition()]
+            ['position' => $productTaxon->getPosition()],
         );
     }
 

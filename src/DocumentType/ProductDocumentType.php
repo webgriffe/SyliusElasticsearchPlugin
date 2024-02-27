@@ -42,6 +42,21 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         return $documents;
     }
 
+    public function getSettings(): array
+    {
+        return [
+            'analysis' => [
+                'analyzer' => [
+                    'search_standard' => [
+                        'type' => 'custom',
+                        'tokenizer' => 'icu_tokenizer',
+                        'filter' => ['lowercase', 'icu_folding', 'elision'],
+                    ],
+                ],
+            ],
+        ];
+    }
+
     public function getMappings(): array
     {
         return [
@@ -56,6 +71,13 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
                 'variant-selection-method' => self::text(),
                 'variant-selection-method-label' => self::text(),
                 'created-at' => self::date(),
+                'default-variant' => [
+                    'type' => 'object',
+                    'dynamic' => false,
+                    'enabled' => true,
+                    'subobjects' => true,
+                    'properties' => self::variantProperties(),
+                ],
                 'main-taxon' => [
                     'type' => 'object',
                     'dynamic' => false,
@@ -152,7 +174,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
             'dynamic' => 'false',
             'include_in_parent' => true,
             'properties' => [
-                'locale' => self::text(false),
+                'locale' => self::text(),
                 'value' => self::keyword($indexValue),
             ],
         ];
@@ -271,7 +293,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
                 'enabled' => true,
                 'subobjects' => true,
                 'properties' => self::priceProperties(),
-            ]
+            ],
         ];
     }
 
