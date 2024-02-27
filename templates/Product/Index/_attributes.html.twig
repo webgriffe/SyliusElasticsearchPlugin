@@ -1,0 +1,13 @@
+{# queryResult \Webgriffe\SyliusElasticsearchPlugin\Model\QueryResultInterface #}
+{% for filter in queryResult.filters %}
+    <div>
+        <h3>{{ filter.attributeCode }}</h3>
+        <ul>
+            {% for option in filter.values %}
+                <li>
+                    {{ option.value }} ({{ option.count }})
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endfor %}

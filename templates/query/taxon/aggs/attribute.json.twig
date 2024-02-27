@@ -1,0 +1,23 @@
+{
+    "{{ attribute.code }}": {
+        "nested": {
+            "path": "attributes"
+        },
+        "aggs": {
+            "values": {
+                "filter": {
+                    "match": {
+                        "attributes.code": "{{ attribute.code }}"
+                    }
+                },
+                "aggs": {
+                    "valu": {
+                        "terms": {
+                            "field": "attributes.values.text-value"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

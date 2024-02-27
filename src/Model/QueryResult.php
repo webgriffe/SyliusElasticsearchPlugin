@@ -8,10 +8,12 @@ final readonly class QueryResult implements QueryResultInterface
 {
     /**
      * @param ResponseInterface[] $hints
+     * @param FilterInterface[] $filters
      */
     public function __construct(
         private int $totalHints,
         private array $hints,
+        private array $filters,
     ) {
     }
 
@@ -23,5 +25,10 @@ final readonly class QueryResult implements QueryResultInterface
     public function getHints(int $offset, int $length): array
     {
         return $this->hints;
+    }
+
+    public function getFilters(): array
+    {
+        return $this->filters;
     }
 }

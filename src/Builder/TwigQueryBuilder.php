@@ -8,14 +8,20 @@ use const JSON_THROW_ON_ERROR;
 use Psr\Log\LoggerInterface;
 use Sylius\Component\Core\Model\TaxonInterface;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
+use Sylius\Component\Product\Model\ProductAttributeInterface;
+use Sylius\Component\Resource\Repository\RepositoryInterface;
 use Twig\Environment;
 
 final readonly class TwigQueryBuilder implements QueryBuilderInterface
 {
+    /**
+     * @param RepositoryInterface<ProductAttributeInterface> $attributeRepository
+     */
     public function __construct(
         private Environment $twig,
         private LocaleContextInterface $localeContext,
         private LoggerInterface $logger,
+        private RepositoryInterface $attributeRepository,
     ) {
     }
 
@@ -47,6 +53,19 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
         }
         $taxonQuery['from'] = $from;
         $taxonQuery['size'] = $size;
+
+        $aggs = [];
+        foreach ($this->attributeRepository->findAll() as $attribute) {
+            $aggregation = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/taxon/aggs/attribute.json.twig', [
+                'attribute' => $attribute,
+                'taxon' => $taxon,
+                'localeCode' => $localeCode,
+            ]);
+            /** @var array $aggregationNormalized */
+            $aggregationNormalized = json_decode($aggregation, true, 512, JSON_THROW_ON_ERROR);
+            $aggs = array_merge($aggs, $aggregationNormalized);
+        }
+        $taxonQuery['aggs'] = $aggs;
 
         $this->logger->debug(sprintf('Built taxon query: "%s".', json_encode($taxonQuery, JSON_THROW_ON_ERROR)));
 

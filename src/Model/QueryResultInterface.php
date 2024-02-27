@@ -9,7 +9,12 @@ interface QueryResultInterface
     public function getTotalHits(): int;
 
     /**
-     * @return array<ResponseInterface>
+     * @return array<array-key, ResponseInterface>
      */
     public function getHints(int $offset, int $length): array;
+
+    /**
+     * @return array<array-key, FilterInterface>
+     */
+    public function getFilters(): array;
 }
