@@ -84,7 +84,7 @@ final class ElasticsearchController extends AbstractController
         foreach ($result['hits']['hits'] as $hit) {
             $responses[] = $this->documentParser->parse($hit);
         }
-        $queryResult = new QueryResult($responses);
+        $queryResult = new QueryResult($result['hits']['total']['value'], $responses);
         $results = new Pagerfanta(new ElasticsearchAdapter($queryResult));
 
         return $this->render('@WebgriffeSyliusElasticsearchPlugin/Search/results.html.twig', [
@@ -110,16 +110,25 @@ final class ElasticsearchController extends AbstractController
         if ($sorting === []) {
             $sorting = ['position' => 'asc'];
         }
+        $size = $request->query->getInt('limit', 3);
+        $page = $request->query->getInt('page', 1);
 
-        $query = $this->queryBuilder->buildTaxonQuery($taxon, $sorting);
+        $query = $this->queryBuilder->buildTaxonQuery(
+            $taxon,
+            max(0, ($page - 1) * $size),
+            max(1, min($size, 10_000)),
+            $sorting,
+        );
         $result = $this->indexManager->query($query, [$productIndexAliasName]);
         $responses = [];
         /** @var array{_index: string, _id: string, score: float, _source: array} $hit */
         foreach ($result['hits']['hits'] as $hit) {
             $responses[] = $this->documentParser->parse($hit);
         }
-        $queryResult = new QueryResult($responses);
+        $queryResult = new QueryResult($result['hits']['total']['value'], $responses);
         $products = new Pagerfanta(new ElasticsearchAdapter($queryResult));
+        $products->setMaxPerPage($size);
+        $products->setCurrentPage($page);
 
         return $this->render('@WebgriffeSyliusElasticsearchPlugin/Product/index.html.twig', [
             'taxon' => $taxon,

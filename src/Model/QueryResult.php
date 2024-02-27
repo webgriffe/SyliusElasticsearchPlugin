@@ -10,13 +10,14 @@ final readonly class QueryResult implements QueryResultInterface
      * @param ResponseInterface[] $hints
      */
     public function __construct(
+        private int $totalHints,
         private array $hints,
     ) {
     }
 
     public function getTotalHits(): int
     {
-        return count($this->hints);
+        return $this->totalHints;
     }
 
     public function getHints(int $offset, int $length): array

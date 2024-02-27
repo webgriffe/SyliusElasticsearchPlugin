@@ -14,6 +14,9 @@ use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\RemoveIndexesException;
 use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\SwitchAliasException;
 use Webgriffe\SyliusElasticsearchPlugin\ClientBuilder\Exception\ClientConnectionException;
 
+/**
+ * @psalm-import-type QueryResult from ClientInterface
+ */
 final class ElasticsearchClient implements ClientInterface
 {
     private ?LoggerInterface $logger = null;
@@ -186,7 +189,7 @@ final class ElasticsearchClient implements ClientInterface
         array $indexes = [],
         ?string $timeout = null,
     ): array {
-        /** @var array{took: int, timed_out: bool, _shards: array, hits: array{total: array, max_score: ?int, hits: array}} $results */
+        /** @var QueryResult $results */
         $results = $this->getClient()->search([
             'index' => implode(',', $indexes),
             'body' => $query,

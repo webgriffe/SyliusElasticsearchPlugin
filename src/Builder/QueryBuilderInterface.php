@@ -10,9 +10,12 @@ interface QueryBuilderInterface
 {
     /**
      * @param array<string, string> $sorting
+     * @param int<1, 10_000> $size
      */
     public function buildTaxonQuery(
         TaxonInterface $taxon,
+        int $from = 0,
+        int $size = 10,
         array $sorting = [],
     ): array;
 }

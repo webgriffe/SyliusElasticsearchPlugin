@@ -10,6 +10,9 @@ use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\CreateIndexException;
 use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\RemoveIndexesException;
 use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\SwitchAliasException;
 
+/**
+ * @psalm-type QueryResult = array{took: int, timed_out: bool, _shards: array, hits: array{total: array{value: int, relation: string}, max_score: ?int, hits: array}}
+ */
 interface ClientInterface extends LoggerAwareInterface
 {
     /**
@@ -37,7 +40,7 @@ interface ClientInterface extends LoggerAwareInterface
     /**
      * @param string[] $indexes
      *
-     * @return array{took: int, timed_out: bool, _shards: array, hits: array{total: array, max_score: ?int, hits: array}}
+     * @return QueryResult
      */
     public function query(
         array $query,

@@ -21,6 +21,8 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
 
     public function buildTaxonQuery(
         TaxonInterface $taxon,
+        int $from = 0,
+        int $size = 10,
         array $sorting = [],
     ): array {
         $query = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/taxon/query.json.twig', [
@@ -43,6 +45,8 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
             $sortNormalized = json_decode($sort, true, 512, JSON_THROW_ON_ERROR);
             $taxonQuery['sort'][] = $sortNormalized;
         }
+        $taxonQuery['from'] = $from;
+        $taxonQuery['size'] = $size;
 
         $this->logger->debug(sprintf('Built taxon query: "%s".', json_encode($taxonQuery, JSON_THROW_ON_ERROR)));
 
