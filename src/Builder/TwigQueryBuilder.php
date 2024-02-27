@@ -9,6 +9,7 @@ use Psr\Log\LoggerInterface;
 use Sylius\Component\Core\Model\TaxonInterface;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
 use Sylius\Component\Product\Model\ProductAttributeInterface;
+use Sylius\Component\Product\Repository\ProductOptionRepositoryInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
 use Twig\Environment;
 
@@ -22,6 +23,7 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
         private LocaleContextInterface $localeContext,
         private LoggerInterface $logger,
         private RepositoryInterface $attributeRepository,
+        private ProductOptionRepositoryInterface $optionRepository,
     ) {
     }
 
@@ -58,6 +60,16 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
         foreach ($this->attributeRepository->findAll() as $attribute) {
             $aggregation = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/taxon/aggs/attribute.json.twig', [
                 'attribute' => $attribute,
+                'taxon' => $taxon,
+                'localeCode' => $localeCode,
+            ]);
+            /** @var array $aggregationNormalized */
+            $aggregationNormalized = json_decode($aggregation, true, 512, JSON_THROW_ON_ERROR);
+            $aggs = array_merge($aggs, $aggregationNormalized);
+        }
+        foreach ($this->optionRepository->findAll() as $option) {
+            $aggregation = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/taxon/aggs/option.json.twig', [
+                'option' => $option,
                 'taxon' => $taxon,
                 'localeCode' => $localeCode,
             ]);

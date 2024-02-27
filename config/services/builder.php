@@ -15,6 +15,7 @@ return static function (ContainerConfigurator $containerConfigurator) {
             service('sylius.context.locale'),
             service('monolog.logger.webgriffe_sylius_elasticsearch_plugin'),
             service('sylius.repository.product_attribute'),
+            service('sylius.repository.product_option'),
         ])
     ;
 };

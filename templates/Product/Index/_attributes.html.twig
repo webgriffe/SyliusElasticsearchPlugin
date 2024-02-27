@@ -1,6 +1,6 @@
 {# queryResult \Webgriffe\SyliusElasticsearchPlugin\Model\QueryResultInterface #}
 {% for filter in queryResult.filters %}
-    <div>
+    <div class="ui fluid vertical menu">
         <h3>{{ filter.attributeCode }}</h3>
         <ul>
             {% for option in filter.values %}

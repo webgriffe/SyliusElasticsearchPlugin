@@ -1,0 +1,23 @@
+{
+    "{{ option.code }}": {
+        "nested": {
+            "path": "options"
+        },
+        "aggs": {
+            "values": {
+                "filter": {
+                    "match": {
+                        "options.code": "{{ option.code }}"
+                    }
+                },
+                "aggs": {
+                    "valu": {
+                        "terms": {
+                            "field": "options.values.value"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
