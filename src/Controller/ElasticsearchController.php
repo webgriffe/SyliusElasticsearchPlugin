@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Webgriffe\SyliusElasticsearchPlugin\Builder\QueryBuilderInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Client\ClientInterface;
 use Webgriffe\SyliusElasticsearchPlugin\DocumentType\ProductDocumentType;
+use Webgriffe\SyliusElasticsearchPlugin\FilterHelper;
 use Webgriffe\SyliusElasticsearchPlugin\Form\SearchType;
 use Webgriffe\SyliusElasticsearchPlugin\Generator\IndexNameGeneratorInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Mapper\QueryResultMapperInterface;
@@ -84,6 +85,10 @@ final class ElasticsearchController extends AbstractController
         $size = $request->query->getInt('limit', 3);
         $page = $request->query->getInt('page', 1);
 
+        /** @var array<string, array<string, string>> $requestFilters */
+        $requestFilters = $request->query->all('filters');
+        $filters = FilterHelper::retrieveFilters($requestFilters);
+
         $esTaxonQueryAdapter = new ElasticsearchTaxonQueryAdapter(
             $this->queryBuilder,
             $this->indexManager,
@@ -91,6 +96,7 @@ final class ElasticsearchController extends AbstractController
             [$productIndexAliasName],
             $taxon,
             $sorting,
+            $filters,
         );
         /**
          * @psalm-suppress InvalidArgument Why Psalm??

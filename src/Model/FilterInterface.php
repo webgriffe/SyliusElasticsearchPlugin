@@ -6,7 +6,11 @@ namespace Webgriffe\SyliusElasticsearchPlugin\Model;
 
 interface FilterInterface
 {
+    public function getType(): string;
+
     public function getValues(): array;
 
-    public function getAttributeCode(): string;
+    public function getKeyCode(): string;
+
+    public function getQueryStringKey(): string;
 }

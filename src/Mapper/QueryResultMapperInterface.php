@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace Webgriffe\SyliusElasticsearchPlugin\Mapper;
 
+use Webgriffe\SyliusElasticsearchPlugin\Client\ClientInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Model\QueryResultInterface;
 
 /**
- * @psalm-import-type QueryResult from \Webgriffe\SyliusElasticsearchPlugin\Client\ClientInterface
+ * @psalm-import-type ESQueryResult from ClientInterface
  */
 interface QueryResultMapperInterface
 {
     /**
-     * @param QueryResult $queryResult
+     * @param ESQueryResult $queryResult
      */
     public function map(array $queryResult): QueryResultInterface;
 }

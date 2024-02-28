@@ -11,7 +11,9 @@ use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\RemoveIndexesException;
 use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\SwitchAliasException;
 
 /**
- * @psalm-type QueryResult = array{took: int, timed_out: bool, _shards: array, hits: array{total: array{value: int, relation: string}, max_score: ?int, hits: array}, aggregations: array}
+ * @psalm-type ESAggregation = array{meta: array{type: string}, doc_count: int, values: array{doc_count: int, valu: array{doc_count_error_upper_bound: int, sum_other_doc_count: int, buckets: array<int, array{key: string, doc_count: int}>}}}
+ * @psalm-type ESHit = array{_index: string, _id: string, score: float, _source: array}
+ * @psalm-type ESQueryResult = array{took: int, timed_out: bool, _shards: array, hits: array{total: array{value: int, relation: string}, max_score: ?int, hits: array<array-key, ESHit>}, aggregations: array<string, ESAggregation>}
  */
 interface ClientInterface extends LoggerAwareInterface
 {
@@ -40,7 +42,7 @@ interface ClientInterface extends LoggerAwareInterface
     /**
      * @param string[] $indexes
      *
-     * @return QueryResult
+     * @return ESQueryResult
      */
     public function query(
         array $query,

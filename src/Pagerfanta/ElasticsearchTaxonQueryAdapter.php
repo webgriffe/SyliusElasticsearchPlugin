@@ -14,6 +14,8 @@ use Webgriffe\SyliusElasticsearchPlugin\Model\QueryResultInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Model\ResponseInterface;
 
 /**
+ * @psalm-import-type QueryFilters from QueryBuilderInterface
+ *
  * @implements AdapterInterface<ResponseInterface>
  */
 final class ElasticsearchTaxonQueryAdapter implements AdapterInterface
@@ -26,6 +28,7 @@ final class ElasticsearchTaxonQueryAdapter implements AdapterInterface
     /**
      * @param array<array-key, string> $indexes
      * @param array<string, string> $sorting
+     * @param QueryFilters $filters
      */
     public function __construct(
         private readonly QueryBuilderInterface $queryBuilder,
@@ -34,6 +37,7 @@ final class ElasticsearchTaxonQueryAdapter implements AdapterInterface
         private readonly array $indexes,
         private readonly TaxonInterface $taxon,
         private readonly array $sorting,
+        private readonly array $filters,
     ) {
     }
 
@@ -86,6 +90,7 @@ final class ElasticsearchTaxonQueryAdapter implements AdapterInterface
             $size,
             $this->sorting,
             true,
+            $this->filters,
         );
         $esResult = $this->indexManager->query($query, $this->indexes);
         $this->queryResult = $this->queryResultMapper->map($esResult);

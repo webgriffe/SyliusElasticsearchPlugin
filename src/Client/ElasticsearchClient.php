@@ -15,7 +15,7 @@ use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\SwitchAliasException;
 use Webgriffe\SyliusElasticsearchPlugin\ClientBuilder\Exception\ClientConnectionException;
 
 /**
- * @psalm-import-type QueryResult from ClientInterface
+ * @psalm-import-type ESQueryResult from ClientInterface
  */
 final class ElasticsearchClient implements ClientInterface
 {
@@ -189,7 +189,7 @@ final class ElasticsearchClient implements ClientInterface
         array $indexes = [],
         ?string $timeout = null,
     ): array {
-        /** @var QueryResult $results */
+        /** @var ESQueryResult $results */
         $results = $this->getClient()->search([
             'index' => implode(',', $indexes),
             'body' => $query,

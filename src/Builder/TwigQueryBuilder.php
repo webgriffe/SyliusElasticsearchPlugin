@@ -33,9 +33,11 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
         ?int $size = null,
         ?array $sorting = null,
         bool $withAggregates = false,
+        ?array $filters = null,
     ): array {
         $query = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/taxon/query.json.twig', [
             'taxon' => $taxon,
+            'filters' => $filters ?? [],
         ]);
         $taxonQuery = [];
         /** @var array $queryNormalized */

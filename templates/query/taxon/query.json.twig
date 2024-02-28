@@ -1,12 +1,17 @@
 {
     "bool": {
-        "must": [
+        "filter": [
+            {
+                "term": {
+                    "enabled": true
+                }
+            },
             {
                 "nested": {
                     "path": "taxons",
                     "query": {
                         "bool": {
-                            "must": [
+                            "filter": [
                                 {
                                     "term": {
                                         "taxons.sylius-id": "{{ taxon.id }}"
@@ -16,12 +21,64 @@
                         }
                     }
                 }
+            }{% if (filters['attributes']|length > 0) or (filters['options']|length > 0) %},{% endif %}
+            {% for attributeFilter in filters['attributes'] %}
+            {
+                "nested": {
+                    "path": "attributes",
+                    "query": {
+                        "bool": {
+                            "filter": [
+                                {
+                                    "term": {
+                                        "attributes.code": "{{ attributeFilter.code }}"
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "attributes.values.text-value": "{{ attributeFilter.value }}"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }{% if (not loop.last) or (filters['options']|length > 0) %},{% endif %}
+            {% endfor %}
+            {% for optionFilter in filters['options'] %}
+            {
+                "nested": {
+                    "path": "options",
+                    "query": {
+                        "bool": {
+                            "filter": [
+                                {
+                                    "term": {
+                                        "options.code": "{{ optionFilter.code }}"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
             },
             {
-                "term": {
-                    "enabled": true
+                "nested": {
+                    "path": "variants",
+                    "query": {
+                        "bool": {
+                            "filter": [
+                                {
+                                    "term": {
+                                        "variants.option.value": "{{ optionFilter.value }}"
+                                    }
+                                }
+                            ]
+                        }
+                    }
                 }
-            }
+            }{% if not loop.last %},{% endif %}
+            {% endfor %}
         ]
     }
 }

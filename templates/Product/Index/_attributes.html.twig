@@ -1,11 +1,16 @@
 {# queryResult \Webgriffe\SyliusElasticsearchPlugin\Model\QueryResultInterface #}
+{# filter \Webgriffe\SyliusElasticsearchPlugin\Model\FilterInterface #}
 {% for filter in queryResult.filters %}
     <div class="ui fluid vertical menu">
-        <h3>{{ filter.attributeCode }}</h3>
+        <h3>{{ filter.keyCode }}</h3>
         <ul>
             {% for option in filter.values %}
                 <li>
-                    {{ option.value }} ({{ option.count }})
+                    {% set path = path(
+                        app.request.attributes.get('_route'),
+                        app.request.attributes.all('_route_params')|merge(app.request.query.all)|merge({(filter.queryStringKey): option.value}),
+                    ) %}
+                    <a class="item" href="{{ path }}">{{ option.value }} ({{ option.count }})</a>
                 </li>
             {% endfor %}
         </ul>
