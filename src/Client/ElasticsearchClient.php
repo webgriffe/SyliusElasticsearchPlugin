@@ -199,6 +199,19 @@ final class ElasticsearchClient implements ClientInterface
         return $results;
     }
 
+    public function count(
+        array $query,
+        array $indexes = [],
+    ): int {
+        /** @var array{count: int, _shards: array} $result */
+        $result = $this->getClient()->count([
+            'index' => implode(',', $indexes),
+            'body' => $query,
+        ]);
+
+        return $result['count'];
+    }
+
     private function getClient(): Client
     {
         if ($this->client === null) {

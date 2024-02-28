@@ -17,9 +17,9 @@ return static function (ContainerConfigurator $containerConfigurator) {
             service('sylius.context.channel'),
             service('webgriffe.sylius_elasticsearch_plugin.generator.index_name'),
             service('webgriffe.sylius_elasticsearch_plugin.provider.document_type'),
-            service('webgriffe.sylius_elasticsearch_plugin.parser.elasticsearch_document'),
             service('form.factory'),
             service('webgriffe.sylius_elasticsearch_plugin.builder.query'),
+            service('webgriffe.sylius_elasticsearch_plugin.mapper.query_result'),
         ])
         ->call('setContainer', [service('service_container')])
         ->tag('controller.service_arguments')

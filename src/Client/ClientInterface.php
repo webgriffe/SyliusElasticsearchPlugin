@@ -47,4 +47,12 @@ interface ClientInterface extends LoggerAwareInterface
         array $indexes = [],
         ?string $timeout = null,
     ): array;
+
+    /**
+     * @param string[] $indexes
+     */
+    public function count(
+        array $query,
+        array $indexes = [],
+    ): int;
 }

@@ -29,9 +29,10 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
 
     public function buildTaxonQuery(
         TaxonInterface $taxon,
-        int $from = 0,
-        int $size = 10,
-        array $sorting = [],
+        ?int $from = null,
+        ?int $size = null,
+        ?array $sorting = null,
+        bool $withAggregates = false,
     ): array {
         $query = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/taxon/query.json.twig', [
             'taxon' => $taxon,
@@ -42,42 +43,50 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
         $taxonQuery['query'] = $queryNormalized;
         $localeCode = $this->localeContext->getLocaleCode();
 
-        foreach ($sorting as $field => $order) {
-            $sort = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/taxon/sort/' . $field . '.json.twig', [
-                'field' => $field,
-                'order' => $order,
-                'taxon' => $taxon,
-                'localeCode' => $localeCode,
-            ]);
-            /** @var array $sortNormalized */
-            $sortNormalized = json_decode($sort, true, 512, JSON_THROW_ON_ERROR);
-            $taxonQuery['sort'][] = $sortNormalized;
+        if ($sorting !== null) {
+            foreach ($sorting as $field => $order) {
+                $sort = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/taxon/sort/' . $field . '.json.twig', [
+                    'field' => $field,
+                    'order' => $order,
+                    'taxon' => $taxon,
+                    'localeCode' => $localeCode,
+                ]);
+                /** @var array $sortNormalized */
+                $sortNormalized = json_decode($sort, true, 512, JSON_THROW_ON_ERROR);
+                $taxonQuery['sort'][] = $sortNormalized;
+            }
         }
-        $taxonQuery['from'] = $from;
-        $taxonQuery['size'] = $size;
+        if ($from !== null) {
+            $taxonQuery['from'] = $from;
+        }
+        if ($size !== null) {
+            $taxonQuery['size'] = $size;
+        }
 
-        $aggs = [];
-        foreach ($this->attributeRepository->findAll() as $attribute) {
-            $aggregation = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/taxon/aggs/attribute.json.twig', [
-                'attribute' => $attribute,
-                'taxon' => $taxon,
-                'localeCode' => $localeCode,
-            ]);
-            /** @var array $aggregationNormalized */
-            $aggregationNormalized = json_decode($aggregation, true, 512, JSON_THROW_ON_ERROR);
-            $aggs = array_merge($aggs, $aggregationNormalized);
+        if ($withAggregates) {
+            $aggs = [];
+            foreach ($this->attributeRepository->findAll() as $attribute) {
+                $aggregation = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/taxon/aggs/attribute.json.twig', [
+                    'attribute' => $attribute,
+                    'taxon' => $taxon,
+                    'localeCode' => $localeCode,
+                ]);
+                /** @var array $aggregationNormalized */
+                $aggregationNormalized = json_decode($aggregation, true, 512, JSON_THROW_ON_ERROR);
+                $aggs = array_merge($aggs, $aggregationNormalized);
+            }
+            foreach ($this->optionRepository->findAll() as $option) {
+                $aggregation = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/taxon/aggs/option.json.twig', [
+                    'option' => $option,
+                    'taxon' => $taxon,
+                    'localeCode' => $localeCode,
+                ]);
+                /** @var array $aggregationNormalized */
+                $aggregationNormalized = json_decode($aggregation, true, 512, JSON_THROW_ON_ERROR);
+                $aggs = array_merge($aggs, $aggregationNormalized);
+            }
+            $taxonQuery['aggs'] = $aggs;
         }
-        foreach ($this->optionRepository->findAll() as $option) {
-            $aggregation = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/taxon/aggs/option.json.twig', [
-                'option' => $option,
-                'taxon' => $taxon,
-                'localeCode' => $localeCode,
-            ]);
-            /** @var array $aggregationNormalized */
-            $aggregationNormalized = json_decode($aggregation, true, 512, JSON_THROW_ON_ERROR);
-            $aggs = array_merge($aggs, $aggregationNormalized);
-        }
-        $taxonQuery['aggs'] = $aggs;
 
         $this->logger->debug(sprintf('Built taxon query: "%s".', json_encode($taxonQuery, JSON_THROW_ON_ERROR)));
 

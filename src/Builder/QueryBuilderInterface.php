@@ -14,8 +14,9 @@ interface QueryBuilderInterface
      */
     public function buildTaxonQuery(
         TaxonInterface $taxon,
-        int $from = 0,
-        int $size = 10,
-        array $sorting = [],
+        ?int $from = null,
+        ?int $size = null,
+        ?array $sorting = null,
+        bool $withAggregates = false,
     ): array;
 }
