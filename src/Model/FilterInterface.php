@@ -19,5 +19,5 @@ interface FilterInterface
 
     public function getQueryStringKey(): string;
 
-    public static function resolveFromRawData(string $aggregationKey, array $rawData): self;
+    public static function resolveFromRawData(string $aggregationKey, array $rawData): ?self;
 }

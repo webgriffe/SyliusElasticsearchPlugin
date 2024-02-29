@@ -25,9 +25,12 @@ final readonly class OptionFilter extends Filter
      *
      * @param ESDefaultOptionAggregation $rawData
      */
-    public static function resolveFromRawData(string $aggregationKey, array $rawData): self
+    public static function resolveFromRawData(string $aggregationKey, array $rawData): ?self
     {
         $optionValueCodeBuckets = $rawData['filter_by_key']['values']['values']['buckets'];
+        if ($optionValueCodeBuckets === []) {
+            return null;
+        }
         $optionValueLabelBuckets = $rawData['filter_by_key']['values']['name']['filter_value_name_by_locale']['values']['buckets'];
         $values = [];
         for ($i = 0, $iMax = count($optionValueCodeBuckets); $i < $iMax; ++$i) {

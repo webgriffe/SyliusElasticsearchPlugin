@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Webgriffe\SyliusElasticsearchPlugin\Mapper;
 
+use InvalidArgumentException;
 use Webgriffe\SyliusElasticsearchPlugin\Client\ClientInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Model\AttributeFilter;
 use Webgriffe\SyliusElasticsearchPlugin\Model\OptionFilter;
 use Webgriffe\SyliusElasticsearchPlugin\Model\QueryResult;
 use Webgriffe\SyliusElasticsearchPlugin\Model\QueryResultInterface;
@@ -12,6 +14,7 @@ use Webgriffe\SyliusElasticsearchPlugin\Parser\DocumentParserInterface;
 
 /**
  * @psalm-import-type ESDefaultOptionAggregation from ClientInterface
+ * @psalm-import-type ESAggregation from ClientInterface
  */
 final readonly class QueryResultMapper implements QueryResultMapperInterface
 {
@@ -38,14 +41,27 @@ final readonly class QueryResultMapper implements QueryResultMapperInterface
                 !array_key_exists('type', $rawAggregationData['meta']) ||
                 !is_string($rawAggregationData['meta']['type'])
             ) {
-                continue;
+                throw new InvalidArgumentException(sprintf(
+                    'Aggregation data for key "%s" is not valid. Please, provide a meta object with a type string.',
+                    $aggregationKey,
+                ));
             }
+            $filter = null;
             $filterType = $rawAggregationData['meta']['type'];
             if ($filterType === OptionFilter::TYPE) {
                 /** @var ESDefaultOptionAggregation $rawOptionAggregationData */
                 $rawOptionAggregationData = $rawAggregationData;
-                $filters[] = OptionFilter::resolveFromRawData($aggregationKey, $rawOptionAggregationData);
+                $filter = OptionFilter::resolveFromRawData($aggregationKey, $rawOptionAggregationData);
             }
+            if ($filterType === AttributeFilter::TYPE) {
+                /** @var ESAggregation $rawAttributeAggregationData */
+                $rawAttributeAggregationData = $rawAggregationData;
+                $filter = AttributeFilter::resolveFromRawData($aggregationKey, $rawAttributeAggregationData);
+            }
+            if ($filter === null) {
+                continue;
+            }
+            $filters[] = $filter;
         }
 
         return new QueryResult(
