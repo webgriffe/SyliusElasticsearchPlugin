@@ -12,6 +12,7 @@ use Sylius\Component\Product\Model\ProductAttributeInterface;
 use Sylius\Component\Product\Repository\ProductOptionRepositoryInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
 use Twig\Environment;
+use Webgriffe\SyliusElasticsearchPlugin\FilterHelper;
 
 final readonly class TwigQueryBuilder implements QueryBuilderInterface
 {
@@ -37,7 +38,7 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
     ): array {
         $query = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/taxon/query.json.twig', [
             'taxon' => $taxon,
-            'filters' => $filters ?? [],
+            'filters' => $filters ?? FilterHelper::retrieveFilters(),
         ]);
         $taxonQuery = [];
         /** @var array $queryNormalized */

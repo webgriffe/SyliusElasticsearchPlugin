@@ -4,16 +4,49 @@
             "path": "attributes"
         },
         "aggs": {
-            "values": {
+            "filter_by_key": {
                 "filter": {
-                    "match": {
-                        "attributes.code": "{{ attribute.code }}"
+                    "bool": {
+                        "filter": [
+                            {
+                                "term": {
+                                    "attributes.code": "{{ attribute.code }}"
+                                }
+                            }
+                        ]
                     }
                 },
                 "aggs": {
-                    "valu": {
+                    "values": {
                         "terms": {
                             "field": "attributes.values.text-value"
+                        }
+                    },
+                    "name": {
+                        "nested": {
+                            "path": "attributes.name"
+                        },
+                        "aggs": {
+                            "filter_name_by_locale": {
+                                "filter": {
+                                    "bool": {
+                                        "filter": [
+                                            {
+                                                "term": {
+                                                    "attributes.name.locale": "{{ localeCode|lower }}"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                "aggs": {
+                                    "values": {
+                                        "terms": {
+                                            "field": "attributes.name.value"
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }

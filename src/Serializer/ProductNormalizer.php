@@ -19,6 +19,7 @@ use Sylius\Component\Product\Model\ProductAttributeTranslationInterface;
 use Sylius\Component\Product\Model\ProductAttributeValueInterface;
 use Sylius\Component\Product\Model\ProductOptionInterface;
 use Sylius\Component\Product\Model\ProductOptionTranslationInterface;
+use Sylius\Component\Product\Model\ProductOptionValueInterface;
 use Sylius\Component\Product\Model\ProductOptionValueTranslationInterface;
 use Sylius\Component\Product\Model\ProductVariantTranslationInterface;
 use Sylius\Component\Product\Resolver\ProductVariantResolverInterface;
@@ -27,7 +28,7 @@ use Sylius\Component\Taxonomy\Model\TaxonTranslationInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Webmozart\Assert\Assert;
 
-final class ProductNormalizer implements NormalizerInterface
+final readonly class ProductNormalizer implements NormalizerInterface
 {
     public function __construct(
         private ProductVariantResolverInterface $productVariantResolver,
@@ -189,7 +190,11 @@ final class ProductNormalizer implements NormalizerInterface
             'shipping-required' => $variant->isShippingRequired(),
             'name' => [],
             'price' => $this->normalizeChannelPricing($variant->getChannelPricingForChannel($channel)),
+            'option-values' => [],
         ];
+        foreach ($variant->getOptionValues() as $optionValue) {
+            $normalizedVariant['option-values'][] = $this->normalizeProductOptionValue($optionValue);
+        }
 
         /** @var ProductVariantTranslationInterface $variantTranslation */
         foreach ($variant->getTranslations() as $variantTranslation) {
@@ -263,19 +268,7 @@ final class ProductNormalizer implements NormalizerInterface
             ];
         }
         foreach ($option->getValues() as $optionValue) {
-            $normalizedOptionValue = [
-                'sylius-id' => $optionValue->getId(),
-                'code' => $optionValue->getCode(),
-                'value' => $optionValue->getValue(),
-                'name' => [],
-            ];
-            /** @var ProductOptionValueTranslationInterface $optionValueTranslation */
-            foreach ($optionValue->getTranslations() as $optionValueTranslation) {
-                $normalizedOptionValue['name'][] = [
-                    'locale' => $optionValueTranslation->getLocale(),
-                    'value' => $optionValueTranslation->getValue(),
-                ];
-            }
+            $normalizedOptionValue = $this->normalizeProductOptionValue($optionValue);
             $normalizedOption['values'][] = $normalizedOptionValue;
         }
 
@@ -334,5 +327,24 @@ final class ProductNormalizer implements NormalizerInterface
         }
 
         return $normalizedImage;
+    }
+
+    private function normalizeProductOptionValue(ProductOptionValueInterface $optionValue): array
+    {
+        $normalizedOptionValue = [
+            'sylius-id' => $optionValue->getId(),
+            'code' => $optionValue->getCode(),
+            'value' => $optionValue->getValue(),
+            'name' => [],
+        ];
+        /** @var ProductOptionValueTranslationInterface $optionValueTranslation */
+        foreach ($optionValue->getTranslations() as $optionValueTranslation) {
+            $normalizedOptionValue['name'][] = [
+                'locale' => $optionValueTranslation->getLocale(),
+                'value' => $optionValueTranslation->getValue(),
+            ];
+        }
+
+        return $normalizedOptionValue;
     }
 }

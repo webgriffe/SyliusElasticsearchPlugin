@@ -16,7 +16,7 @@ final class FilterHelper
      *
      * @return QueryFilters
      */
-    public static function retrieveFilters(array $requestFilters): array
+    public static function retrieveFilters(array $requestFilters = []): array
     {
         $filters = [
             'attributes' => [],

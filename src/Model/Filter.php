@@ -8,6 +8,7 @@ final readonly class Filter implements FilterInterface
 {
     public function __construct(
         private string $keyCode,
+        private string $name,
         private string $type,
         private array $values,
     ) {
@@ -16,6 +17,11 @@ final readonly class Filter implements FilterInterface
     public function getType(): string
     {
         return $this->type;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
     }
 
     public function getValues(): array

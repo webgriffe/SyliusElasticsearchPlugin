@@ -48,29 +48,18 @@
             {% for optionFilter in filters['options'] %}
             {
                 "nested": {
-                    "path": "options",
-                    "query": {
-                        "bool": {
-                            "filter": [
-                                {
-                                    "term": {
-                                        "options.code": "{{ optionFilter.code }}"
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            },
-            {
-                "nested": {
                     "path": "variants",
                     "query": {
                         "bool": {
                             "filter": [
                                 {
                                     "term": {
-                                        "variants.option.value": "{{ optionFilter.value }}"
+                                        "variants.enabled": true
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "variants.option-values.code": "{{ optionFilter.value }}"
                                     }
                                 }
                             ]

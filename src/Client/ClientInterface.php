@@ -11,7 +11,8 @@ use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\RemoveIndexesException;
 use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\SwitchAliasException;
 
 /**
- * @psalm-type ESAggregation = array{meta: array{type: string}, doc_count: int, values: array{doc_count: int, valu: array{doc_count_error_upper_bound: int, sum_other_doc_count: int, buckets: array<int, array{key: string, doc_count: int}>}}}
+ * @psalm-type ESValuesAggregation = array{doc_count_error_upper_bound: int, sum_other_doc_count: int, buckets: array<int, array{key: string, doc_count: int}>}
+ * @psalm-type ESAggregation = array{meta: array{type: string}, doc_count: int, filter_by_key: array{doc_count: int, values: ESValuesAggregation, name: array{doc_count: int, filter_name_by_locale: array{doc_count: int, values: ESValuesAggregation}}}}
  * @psalm-type ESHit = array{_index: string, _id: string, score: float, _source: array}
  * @psalm-type ESQueryResult = array{took: int, timed_out: bool, _shards: array, hits: array{total: array{value: int, relation: string}, max_score: ?int, hits: array<array-key, ESHit>}, aggregations: array<string, ESAggregation>}
  */

@@ -1,8 +1,14 @@
 {# queryResult \Webgriffe\SyliusElasticsearchPlugin\Model\QueryResultInterface #}
 {# filter \Webgriffe\SyliusElasticsearchPlugin\Model\FilterInterface #}
-{% for filter in queryResult.filters %}
-    <div class="ui fluid vertical menu">
-        <h3>{{ filter.keyCode }}</h3>
+
+<div class="ui fluid vertical menu">
+    <a href="{{ path(app.request.attributes.get('_route'), app.request.attributes.all('_route_params')) }}"
+       class="ui button">
+        Reset filters
+    </a>
+
+    {% for filter in queryResult.filters %}
+        <h3>{{ filter.name }}</h3>
         <ul>
             {% for option in filter.values %}
                 <li>
@@ -14,5 +20,5 @@
                 </li>
             {% endfor %}
         </ul>
-    </div>
-{% endfor %}
+    {% endfor %}
+</div>

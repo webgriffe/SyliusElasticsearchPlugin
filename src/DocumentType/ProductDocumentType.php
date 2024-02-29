@@ -294,6 +294,12 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
                 'subobjects' => true,
                 'properties' => self::priceProperties(),
             ],
+            'option-values' => [
+                'type' => 'nested',
+                'dynamic' => false,
+                'include_in_parent' => true,
+                'properties' => self::optionValueProperties(),
+            ],
         ];
     }
 
