@@ -10,17 +10,17 @@
 
         <div class="ui clearing hidden divider"></div>
 
-        {% if results|length > 0 %}
+        {% if paginator|length > 0 %}
             <div class="ui three cards" id="products" {{ sylius_test_html_attribute('products') }}>
-                {% for product in results %}
-                    {% include '@WebgriffeSyliusElasticsearchPlugin/Product/_box.html.twig' %}
+                {% for product in paginator %}
+                    {% include '@SyliusShop/Product/_box.html.twig' %}
                 {% endfor %}
             </div>
             <div class="ui hidden divider"></div>
 
             {# {{ sylius_template_event('sylius.shop.product.index.before_pagination', {'products': resources.data}) }} #}
 
-            {{ pagination.simple(products) }}
+            {{ pagination.simple(paginator) }}
         {% else %}
             {{ messages.info('sylius.ui.no_results_to_display') }}
         {% endif %}

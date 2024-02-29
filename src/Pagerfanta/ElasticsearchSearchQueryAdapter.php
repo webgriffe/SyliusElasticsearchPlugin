@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Webgriffe\SyliusElasticsearchPlugin\Pagerfanta;
 
-use Sylius\Component\Core\Model\TaxonInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Builder\QueryBuilderInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Client\ClientInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Mapper\QueryResultMapperInterface;
@@ -12,7 +11,7 @@ use Webgriffe\SyliusElasticsearchPlugin\Mapper\QueryResultMapperInterface;
 /**
  * @psalm-import-type QueryFilters from QueryBuilderInterface
  */
-final class ElasticsearchTaxonQueryAdapter extends AbstractElasticsearchQueryAdapter
+final class ElasticsearchSearchQueryAdapter extends AbstractElasticsearchQueryAdapter
 {
     /**
      * @param array<array-key, string> $indexes
@@ -26,20 +25,20 @@ final class ElasticsearchTaxonQueryAdapter extends AbstractElasticsearchQueryAda
         array $indexes,
         private readonly array $sorting,
         private readonly array $filters,
-        private readonly TaxonInterface $taxon,
+        private readonly string $searchTerm,
     ) {
         parent::__construct($indexManager, $queryResultMapper, $indexes);
     }
 
     protected function getCountQuery(): array
     {
-        return $this->queryBuilder->buildTaxonQuery($this->taxon);
+        return $this->queryBuilder->buildSearchQuery($this->searchTerm);
     }
 
     protected function getQuery(int $page, int $size): array
     {
-        return $this->queryBuilder->buildTaxonQuery(
-            $this->taxon,
+        return $this->queryBuilder->buildSearchQuery(
+            $this->searchTerm,
             $page,
             $size,
             $this->sorting,

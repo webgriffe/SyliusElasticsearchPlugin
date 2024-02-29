@@ -24,4 +24,18 @@ interface QueryBuilderInterface
         bool $withAggregates = false,
         ?array $filters = null,
     ): array;
+
+    /**
+     * @param int<1, 10_000> $size
+     * @param array<string, string> $sorting
+     * @param QueryFilters $filters
+     */
+    public function buildSearchQuery(
+        string $searchTerm,
+        ?int $from = null,
+        ?int $size = null,
+        ?array $sorting = null,
+        bool $withAggregates = false,
+        ?array $filters = null,
+    ): array;
 }

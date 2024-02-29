@@ -21,6 +21,7 @@ use Webgriffe\SyliusElasticsearchPlugin\FilterHelper;
 use Webgriffe\SyliusElasticsearchPlugin\Form\SearchType;
 use Webgriffe\SyliusElasticsearchPlugin\Generator\IndexNameGeneratorInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Mapper\QueryResultMapperInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Pagerfanta\ElasticsearchSearchQueryAdapter;
 use Webgriffe\SyliusElasticsearchPlugin\Pagerfanta\ElasticsearchTaxonQueryAdapter;
 use Webgriffe\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
 use Webmozart\Assert\Assert;
@@ -56,9 +57,51 @@ final class ElasticsearchController extends AbstractController
         if ($query === null) {
             throw $this->createNotFoundException();
         }
+        $channel = $this->channelContext->getChannel();
+        Assert::isInstanceOf($channel, ChannelInterface::class);
+
+        $indexAliasNames = [];
+        foreach ($this->documentTypeProvider->getDocumentsType() as $documentType) {
+            $indexAliasNames[] = $this->indexNameGenerator->generateAlias(
+                $channel,
+                $documentType,
+            );
+        }
+
+        /** @var array<string, string> $sorting */
+        $sorting = $request->query->all('sorting');
+        $size = $request->query->getInt('limit', 3);
+        $page = $request->query->getInt('page', 1);
+
+        /** @var array<string, array<string, string>> $requestFilters */
+        $requestFilters = $request->query->all('filters');
+        $filters = FilterHelper::retrieveFilters($requestFilters);
+
+        $esSearchQueryAdapter = new ElasticsearchSearchQueryAdapter(
+            $this->queryBuilder,
+            $this->indexManager,
+            $this->queryResultMapper,
+            $indexAliasNames,
+            $sorting,
+            $filters,
+            $query,
+        );
+        /**
+         * @psalm-suppress InvalidArgument Why Psalm??
+         */
+        $paginator = Pagerfanta::createForCurrentPageWithMaxPerPage(
+            $esSearchQueryAdapter,
+            $page,
+            $size,
+        );
+        // This prevents Pagerfanta from querying ES from a template
+        $paginator->getCurrentPageResults();
 
         return $this->render('@WebgriffeSyliusElasticsearchPlugin/Search/results.html.twig', [
             'query' => $query,
+            'paginator' => $paginator,
+            'filters' => $esSearchQueryAdapter->getQueryResult()->getFilters(),
+            'queryResult' => $esSearchQueryAdapter->getQueryResult(),
         ]);
     }
 
@@ -94,9 +137,9 @@ final class ElasticsearchController extends AbstractController
             $this->indexManager,
             $this->queryResultMapper,
             [$productIndexAliasName],
-            $taxon,
             $sorting,
             $filters,
+            $taxon,
         );
         /**
          * @psalm-suppress InvalidArgument Why Psalm??

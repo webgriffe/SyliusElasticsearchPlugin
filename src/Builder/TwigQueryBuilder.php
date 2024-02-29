@@ -95,4 +95,72 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
 
         return $taxonQuery;
     }
+
+    public function buildSearchQuery(
+        string $searchTerm,
+        ?int $from = null,
+        ?int $size = null,
+        ?array $sorting = null,
+        bool $withAggregates = false,
+        ?array $filters = null,
+    ): array {
+        $query = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/search/query.json.twig', [
+            'searchTerm' => $searchTerm,
+            'filters' => $filters ?? FilterHelper::retrieveFilters(),
+        ]);
+        $searchQuery = [];
+        /** @var array $queryNormalized */
+        $queryNormalized = json_decode($query, true, 512, JSON_THROW_ON_ERROR);
+        $searchQuery['query'] = $queryNormalized;
+        $localeCode = $this->localeContext->getLocaleCode();
+
+        if ($sorting !== null) {
+            foreach ($sorting as $field => $order) {
+                $sort = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/search/sort/' . $field . '.json.twig', [
+                    'field' => $field,
+                    'order' => $order,
+                    'searchTerm' => $searchTerm,
+                    'localeCode' => $localeCode,
+                ]);
+                /** @var array $sortNormalized */
+                $sortNormalized = json_decode($sort, true, 512, JSON_THROW_ON_ERROR);
+                $searchQuery['sort'][] = $sortNormalized;
+            }
+        }
+        if ($from !== null) {
+            $searchQuery['from'] = $from;
+        }
+        if ($size !== null) {
+            $searchQuery['size'] = $size;
+        }
+
+        if ($withAggregates) {
+            $aggs = [];
+            foreach ($this->attributeRepository->findAll() as $attribute) {
+                $aggregation = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/taxon/aggs/attribute.json.twig', [
+                    'attribute' => $attribute,
+                    'searchTerm' => $searchTerm,
+                    'localeCode' => $localeCode,
+                ]);
+                /** @var array $aggregationNormalized */
+                $aggregationNormalized = json_decode($aggregation, true, 512, JSON_THROW_ON_ERROR);
+                $aggs = array_merge($aggs, $aggregationNormalized);
+            }
+            foreach ($this->optionRepository->findAll() as $option) {
+                $aggregation = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/taxon/aggs/option.json.twig', [
+                    'option' => $option,
+                    'searchTerm' => $searchTerm,
+                    'localeCode' => $localeCode,
+                ]);
+                /** @var array $aggregationNormalized */
+                $aggregationNormalized = json_decode($aggregation, true, 512, JSON_THROW_ON_ERROR);
+                $aggs = array_merge($aggs, $aggregationNormalized);
+            }
+            $searchQuery['aggs'] = $aggs;
+        }
+
+        $this->logger->debug(sprintf('Built search query: "%s".', json_encode($searchQuery, JSON_THROW_ON_ERROR)));
+
+        return $searchQuery;
+    }
 }
