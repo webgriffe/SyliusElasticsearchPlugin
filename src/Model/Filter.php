@@ -4,19 +4,16 @@ declare(strict_types=1);
 
 namespace Webgriffe\SyliusElasticsearchPlugin\Model;
 
-final readonly class Filter implements FilterInterface
+abstract readonly class Filter implements FilterInterface
 {
+    /**
+     * @param FilterValueInterface[] $values
+     */
     public function __construct(
         private string $keyCode,
         private string $name,
-        private string $type,
         private array $values,
     ) {
-    }
-
-    public function getType(): string
-    {
-        return $this->type;
     }
 
     public function getName(): string

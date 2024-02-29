@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Webgriffe\SyliusElasticsearchPlugin\Mapper;
 
-use Webgriffe\SyliusElasticsearchPlugin\Model\Filter;
+use Webgriffe\SyliusElasticsearchPlugin\Client\ClientInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Model\OptionFilter;
 use Webgriffe\SyliusElasticsearchPlugin\Model\QueryResult;
 use Webgriffe\SyliusElasticsearchPlugin\Model\QueryResultInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Parser\DocumentParserInterface;
 
+/**
+ * @psalm-import-type ESDefaultOptionAggregation from ClientInterface
+ */
 final readonly class QueryResultMapper implements QueryResultMapperInterface
 {
     public function __construct(
@@ -23,22 +27,25 @@ final readonly class QueryResultMapper implements QueryResultMapperInterface
             $responses[] = $this->documentParser->parse($hit);
         }
         $filters = [];
-        foreach ($queryResult['aggregations'] as $aggregationKey => $aggregation) {
-            $buckets = $aggregation['filter_by_key']['values']['buckets'];
-            if ($buckets === []) {
+
+        $aggregations = [];
+        if (array_key_exists('aggregations', $queryResult)) {
+            $aggregations = $queryResult['aggregations'];
+        }
+        foreach ($aggregations as $aggregationKey => $rawAggregationData) {
+            if (!array_key_exists('meta', $rawAggregationData) ||
+                !is_array($rawAggregationData['meta']) ||
+                !array_key_exists('type', $rawAggregationData['meta']) ||
+                !is_string($rawAggregationData['meta']['type'])
+            ) {
                 continue;
             }
-            $values = array_map(
-                static fn (array $bucket): array => ['value' => $bucket['key'], 'count' => $bucket['doc_count']],
-                $buckets,
-            );
-            $name = $aggregation['filter_by_key']['name']['filter_name_by_locale']['values']['buckets'][0]['key'];
-            $filters[] = new Filter(
-                $aggregationKey,
-                $name,
-                $aggregation['meta']['type'],
-                $values,
-            );
+            $filterType = $rawAggregationData['meta']['type'];
+            if ($filterType === OptionFilter::TYPE) {
+                /** @var ESDefaultOptionAggregation $rawOptionAggregationData */
+                $rawOptionAggregationData = $rawAggregationData;
+                $filters[] = OptionFilter::resolveFromRawData($aggregationKey, $rawOptionAggregationData);
+            }
         }
 
         return new QueryResult(
