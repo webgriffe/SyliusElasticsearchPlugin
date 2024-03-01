@@ -33,6 +33,15 @@
    ```
    **NB:** if you have locales prefix enabled you should prefix import with that.
 
+5. Make your ProductRepository implements the DocumentTypeRepositoryInterface. Remember to update your product resource configuration to use the new repository. For example:
+   ```yaml
+   sylius_product:
+       resources:
+           product:
+               classes:
+                   repository: App\Doctrine\ORM\ProductRepository
+   ```
+
 ## Usage
 
 ## Contributing

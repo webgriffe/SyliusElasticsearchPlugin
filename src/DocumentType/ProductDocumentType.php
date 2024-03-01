@@ -8,13 +8,14 @@ use Sylius\Component\Core\Model\ChannelInterface;
 use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Core\Repository\ProductRepositoryInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Repository\DocumentTypeRepositoryInterface;
 
 final readonly class ProductDocumentType implements DocumentTypeInterface
 {
     public const CODE = 'product';
 
     public function __construct(
-        private ProductRepositoryInterface $productRepository,
+        private DocumentTypeRepositoryInterface $documentTypeRepository,
         private NormalizerInterface $normalizer,
     ) {
     }
@@ -31,9 +32,9 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
     public function getDocuments(ChannelInterface $channel): array
     {
         $documents = [];
-        /** @var ProductInterface $product */
-        foreach ($this->productRepository->findAll() as $product) {
-            $documents[] = $this->normalizer->normalize($product, null, [
+        /** @var ProductInterface $documentToIndex */
+        foreach ($this->documentTypeRepository->findDocumentsToIndex() as $documentToIndex) {
+            $documents[] = $this->normalizer->normalize($documentToIndex, null, [
                 'type' => 'webgriffe_sylius_elasticsearch_plugin',
                 'channel' => $channel,
             ]);

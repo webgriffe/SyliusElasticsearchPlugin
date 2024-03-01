@@ -82,7 +82,7 @@ final class ElasticsearchClient implements ClientInterface
             $params['body'][] = $action;
 
             // Every 1000 actions stop and send the bulk request
-            if ($count % 1000 === 0) {
+            if ($count % 250 === 0) {
                 /** @var array{took: int, errors: bool, items: array} $result */
                 $result = $this->getClient()->bulk($params);
                 if ($result['errors'] === true) {
