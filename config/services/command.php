@@ -14,7 +14,7 @@ return static function (ContainerConfigurator $containerConfigurator) {
             service('sylius.repository.channel'),
             service('webgriffe_sylius_elasticsearch_plugin.command_bus'),
             service('webgriffe.sylius_elasticsearch_plugin.provider.document_type'),
-            'webgriffe.elasticsearch.index',
+            'webgriffe:elasticsearch:index',
         ])
         ->tag('console.command')
     ;
