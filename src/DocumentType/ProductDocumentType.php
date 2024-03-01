@@ -75,14 +75,14 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
                     'type' => 'object',
                     'dynamic' => false,
                     'enabled' => true,
-                    'subobjects' => true,
+                    // 'subobjects' => true, ES v8
                     'properties' => self::variantProperties(),
                 ],
                 'main-taxon' => [
                     'type' => 'object',
                     'dynamic' => false,
                     'enabled' => true,
-                    'subobjects' => true,
+                    // 'subobjects' => true, ES v8
                     'properties' => self::taxonProperties(),
                 ],
                 'taxons' => [
@@ -291,7 +291,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
                 'type' => 'object',
                 'dynamic' => false,
                 'enabled' => true,
-                'subobjects' => true,
+                // 'subobjects' => true, ES v8
                 'properties' => self::priceProperties(),
             ],
             'option-values' => [
