@@ -69,8 +69,8 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
                 'description' => self::nestedTranslationValues(),
                 'short-description' => self::nestedTranslationValues(),
                 'slug' => self::nestedTranslationValues(),
-                'variant-selection-method' => self::text(),
-                'variant-selection-method-label' => self::text(),
+                'variant-selection-method' => self::keyword(),
+                'variant-selection-method-label' => self::keyword(),
                 'created-at' => self::date(),
                 'default-variant' => [
                     'type' => 'object',
@@ -195,9 +195,9 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
     {
         return [
             'sylius-id' => self::keyword(false),
-            'code' => self::keyword(false),
-            'type' => self::text(false),
-            'storage-type' => self::text(false),
+            'code' => self::keyword(),
+            'type' => self::keyword(false),
+            'storage-type' => self::keyword(false),
             'position' => self::integer(false),
             'translatable' => self::boolean(false),
             'name' => self::nestedTranslationValues(false),
@@ -215,7 +215,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         return [
             'sylius-id' => self::keyword(false),
             'code' => self::keyword(false),
-            'locale' => self::text(false),
+            'locale' => self::keyword(false),
             'checkbox-value' => self::keyword(),
             'date-value' => self::keyword(),
             'datetime-value' => self::keyword(),
@@ -231,8 +231,8 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
     {
         return [
             'sylius-id' => self::keyword(false),
-            'type' => self::text(false),
-            'path' => self::text(false),
+            'type' => self::keyword(false),
+            'path' => self::keyword(false),
             'variants' => [
                 'type' => 'nested',
                 'dynamic' => false,
@@ -254,7 +254,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
     {
         return [
             'sylius-id' => self::keyword(false),
-            'code' => self::keyword(false),
+            'code' => self::keyword(),
             'name' => self::nestedTranslationValues(false),
             'values' => [
                 'type' => 'nested',
