@@ -1,0 +1,23 @@
+{% for filter in filters %}
+    {
+        "nested": {
+            "path": "attributes",
+            "query": {
+                "bool": {
+                    "filter": [
+                        {
+                            "term": {
+                                "attributes.code": "{{ filter.code }}"
+                            }
+                        },
+                        {
+                            "term": {
+                                "attributes.values.text-value": "{{ filter.value }}"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    }{% if not loop.last %},{% endif %}
+{% endfor %}

@@ -21,52 +21,11 @@
                         }
                     }
                 }
-            }{% if (filters['attributes']|length > 0) or (filters['options']|length > 0) %},{% endif %}
-            {% for attributeFilter in filters['attributes'] %}
-            {
-                "nested": {
-                    "path": "attributes",
-                    "query": {
-                        "bool": {
-                            "filter": [
-                                {
-                                    "term": {
-                                        "attributes.code": "{{ attributeFilter.code }}"
-                                    }
-                                },
-                                {
-                                    "term": {
-                                        "attributes.values.text-value": "{{ attributeFilter.value }}"
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }{% if (not loop.last) or (filters['options']|length > 0) %},{% endif %}
-            {% endfor %}
-            {% for optionFilter in filters['options'] %}
-            {
-                "nested": {
-                    "path": "variants",
-                    "query": {
-                        "bool": {
-                            "filter": [
-                                {
-                                    "term": {
-                                        "variants.enabled": true
-                                    }
-                                },
-                                {
-                                    "term": {
-                                        "variants.option-values.code": "{{ optionFilter.value }}"
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }{% if not loop.last %},{% endif %}
+            }
+            {% for filterType, filters in filters %}
+                {% if filters|length > 0 %}
+                    ,{% include '@WebgriffeSyliusElasticsearchPlugin/query/taxon/search/' ~ filterType ~ '.json.twig' %}
+                {% endif %}
             {% endfor %}
         ]
     }

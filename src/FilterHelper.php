@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Webgriffe\SyliusElasticsearchPlugin;
 
 use Webgriffe\SyliusElasticsearchPlugin\Builder\QueryBuilderInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Model\AttributeFilter;
+use Webgriffe\SyliusElasticsearchPlugin\Model\OptionFilter;
 
 /**
  * @psalm-import-type QueryFilters from QueryBuilderInterface
@@ -19,8 +21,8 @@ final class FilterHelper
     public static function retrieveFilters(array $requestFilters = []): array
     {
         $filters = [
-            'attributes' => [],
-            'options' => [],
+            AttributeFilter::TYPE => [],
+            OptionFilter::TYPE => [],
         ];
 
         foreach ($requestFilters as $type => $filter) {

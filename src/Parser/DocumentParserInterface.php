@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Webgriffe\SyliusElasticsearchPlugin\Parser;
 
+use Webgriffe\SyliusElasticsearchPlugin\Client\ClientInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Model\ResponseInterface;
 
+/**
+ * @psalm-import-type ESHit from ClientInterface
+ */
 interface DocumentParserInterface
 {
     /**
-     * @param array{_index: string, _id: string, score: float, _source: array} $document
+     * @param ESHit $document
      */
     public function parse(array $document): ResponseInterface;
 }

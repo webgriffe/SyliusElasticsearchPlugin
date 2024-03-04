@@ -24,34 +24,39 @@ final readonly class OptionFilter extends Filter
      * @phpstan-ignore-next-line
      *
      * @param ESDefaultOptionAggregation $rawData
+     *
+     * @return OptionFilter[]
      */
-    public static function resolveFromRawData(string $aggregationKey, array $rawData): ?self
+    public static function resolveFromRawData(array $rawData): array
     {
-        $optionValueCodeBuckets = $rawData['filter_by_key']['values']['values']['buckets'];
-        if ($optionValueCodeBuckets === []) {
-            return null;
-        }
-        $optionValueLabelBuckets = $rawData['filter_by_key']['values']['name']['filter_value_name_by_locale']['values']['buckets'];
-        $values = [];
-        for ($i = 0, $iMax = count($optionValueCodeBuckets); $i < $iMax; ++$i) {
-            $optionValueCodeBucket = $optionValueCodeBuckets[$i];
-            $optionValueLabelBucket = $optionValueLabelBuckets[$i];
-            $values[] = new FilterValue($optionValueCodeBucket['key'], $optionValueLabelBucket['key'], $optionValueCodeBucket['doc_count']);
-        }
-        $optionName = null;
-        $optionNameBuckets = $rawData['filter_by_key']['name']['filter_name_by_locale']['values']['buckets'];
-        if (count($optionNameBuckets) > 0) {
-            $firstOptionNameBucket = reset($optionNameBuckets);
-            $optionName = $firstOptionNameBucket['key'];
-        }
-        if ($optionName === null) {
-            $optionName = $aggregationKey;
+        $filters = [];
+        foreach ($rawData['filtered_options']['option']['buckets'] as $bucket) {
+            $optionLabel = $bucket['key'];
+            $optionLabelBuckets = $bucket['label']['buckets'];
+            $optionLabelBucket = reset($optionLabelBuckets);
+            if ($optionLabelBucket !== false) {
+                $optionLabel = $optionLabelBucket['key'];
+            }
+
+            $optionValues = [];
+            foreach ($bucket['values']['buckets'] as $optionValueBucket) {
+                $optionValueLabel = $optionValueBucket['key'];
+                $optionValueLabelBuckets = $optionValueBucket['label']['buckets'];
+                $optionValueLabelBucket = reset($optionValueLabelBuckets);
+                if ($optionValueLabelBucket !== false) {
+                    $optionValueLabel = $optionValueLabelBucket['key'];
+                }
+
+                $optionValues[] = new FilterValue(
+                    $optionValueBucket['key'],
+                    $optionValueLabel,
+                    $optionValueBucket['doc_count'],
+                );
+            }
+
+            $filters[] = new self($bucket['key'], $optionLabel, $optionValues);
         }
 
-        return new self(
-            $aggregationKey,
-            $optionName,
-            $values,
-        );
+        return $filters;
     }
 }

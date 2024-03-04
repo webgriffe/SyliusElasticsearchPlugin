@@ -1,0 +1,39 @@
+{
+    "attributes": {
+        "filter": {
+            "bool": {
+                "filter": [
+                ]
+            }
+        },
+        "aggs": {
+            "filtered_attributes": {
+                "nested": {
+                    "path": "attributes"
+                },
+                "aggs": {
+                    "attribute": {
+                        "terms": {
+                            "field": "attributes.code"
+                        },
+                        "aggs": {
+                            "values": {
+                                "terms": {
+                                    "field": "attributes.values.text-value"
+                                }
+                            },
+                            "label": {
+                                "terms": {
+                                    "field": "attributes.name.{{localeCode}}"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "meta": {
+            "type": "{{ constant('\\Webgriffe\\SyliusElasticsearchPlugin\\Model\\AttributeFilter::TYPE') }}"
+        }
+    }
+}

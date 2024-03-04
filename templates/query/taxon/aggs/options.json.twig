@@ -1,0 +1,51 @@
+{
+    "options": {
+        "filter": {
+            "bool": {
+                "filter": [
+                    {
+                        "term": {
+                            "variants.enabled": true
+                        }
+                    }
+                ]
+            }
+        },
+        "aggs": {
+            "filtered_options": {
+                "nested": {
+                    "path": "variants.options"
+                },
+                "aggs": {
+                    "option": {
+                        "terms": {
+                            "field": "variants.options.code"
+                        },
+                        "aggs": {
+                            "values": {
+                                "terms": {
+                                    "field": "variants.options.value.code"
+                                },
+                                "aggs": {
+                                    "label": {
+                                        "terms": {
+                                            "field": "variants.options.value.name.{{localeCode}}"
+                                        }
+                                    }
+                                }
+                            },
+                            "label": {
+                                "terms": {
+                                    "field": "variants.options.name.{{localeCode}}"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "meta": {
+            "type": "{{ constant('\\Webgriffe\\SyliusElasticsearchPlugin\\Model\\OptionFilter::TYPE') }}"
+        }
+    }
+}

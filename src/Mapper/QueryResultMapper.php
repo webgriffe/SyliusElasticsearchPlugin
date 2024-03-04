@@ -14,6 +14,7 @@ use Webgriffe\SyliusElasticsearchPlugin\Parser\DocumentParserInterface;
 
 /**
  * @psalm-import-type ESDefaultOptionAggregation from ClientInterface
+ * @psalm-import-type ESDefaultAttributeAggregation from ClientInterface
  * @psalm-import-type ESAggregation from ClientInterface
  */
 final readonly class QueryResultMapper implements QueryResultMapperInterface
@@ -46,22 +47,17 @@ final readonly class QueryResultMapper implements QueryResultMapperInterface
                     $aggregationKey,
                 ));
             }
-            $filter = null;
             $filterType = $rawAggregationData['meta']['type'];
             if ($filterType === OptionFilter::TYPE) {
                 /** @var ESDefaultOptionAggregation $rawOptionAggregationData */
                 $rawOptionAggregationData = $rawAggregationData;
-                $filter = OptionFilter::resolveFromRawData($aggregationKey, $rawOptionAggregationData);
+                $filters = array_merge($filters, OptionFilter::resolveFromRawData($rawOptionAggregationData));
             }
             if ($filterType === AttributeFilter::TYPE) {
-                /** @var ESAggregation $rawAttributeAggregationData */
+                /** @var ESDefaultAttributeAggregation $rawAttributeAggregationData */
                 $rawAttributeAggregationData = $rawAggregationData;
-                $filter = AttributeFilter::resolveFromRawData($aggregationKey, $rawAttributeAggregationData);
+                $filters = array_merge($filters, AttributeFilter::resolveFromRawData($rawAttributeAggregationData));
             }
-            if ($filter === null) {
-                continue;
-            }
-            $filters[] = $filter;
         }
 
         return new QueryResult(

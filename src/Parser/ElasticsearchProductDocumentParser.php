@@ -20,7 +20,7 @@ use Webgriffe\SyliusElasticsearchPlugin\Model\ProductResponseInterface;
 use Webmozart\Assert\Assert;
 
 /**
- * @psalm-type LocalizedField = array<array-key, array{locale: string, value: string}>
+ * @psalm-type LocalizedField = array<array-key, array<string, string>>
  */
 final class ElasticsearchProductDocumentParser implements DocumentParserInterface
 {
@@ -107,12 +107,14 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
     private function getValueFromLocalizedField(array $localizedField, string $localeCode): ?string
     {
         $fallbackValue = null;
+        $defaultLocale = $this->defaultLocale;
+        Assert::string($defaultLocale);
         foreach ($localizedField as $field) {
-            if ($field['locale'] === $this->defaultLocale) {
-                $fallbackValue = $field['value'];
+            if (array_key_exists($localeCode, $field)) {
+                return $field[$localeCode];
             }
-            if ($field['locale'] === $localeCode) {
-                return $field['value'];
+            if (array_key_exists($defaultLocale, $field)) {
+                $fallbackValue = $field[$defaultLocale];
             }
         }
 
@@ -125,8 +127,8 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
     private function getSlug(array $localizedSlug, string $localeCode): string
     {
         foreach ($localizedSlug as $slug) {
-            if ($slug['locale'] === $localeCode) {
-                return $slug['value'];
+            if (array_key_exists($localeCode, $slug)) {
+                return $slug[$localeCode];
             }
         }
 
