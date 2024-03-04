@@ -14,9 +14,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Builder\QueryBuilderInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Client\ClientInterface;
 use Webgriffe\SyliusElasticsearchPlugin\DocumentType\ProductDocumentType;
+use Webgriffe\SyliusElasticsearchPlugin\Event\ProductIndexEvent;
 use Webgriffe\SyliusElasticsearchPlugin\FilterHelper;
 use Webgriffe\SyliusElasticsearchPlugin\Form\SearchType;
 use Webgriffe\SyliusElasticsearchPlugin\Generator\IndexNameGeneratorInterface;
@@ -41,6 +43,7 @@ final class ElasticsearchController extends AbstractController
         private readonly FormFactoryInterface $formFactory,
         private readonly QueryBuilderInterface $queryBuilder,
         private readonly QueryResultMapperInterface $queryResultMapper,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -151,6 +154,8 @@ final class ElasticsearchController extends AbstractController
         );
         // This prevents Pagerfanta from querying ES from a template
         $paginator->getCurrentPageResults();
+
+        $this->eventDispatcher->dispatch(new ProductIndexEvent($taxon, $paginator));
 
         return $this->render('@WebgriffeSyliusElasticsearchPlugin/Product/index.html.twig', [
             'taxon' => $taxon,

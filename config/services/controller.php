@@ -20,6 +20,7 @@ return static function (ContainerConfigurator $containerConfigurator) {
             service('form.factory'),
             service('webgriffe.sylius_elasticsearch_plugin.builder.query'),
             service('webgriffe.sylius_elasticsearch_plugin.mapper.query_result'),
+            service('event_dispatcher'),
         ])
         ->call('setContainer', [service('service_container')])
         ->tag('controller.service_arguments')
