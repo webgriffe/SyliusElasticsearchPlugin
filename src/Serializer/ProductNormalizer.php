@@ -61,6 +61,7 @@ final readonly class ProductNormalizer implements NormalizerInterface
             'default-variant' => null,
             'main-taxon' => null,
             'attributes' => [],
+            'translated-attributes' => [],
             'images' => [],
         ];
         /** @var ProductTranslationInterface $productTranslation */
@@ -96,6 +97,8 @@ final readonly class ProductNormalizer implements NormalizerInterface
             $normalizedProduct['variants'][] = $this->normalizeProductVariant($variant, $channel);
         }
 
+        /** @var array<string|int, array{attribute: ProductAttributeInterface, values: ProductAttributeValueInterface[]}> $translatedAttributes */
+        $translatedAttributes = [];
         /** @var array<string|int, array{attribute: ProductAttributeInterface, values: ProductAttributeValueInterface[]}> $attributes */
         $attributes = [];
 
@@ -108,6 +111,19 @@ final readonly class ProductNormalizer implements NormalizerInterface
             if (!is_string($attributeId) && !is_int($attributeId)) {
                 throw new RuntimeException('Attribute ID different from string or integer is not supported.');
             }
+
+            if ($attribute->isTranslatable()) {
+                if (!array_key_exists($attributeId, $translatedAttributes)) {
+                    $translatedAttributes[$attributeId] = [
+                        'attribute' => $attribute,
+                        'values' => [],
+                    ];
+                }
+                $translatedAttributes[$attributeId]['values'][] = $attributeValue;
+
+                continue;
+            }
+
             if (!array_key_exists($attributeId, $attributes)) {
                 $attributes[$attributeId] = [
                     'attribute' => $attribute,
@@ -115,6 +131,9 @@ final readonly class ProductNormalizer implements NormalizerInterface
                 ];
             }
             $attributes[$attributeId]['values'][] = $attributeValue;
+        }
+        foreach ($translatedAttributes as $attribute) {
+            $normalizedProduct['translated-attributes'][] = $this->normalizeAttribute($attribute);
         }
         foreach ($attributes as $attribute) {
             $normalizedProduct['attributes'][] = $this->normalizeAttribute($attribute);
@@ -228,13 +247,14 @@ final readonly class ProductNormalizer implements NormalizerInterface
     private function normalizeAttribute(array $attributeWithValues): array
     {
         $attribute = $attributeWithValues['attribute'];
+        $isTranslatable = $attribute->isTranslatable();
         $normalizedAttributeValue = [
             'sylius-id' => $attribute->getId(),
             'code' => $attribute->getCode(),
             'type' => $attribute->getType(),
             'storage-type' => $attribute->getStorageType(),
             'position' => $attribute->getPosition(),
-            'translatable' => $attribute->isTranslatable(),
+            'translatable' => $isTranslatable,
             'name' => [],
             'values' => [],
         ];
@@ -247,7 +267,13 @@ final readonly class ProductNormalizer implements NormalizerInterface
             ];
         }
         foreach ($attributeWithValues['values'] as $attributeValue) {
-            $normalizedAttributeValue['values'][] = $this->normalizeAttributeValue($attributeValue);
+            $localeCode = $attributeValue->getLocaleCode();
+            if ($isTranslatable) {
+                Assert::string($localeCode);
+                $normalizedAttributeValue['values'][$localeCode][] = $this->normalizeAttributeValue($attributeValue);
+            } else {
+                $normalizedAttributeValue['values'][] = $this->normalizeAttributeValue($attributeValue);
+            }
         }
 
         return $normalizedAttributeValue;

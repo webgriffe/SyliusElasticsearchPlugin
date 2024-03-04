@@ -7,7 +7,7 @@ namespace Webgriffe\SyliusElasticsearchPlugin\Builder;
 use Sylius\Component\Core\Model\TaxonInterface;
 
 /**
- * @psalm-type QueryFilters = array{attributes: array<array-key, array{code: string, value: string}>, options: array<array-key, array{code: string, value: string}>}
+ * @psalm-type QueryFilters = array{attribute: array<array-key, array{code: string, value: string}>, translated-attribute: array<array-key, array{code: string, value: string}>, option: array<array-key, array{code: string, value: string}>}
  */
 interface QueryBuilderInterface
 {

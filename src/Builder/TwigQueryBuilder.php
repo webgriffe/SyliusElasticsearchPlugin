@@ -36,15 +36,16 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
         bool $withAggregates = false,
         ?array $filters = null,
     ): array {
+        $localeCode = $this->localeContext->getLocaleCode();
         $query = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/taxon/query.json.twig', [
             'taxon' => $taxon,
             'filters' => $filters ?? FilterHelper::retrieveFilters(),
+            'localeCode' => $localeCode,
         ]);
         $taxonQuery = [];
         /** @var array $queryNormalized */
         $queryNormalized = json_decode($query, true, 512, JSON_THROW_ON_ERROR);
         $taxonQuery['query'] = $queryNormalized;
-        $localeCode = $this->localeContext->getLocaleCode();
 
         if ($sorting !== null) {
             foreach ($sorting as $field => $order) {
@@ -74,6 +75,13 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
             /** @var array $attributeAggregationNormalized */
             $attributeAggregationNormalized = json_decode($attributeAggregationRaw, true, 512, JSON_THROW_ON_ERROR);
 
+            $translatedAttributeAggregationRaw = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/taxon/aggs/translated-attributes.json.twig', [
+                'taxon' => $taxon,
+                'localeCode' => $localeCode,
+            ]);
+            /** @var array $translatedAttributeAggregationNormalized */
+            $translatedAttributeAggregationNormalized = json_decode($translatedAttributeAggregationRaw, true, 512, JSON_THROW_ON_ERROR);
+
             $optionAggregationRaw = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/taxon/aggs/options.json.twig', [
                 'taxon' => $taxon,
                 'localeCode' => $localeCode,
@@ -81,7 +89,11 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
             /** @var array $optionAggregationNormalized */
             $optionAggregationNormalized = json_decode($optionAggregationRaw, true, 512, JSON_THROW_ON_ERROR);
 
-            $taxonQuery['aggs'] = array_merge($attributeAggregationNormalized, $optionAggregationNormalized);
+            $taxonQuery['aggs'] = array_merge(
+                $attributeAggregationNormalized,
+                $translatedAttributeAggregationNormalized,
+                $optionAggregationNormalized,
+            );
         }
 
         $this->logger->debug(sprintf('Built taxon query: "%s".', json_encode($taxonQuery, JSON_THROW_ON_ERROR)));

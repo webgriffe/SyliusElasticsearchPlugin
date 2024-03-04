@@ -104,6 +104,12 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
                     'include_in_parent' => true,
                     'properties' => $this->attributeProperties(),
                 ],
+                'translated-attributes' => [
+                    'type' => 'nested',
+                    'dynamic' => false,
+                    'include_in_parent' => true,
+                    'properties' => $this->attributeProperties(true),
+                ],
                 'images' => [
                     'type' => 'nested',
                     'dynamic' => false,
@@ -188,8 +194,24 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         ];
     }
 
-    private function attributeProperties(): array
+    private function attributeProperties(bool $translated = false): array
     {
+        $locales = $this->localeRepository->findAll();
+        $properties = [];
+        foreach ($locales as $locale) {
+            $localeCode = $locale->getCode();
+            Assert::string($localeCode);
+            $properties[$localeCode] = [
+                'type' => 'nested',
+                'dynamic' => false,
+                'include_in_parent' => true,
+                'properties' => $this->attributeValueProperties(),
+            ];
+        }
+        if ($translated === false) {
+            $properties = $this->attributeValueProperties();
+        }
+
         return [
             'sylius-id' => $this->keyword(false),
             'code' => $this->keyword(),
@@ -202,7 +224,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
                 'type' => 'nested',
                 'dynamic' => false,
                 'include_in_parent' => true,
-                'properties' => $this->attributeValueProperties(),
+                'properties' => $properties,
             ],
         ];
     }

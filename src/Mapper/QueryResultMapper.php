@@ -10,11 +10,13 @@ use Webgriffe\SyliusElasticsearchPlugin\Model\AttributeFilter;
 use Webgriffe\SyliusElasticsearchPlugin\Model\OptionFilter;
 use Webgriffe\SyliusElasticsearchPlugin\Model\QueryResult;
 use Webgriffe\SyliusElasticsearchPlugin\Model\QueryResultInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Model\TranslatedAttributeFilter;
 use Webgriffe\SyliusElasticsearchPlugin\Parser\DocumentParserInterface;
 
 /**
  * @psalm-import-type ESDefaultOptionAggregation from ClientInterface
  * @psalm-import-type ESDefaultAttributeAggregation from ClientInterface
+ * @psalm-import-type ESDefaultTranslatedAttributeAggregation from ClientInterface
  * @psalm-import-type ESAggregation from ClientInterface
  */
 final readonly class QueryResultMapper implements QueryResultMapperInterface
@@ -57,6 +59,11 @@ final readonly class QueryResultMapper implements QueryResultMapperInterface
                 /** @var ESDefaultAttributeAggregation $rawAttributeAggregationData */
                 $rawAttributeAggregationData = $rawAggregationData;
                 $filters = array_merge($filters, AttributeFilter::resolveFromRawData($rawAttributeAggregationData));
+            }
+            if ($filterType === TranslatedAttributeFilter::TYPE) {
+                /** @var ESDefaultTranslatedAttributeAggregation $rawTranslatedAttributeAggregationData */
+                $rawTranslatedAttributeAggregationData = $rawAggregationData;
+                $filters = array_merge($filters, TranslatedAttributeFilter::resolveFromRawData($rawTranslatedAttributeAggregationData));
             }
         }
 

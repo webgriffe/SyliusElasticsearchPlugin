@@ -7,11 +7,11 @@ namespace Webgriffe\SyliusElasticsearchPlugin\Model;
 use Webgriffe\SyliusElasticsearchPlugin\Client\ClientInterface;
 
 /**
- * @psalm-import-type ESDefaultAttributeAggregation from ClientInterface
+ * @psalm-import-type ESDefaultTranslatedAttributeAggregation from ClientInterface
  */
-final readonly class AttributeFilter extends Filter
+final readonly class TranslatedAttributeFilter extends Filter
 {
-    public const TYPE = 'attribute';
+    public const TYPE = 'translated-attribute';
 
     public function getType(): string
     {
@@ -23,14 +23,14 @@ final readonly class AttributeFilter extends Filter
      *
      * @phpstan-ignore-next-line
      *
-     * @param ESDefaultAttributeAggregation $rawData
+     * @param ESDefaultTranslatedAttributeAggregation $rawData
      *
-     * @return AttributeFilter[]
+     * @return TranslatedAttributeFilter[]
      */
     public static function resolveFromRawData(array $rawData): array
     {
         $filters = [];
-        foreach ($rawData['filtered-attributes']['attribute']['buckets'] as $bucket) {
+        foreach ($rawData['filtered-translated-attributes']['translated-attribute']['buckets'] as $bucket) {
             $attributeLabel = $bucket['key'];
             $attributeLabelBuckets = $bucket['label']['buckets'];
             $attributeLabelBucket = reset($attributeLabelBuckets);
