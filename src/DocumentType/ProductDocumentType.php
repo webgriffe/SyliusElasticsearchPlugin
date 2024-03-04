@@ -6,17 +6,23 @@ namespace Webgriffe\SyliusElasticsearchPlugin\DocumentType;
 
 use Sylius\Component\Core\Model\ChannelInterface;
 use Sylius\Component\Core\Model\ProductInterface;
-use Sylius\Component\Core\Repository\ProductRepositoryInterface;
+use Sylius\Component\Locale\Model\LocaleInterface;
+use Sylius\Component\Resource\Repository\RepositoryInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Repository\DocumentTypeRepositoryInterface;
+use Webmozart\Assert\Assert;
 
 final readonly class ProductDocumentType implements DocumentTypeInterface
 {
     public const CODE = 'product';
 
+    /**
+     * @param RepositoryInterface<LocaleInterface> $localeRepository
+     */
     public function __construct(
         private DocumentTypeRepositoryInterface $documentTypeRepository,
         private NormalizerInterface $normalizer,
+        private RepositoryInterface $localeRepository,
     ) {
     }
 
@@ -62,65 +68,59 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
     {
         return [
             'properties' => [
-                'sylius-id' => self::keyword(false),
-                'code' => self::keyword(),
-                'name' => self::nestedTranslationValues(),
-                'enabled' => self::boolean(),
-                'description' => self::nestedTranslationValues(),
-                'short-description' => self::nestedTranslationValues(),
-                'slug' => self::nestedTranslationValues(),
-                'variant-selection-method' => self::keyword(),
-                'variant-selection-method-label' => self::keyword(),
-                'created-at' => self::date(),
+                'sylius-id' => $this->keyword(false),
+                'code' => $this->keyword(),
+                'name' => $this->nestedTranslationValues(),
+                'enabled' => $this->boolean(),
+                'description' => $this->nestedTranslationValues(),
+                'short-description' => $this->nestedTranslationValues(),
+                'slug' => $this->nestedTranslationValues(),
+                'variant-selection-method' => $this->keyword(),
+                'variant-selection-method-label' => $this->keyword(),
+                'created-at' => $this->date(),
                 'default-variant' => [
                     'type' => 'object',
                     'dynamic' => false,
                     'enabled' => true,
                     // 'subobjects' => true, ES v8
-                    'properties' => self::variantProperties(),
+                    'properties' => $this->variantProperties(),
                 ],
                 'main-taxon' => [
                     'type' => 'object',
                     'dynamic' => false,
                     'enabled' => true,
                     // 'subobjects' => true, ES v8
-                    'properties' => self::taxonProperties(),
+                    'properties' => $this->taxonProperties(),
                 ],
                 'taxons' => [
                     'type' => 'nested',
                     'dynamic' => false,
                     'include_in_parent' => true,
-                    'properties' => self::taxonProperties(),
+                    'properties' => $this->taxonProperties(),
                 ],
                 'attributes' => [
                     'type' => 'nested',
                     'dynamic' => false,
                     'include_in_parent' => true,
-                    'properties' => self::attributeProperties(),
+                    'properties' => $this->attributeProperties(),
                 ],
                 'images' => [
                     'type' => 'nested',
                     'dynamic' => false,
                     'include_in_parent' => true,
-                    'properties' => self::imageProperties(),
-                ],
-                'options' => [
-                    'type' => 'nested',
-                    'dynamic' => false,
-                    'include_in_parent' => true,
-                    'properties' => self::optionProperties(),
+                    'properties' => $this->imageProperties(),
                 ],
                 'variants' => [
                     'type' => 'nested',
                     'dynamic' => false,
                     'include_in_parent' => true,
-                    'properties' => self::variantProperties(),
+                    'properties' => $this->variantProperties(),
                 ],
             ],
         ];
     }
 
-    private static function keyword(bool $index = true): array
+    private function keyword(bool $index = true): array
     {
         return [
             'type' => 'keyword',
@@ -128,7 +128,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         ];
     }
 
-    private static function boolean(bool $index = true): array
+    private function boolean(bool $index = true): array
     {
         return [
             'type' => 'boolean',
@@ -136,15 +136,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         ];
     }
 
-    private static function text(bool $index = true): array
-    {
-        return [
-            'type' => 'text',
-            'index' => $index,
-        ];
-    }
-
-    private static function integer(bool $index = true): array
+    private function integer(bool $index = true): array
     {
         return [
             'type' => 'integer',
@@ -152,7 +144,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         ];
     }
 
-    private static function float(bool $index = true): array
+    private function float(bool $index = true): array
     {
         return [
             'type' => 'float',
@@ -160,7 +152,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         ];
     }
 
-    private static function date(bool $index = true): array
+    private function date(bool $index = true): array
     {
         return [
             'type' => 'date',
@@ -168,163 +160,169 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         ];
     }
 
-    private static function nestedTranslationValues(bool $indexValue = true): array
+    private function nestedTranslationValues(bool $indexValue = true): array
     {
+        $locales = $this->localeRepository->findAll();
+        $properties = [];
+        foreach ($locales as $locale) {
+            $localeCode = $locale->getCode();
+            Assert::string($localeCode);
+            $properties[$localeCode] = $this->keyword($indexValue);
+        }
+
         return [
             'type' => 'nested',
             'dynamic' => 'false',
             'include_in_parent' => true,
-            'properties' => [
-                'locale' => self::text(),
-                'value' => self::keyword($indexValue),
-            ],
+            'properties' => $properties,
         ];
     }
 
-    private static function taxonProperties(): array
+    private function taxonProperties(): array
     {
         return [
-            'sylius-id' => self::keyword(false),
-            'code' => self::keyword(false),
-            'position' => self::integer(false),
-            'name' => self::nestedTranslationValues(false),
+            'sylius-id' => $this->keyword(),
+            'code' => $this->keyword(false),
+            'position' => $this->integer(false),
+            'name' => $this->nestedTranslationValues(false),
         ];
     }
 
-    private static function attributeProperties(): array
+    private function attributeProperties(): array
     {
         return [
-            'sylius-id' => self::keyword(false),
-            'code' => self::keyword(),
-            'type' => self::keyword(false),
-            'storage-type' => self::keyword(false),
-            'position' => self::integer(false),
-            'translatable' => self::boolean(false),
-            'name' => self::nestedTranslationValues(false),
+            'sylius-id' => $this->keyword(false),
+            'code' => $this->keyword(),
+            'type' => $this->keyword(false),
+            'storage-type' => $this->keyword(false),
+            'position' => $this->integer(false),
+            'translatable' => $this->boolean(false),
+            'name' => $this->nestedTranslationValues(false),
             'values' => [
                 'type' => 'nested',
                 'dynamic' => false,
                 'include_in_parent' => true,
-                'properties' => self::attributeValueProperties(),
+                'properties' => $this->attributeValueProperties(),
             ],
         ];
     }
 
-    private static function attributeValueProperties(): array
+    private function attributeValueProperties(): array
     {
         return [
-            'sylius-id' => self::keyword(false),
-            'code' => self::keyword(false),
-            'locale' => self::keyword(false),
-            'checkbox-value' => self::keyword(),
-            'date-value' => self::keyword(),
-            'datetime-value' => self::keyword(),
-            'integer-value' => self::integer(),
-            'percent-value' => self::float(),
-            'select-value' => self::keyword(),
-            'textarea-value' => self::keyword(),
-            'text-value' => self::keyword(),
+            'sylius-id' => $this->keyword(false),
+            'code' => $this->keyword(false),
+            'locale' => $this->keyword(false),
+            'checkbox-value' => $this->keyword(),
+            'date-value' => $this->keyword(),
+            'datetime-value' => $this->keyword(),
+            'integer-value' => $this->integer(),
+            'percent-value' => $this->float(),
+            'select-value' => $this->keyword(),
+            'textarea-value' => $this->keyword(),
+            'text-value' => $this->keyword(),
         ];
     }
 
-    private static function imageProperties(): array
+    private function imageProperties(): array
     {
         return [
-            'sylius-id' => self::keyword(false),
-            'type' => self::keyword(false),
-            'path' => self::keyword(false),
+            'sylius-id' => $this->keyword(false),
+            'type' => $this->keyword(false),
+            'path' => $this->keyword(false),
             'variants' => [
                 'type' => 'nested',
                 'dynamic' => false,
                 'include_in_parent' => true,
-                'properties' => self::imageVariantsProperties(),
+                'properties' => $this->imageVariantsProperties(),
             ],
         ];
     }
 
-    private static function imageVariantsProperties(): array
+    private function imageVariantsProperties(): array
     {
         return [
-            'sylius-id' => self::keyword(false),
-            'code' => self::keyword(false),
+            'sylius-id' => $this->keyword(false),
+            'code' => $this->keyword(false),
         ];
     }
 
-    private static function optionProperties(): array
+    private function optionProperties(): array
     {
         return [
-            'sylius-id' => self::keyword(false),
-            'code' => self::keyword(),
-            'name' => self::nestedTranslationValues(false),
-            'values' => [
-                'type' => 'nested',
+            'sylius-id' => $this->keyword(false),
+            'code' => $this->keyword(),
+            'name' => $this->nestedTranslationValues(false),
+            'value' => [
+                'type' => 'object',
                 'dynamic' => false,
-                'include_in_parent' => true,
-                'properties' => self::optionValueProperties(),
+                'enabled' => true,
+                // 'subobjects' => true, ES v8
+                'properties' => $this->optionValueProperties(),
             ],
         ];
     }
 
-    private static function optionValueProperties(): array
+    private function optionValueProperties(): array
     {
         return [
-            'sylius-id' => self::keyword(false),
-            'code' => self::keyword(false),
-            'value' => self::keyword(),
-            'name' => self::nestedTranslationValues(false),
+            'sylius-id' => $this->keyword(false),
+            'code' => $this->keyword(false),
+            'value' => $this->keyword(),
+            'name' => $this->nestedTranslationValues(false),
         ];
     }
 
-    private static function variantProperties(): array
+    private function variantProperties(): array
     {
         return [
-            'sylius-id' => self::keyword(false),
-            'code' => self::keyword(),
-            'enabled' => self::boolean(),
-            'position' => self::integer(),
-            'weight' => self::float(false),
-            'width' => self::float(false),
-            'height' => self::float(false),
-            'depth' => self::float(false),
-            'shipping-required' => self::boolean(false),
-            'name' => self::nestedTranslationValues(),
+            'sylius-id' => $this->keyword(false),
+            'code' => $this->keyword(),
+            'enabled' => $this->boolean(),
+            'position' => $this->integer(),
+            'weight' => $this->float(false),
+            'width' => $this->float(false),
+            'height' => $this->float(false),
+            'depth' => $this->float(false),
+            'shipping-required' => $this->boolean(false),
+            'name' => $this->nestedTranslationValues(),
             'price' => [
                 'type' => 'object',
                 'dynamic' => false,
                 'enabled' => true,
                 // 'subobjects' => true, ES v8
-                'properties' => self::priceProperties(),
+                'properties' => $this->priceProperties(),
             ],
-            'option-values' => [
+            'options' => [
                 'type' => 'nested',
                 'dynamic' => false,
                 'include_in_parent' => true,
-                'properties' => self::optionValueProperties(),
+                'properties' => $this->optionProperties(),
             ],
         ];
     }
 
-    private static function priceProperties(): array
+    private function priceProperties(): array
     {
         return [
-            'price' => self::integer(false),
-            'original-price' => self::integer(false),
+            'price' => $this->integer(false),
+            'original-price' => $this->integer(false),
             'applied-promotions' => [
                 'type' => 'nested',
                 'dynamic' => false,
                 'include_in_parent' => true,
-                'properties' => self::catalogPromotionProperties(),
+                'properties' => $this->catalogPromotionProperties(),
             ],
         ];
     }
 
-    private static function catalogPromotionProperties(): array
+    private function catalogPromotionProperties(): array
     {
         return [
-            'sylius-id' => self::keyword(false),
-            'code' => self::keyword(),
-            'label' => self::nestedTranslationValues(),
-            'description' => self::nestedTranslationValues(),
+            'sylius-id' => $this->keyword(false),
+            'code' => $this->keyword(),
+            'label' => $this->nestedTranslationValues(),
+            'description' => $this->nestedTranslationValues(),
         ];
     }
 }

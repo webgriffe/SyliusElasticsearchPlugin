@@ -13,6 +13,7 @@ return static function (ContainerConfigurator $containerConfigurator) {
         ->args([
             service('sylius.repository.product'),
             service('serializer'),
+            service('sylius.repository.locale'),
         ])
         ->tag('webgriffe.sylius_elasticsearch_plugin.document_type')
     ;
