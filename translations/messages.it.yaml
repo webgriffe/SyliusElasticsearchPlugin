@@ -1,0 +1,4 @@
+webgriffe_sylius_elasticsearch_plugin:
+    form:
+        filterable:
+            label: 'Usa come filtro in pagina categoria e ricerca'

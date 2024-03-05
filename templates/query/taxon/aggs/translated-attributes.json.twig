@@ -3,6 +3,11 @@
         "filter": {
             "bool": {
                 "filter": [
+                    {
+                        "term": {
+                            "attributes.filterable": true
+                        }
+                    }
                 ]
             }
         },

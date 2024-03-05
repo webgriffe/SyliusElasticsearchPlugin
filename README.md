@@ -42,6 +42,17 @@
                    repository: App\Doctrine\ORM\ProductRepository
    ```
 
+6. Make your ProductAttribute and ProductOption entities implements the FilterableInterface. You can implement it by using our ready DoctrineORMFilterableTrait. For example:
+   ```php
+   use Webgriffe\SyliusElasticsearchPlugin\Model\FilterableInterface;
+   use Webgriffe\SyliusElasticsearchPlugin\Model\DoctrineORMFilterableTrait;
+   
+   class ProductAttribute implements FilterableInterface
+   {
+       use DoctrineORMFilterableTrait;
+   }
+   ```
+
 ## Usage
 
 ## Contributing

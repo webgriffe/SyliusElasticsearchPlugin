@@ -7,7 +7,7 @@ namespace Webgriffe\SyliusElasticsearchPlugin\Twig;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormView;
 use Twig\Extension\RuntimeExtensionInterface;
-use Webgriffe\SyliusElasticsearchPlugin\Form\SearchType;
+use Webgriffe\SyliusElasticsearchPlugin\Form\Type\SearchType;
 
 final readonly class SearchRuntime implements RuntimeExtensionInterface
 {

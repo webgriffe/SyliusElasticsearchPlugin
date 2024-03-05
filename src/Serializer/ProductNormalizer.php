@@ -26,6 +26,7 @@ use Sylius\Component\Product\Resolver\ProductVariantResolverInterface;
 use Sylius\Component\Promotion\Model\CatalogPromotionTranslationInterface;
 use Sylius\Component\Taxonomy\Model\TaxonTranslationInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Model\FilterableInterface;
 use Webmozart\Assert\Assert;
 
 final readonly class ProductNormalizer implements NormalizerInterface
@@ -248,6 +249,10 @@ final readonly class ProductNormalizer implements NormalizerInterface
     {
         $attribute = $attributeWithValues['attribute'];
         $isTranslatable = $attribute->isTranslatable();
+        $filterable = false;
+        if ($attribute instanceof FilterableInterface) {
+            $filterable = $attribute->isFilterable();
+        }
         $normalizedAttributeValue = [
             'sylius-id' => $attribute->getId(),
             'code' => $attribute->getCode(),
@@ -255,6 +260,7 @@ final readonly class ProductNormalizer implements NormalizerInterface
             'storage-type' => $attribute->getStorageType(),
             'position' => $attribute->getPosition(),
             'translatable' => $isTranslatable,
+            'filterable' => $filterable,
             'name' => [],
             'values' => [],
         ];
@@ -298,10 +304,15 @@ final readonly class ProductNormalizer implements NormalizerInterface
         ProductOptionInterface $option,
         ProductOptionValueInterface $optionValue,
     ): array {
+        $filterable = false;
+        if ($option instanceof FilterableInterface) {
+            $filterable = $option->isFilterable();
+        }
         $normalizedOption = [
             'sylius-id' => $option->getId(),
             'code' => $option->getCode(),
             'name' => [],
+            'filterable' => $filterable,
             'value' => $this->normalizeProductOptionValue($optionValue),
         ];
         /** @var ProductOptionTranslationInterface $optionTranslation */

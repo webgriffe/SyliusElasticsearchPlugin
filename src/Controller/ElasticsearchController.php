@@ -7,6 +7,7 @@ namespace Webgriffe\SyliusElasticsearchPlugin\Controller;
 use Pagerfanta\Pagerfanta;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
+use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Core\Model\TaxonInterface;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
 use Sylius\Component\Taxonomy\Repository\TaxonRepositoryInterface;
@@ -20,7 +21,7 @@ use Webgriffe\SyliusElasticsearchPlugin\Client\ClientInterface;
 use Webgriffe\SyliusElasticsearchPlugin\DocumentType\ProductDocumentType;
 use Webgriffe\SyliusElasticsearchPlugin\Event\ProductIndexEvent;
 use Webgriffe\SyliusElasticsearchPlugin\FilterHelper;
-use Webgriffe\SyliusElasticsearchPlugin\Form\SearchType;
+use Webgriffe\SyliusElasticsearchPlugin\Form\Type\SearchType;
 use Webgriffe\SyliusElasticsearchPlugin\Generator\IndexNameGeneratorInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Mapper\QueryResultMapperInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Pagerfanta\ElasticsearchSearchQueryAdapter;
@@ -146,6 +147,8 @@ final class ElasticsearchController extends AbstractController
         );
         /**
          * @psalm-suppress InvalidArgument Why Psalm??
+         *
+         * @var Pagerfanta<ProductInterface> $paginator
          */
         $paginator = Pagerfanta::createForCurrentPageWithMaxPerPage(
             $esTaxonQueryAdapter,
