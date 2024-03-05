@@ -23,6 +23,7 @@ use Webgriffe\SyliusElasticsearchPlugin\Event\ProductIndexEvent;
 use Webgriffe\SyliusElasticsearchPlugin\FilterHelper;
 use Webgriffe\SyliusElasticsearchPlugin\Form\Type\SearchType;
 use Webgriffe\SyliusElasticsearchPlugin\Generator\IndexNameGeneratorInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Helper\SortHelperInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Mapper\QueryResultMapperInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Pagerfanta\ElasticsearchSearchQueryAdapter;
 use Webgriffe\SyliusElasticsearchPlugin\Pagerfanta\ElasticsearchTaxonQueryAdapter;
@@ -45,6 +46,7 @@ final class ElasticsearchController extends AbstractController
         private readonly QueryBuilderInterface $queryBuilder,
         private readonly QueryResultMapperInterface $queryResultMapper,
         private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly SortHelperInterface $sortHelper,
     ) {
     }
 
@@ -126,9 +128,7 @@ final class ElasticsearchController extends AbstractController
 
         /** @var array<string, string> $sorting */
         $sorting = $request->query->all('sorting');
-        if ($sorting === []) {
-            $sorting = ['position' => 'asc'];
-        }
+        $sorting = $this->sortHelper->retrieveSorting($sorting);
         $size = $request->query->getInt('limit', 3);
         $page = $request->query->getInt('page', 1);
 

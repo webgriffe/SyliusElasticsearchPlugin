@@ -322,6 +322,9 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
             'width' => $this->float(false),
             'height' => $this->float(false),
             'depth' => $this->float(false),
+            'on-hand' => $this->integer(false),
+            'on-hold' => $this->integer(false),
+            'is-tracked' => $this->boolean(false),
             'shipping-required' => $this->boolean(false),
             'name' => $this->nestedTranslationValues(),
             'price' => [

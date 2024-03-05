@@ -154,7 +154,7 @@ final readonly class ProductNormalizer implements NormalizerInterface
         foreach ($product->getImages() as $image) {
             $normalizedProduct['images'][] = $this->normalizeProductImage($image);
         }
-        $event = new ProductDocumentTypeProductNormalizeEvent($product, $normalizedProduct);
+        $event = new ProductDocumentTypeProductNormalizeEvent($product, $channel, $normalizedProduct);
         $this->eventDispatcher->dispatch($event);
 
         return $event->getNormalizedProduct();
@@ -216,6 +216,9 @@ final readonly class ProductNormalizer implements NormalizerInterface
             'depth' => $variant->getDepth(),
             'shipping-required' => $variant->isShippingRequired(),
             'name' => [],
+            'on-hand' => $variant->getOnHand(),
+            'on-hold' => $variant->getOnHold(),
+            'is-tracked' => $variant->isTracked(),
             'price' => $this->normalizeChannelPricing($variant->getChannelPricingForChannel($channel)),
             'options' => [],
         ];
