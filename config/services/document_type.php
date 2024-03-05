@@ -14,6 +14,7 @@ return static function (ContainerConfigurator $containerConfigurator) {
             service('sylius.repository.product'),
             service('serializer'),
             service('sylius.repository.locale'),
+            service('event_dispatcher'),
         ])
         ->tag('webgriffe.sylius_elasticsearch_plugin.document_type')
     ;

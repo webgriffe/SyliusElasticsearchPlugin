@@ -12,6 +12,7 @@ return static function (ContainerConfigurator $containerConfigurator) {
     $services->set('webgriffe.sylius_elasticsearch_plugin.serializer.product_normalizer', ProductNormalizer::class)
         ->args([
             service('sylius.product_variant_resolver.default'),
+            service('event_dispatcher'),
         ])
         ->tag('serializer.normalizer', ['priority' => 200])
     ;

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Webgriffe\SyliusElasticsearchPlugin\Serializer;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use RuntimeException;
 use Sylius\Component\Core\Model\CatalogPromotionInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
@@ -26,6 +27,7 @@ use Sylius\Component\Product\Resolver\ProductVariantResolverInterface;
 use Sylius\Component\Promotion\Model\CatalogPromotionTranslationInterface;
 use Sylius\Component\Taxonomy\Model\TaxonTranslationInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Event\ProductDocumentType\ProductDocumentTypeProductNormalizeEvent;
 use Webgriffe\SyliusElasticsearchPlugin\Model\FilterableInterface;
 use Webmozart\Assert\Assert;
 
@@ -33,6 +35,7 @@ final readonly class ProductNormalizer implements NormalizerInterface
 {
     public function __construct(
         private ProductVariantResolverInterface $productVariantResolver,
+        private EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -57,6 +60,8 @@ final readonly class ProductNormalizer implements NormalizerInterface
             'description' => [],
             'short-description' => [],
             'slug' => [],
+            'meta-keywords' => [],
+            'meta-description' => [],
             'taxons' => [],
             'variants' => [],
             'default-variant' => null,
@@ -80,6 +85,12 @@ final readonly class ProductNormalizer implements NormalizerInterface
             ];
             $normalizedProduct['slug'][] = [
                 $localeCode => $productTranslation->getSlug(),
+            ];
+            $normalizedProduct['meta-keywords'][] = [
+                $localeCode => $productTranslation->getMetaKeywords(),
+            ];
+            $normalizedProduct['meta-description'][] = [
+                $localeCode => $productTranslation->getMetaDescription(),
             ];
         }
         $defaultVariant = $this->productVariantResolver->getVariant($product);
@@ -143,8 +154,10 @@ final readonly class ProductNormalizer implements NormalizerInterface
         foreach ($product->getImages() as $image) {
             $normalizedProduct['images'][] = $this->normalizeProductImage($image);
         }
+        $event = new ProductDocumentTypeProductNormalizeEvent($product, $normalizedProduct);
+        $this->eventDispatcher->dispatch($event);
 
-        return $normalizedProduct;
+        return $event->getNormalizedProduct();
     }
 
     public function getSupportedTypes(?string $format): array

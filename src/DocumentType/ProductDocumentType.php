@@ -9,6 +9,9 @@ use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Locale\Model\LocaleInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Event\ProductDocumentType\ProductDocumentTypeMappingsEvent;
+use Webgriffe\SyliusElasticsearchPlugin\Event\ProductDocumentType\ProductDocumentTypeSettingsEvent;
 use Webgriffe\SyliusElasticsearchPlugin\Repository\DocumentTypeRepositoryInterface;
 use Webmozart\Assert\Assert;
 
@@ -23,6 +26,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         private DocumentTypeRepositoryInterface $documentTypeRepository,
         private NormalizerInterface $normalizer,
         private RepositoryInterface $localeRepository,
+        private EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -51,7 +55,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
 
     public function getSettings(): array
     {
-        return [
+        $settings = [
             'analysis' => [
                 'analyzer' => [
                     'search_standard' => [
@@ -62,11 +66,15 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
                 ],
             ],
         ];
+        $event = new ProductDocumentTypeSettingsEvent($settings);
+        $this->eventDispatcher->dispatch($event);
+
+        return $event->getSettings();
     }
 
     public function getMappings(): array
     {
-        return [
+        $mappings = [
             'properties' => [
                 'sylius-id' => $this->keyword(false),
                 'code' => $this->keyword(),
@@ -75,6 +83,8 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
                 'description' => $this->nestedTranslationValues(),
                 'short-description' => $this->nestedTranslationValues(),
                 'slug' => $this->nestedTranslationValues(),
+                'meta-keywords' => $this->nestedTranslationValues(),
+                'meta-description' => $this->nestedTranslationValues(),
                 'variant-selection-method' => $this->keyword(),
                 'variant-selection-method-label' => $this->keyword(),
                 'created-at' => $this->date(),
@@ -124,6 +134,10 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
                 ],
             ],
         ];
+        $event = new ProductDocumentTypeMappingsEvent($mappings);
+        $this->eventDispatcher->dispatch($event);
+
+        return $event->getMappings();
     }
 
     private function keyword(bool $index = true): array
