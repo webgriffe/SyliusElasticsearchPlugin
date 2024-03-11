@@ -233,7 +233,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
             'storage-type' => $this->keyword(false),
             'position' => $this->integer(false),
             'translatable' => $this->boolean(false),
-            'filterable' => $this->boolean(false),
+            'filterable' => $this->boolean(true),
             'name' => $this->nestedTranslationValues(false),
             'values' => [
                 'type' => 'nested',
@@ -290,7 +290,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
             'sylius-id' => $this->keyword(false),
             'code' => $this->keyword(),
             'name' => $this->nestedTranslationValues(false),
-            'filterable' => $this->boolean(false),
+            'filterable' => $this->boolean(true),
             'value' => [
                 'type' => 'object',
                 'dynamic' => false,
