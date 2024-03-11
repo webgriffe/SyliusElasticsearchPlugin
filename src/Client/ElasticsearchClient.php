@@ -202,11 +202,13 @@ final class ElasticsearchClient implements ClientInterface
     public function count(
         array $query,
         array $indexes = [],
+        ?float $minScore = null,
     ): int {
         /** @var array{count: int, _shards: array} $result */
         $result = $this->getClient()->count([
             'index' => implode(',', $indexes),
             'body' => $query,
+            'min_score' => $minScore,
         ]);
 
         return $result['count'];

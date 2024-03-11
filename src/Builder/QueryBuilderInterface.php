@@ -37,5 +37,6 @@ interface QueryBuilderInterface
         ?array $sorting = null,
         bool $withAggregates = false,
         ?array $filters = null,
+        ?float $minScore = null,
     ): array;
 }

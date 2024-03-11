@@ -10,18 +10,32 @@
         "should": [
             {
                 "nested": {
-                    "path": "attributes",
+                    "path": "name",
                     "query": {
-                        "bool": {
-                            "should": [
-                                {
-                                    "match": {
-                                        "attributes.values.text-value": {
-                                            "query": "{{ searchTerm }}"
-                                        }
-                                    }
-                                }
-                            ]
+                        "match": {
+                            "name.{{ localeCode }}": {
+                                "query": "{{ searchTerm }}",
+                                "boost": 10,
+                                "fuzziness": "AUTO",
+                                "fuzzy_transpositions": true,
+                                "operator": "OR"
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "nested": {
+                    "path": "description",
+                    "query": {
+                        "match": {
+                            "description.{{ localeCode }}": {
+                                "query": "{{ searchTerm }}",
+                                "boost": 5,
+                                "fuzziness": "AUTO",
+                                "fuzzy_transpositions": true,
+                                "operator": "OR"
+                            }
                         }
                     }
                 }

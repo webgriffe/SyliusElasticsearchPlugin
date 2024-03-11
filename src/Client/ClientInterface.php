@@ -60,5 +60,6 @@ interface ClientInterface extends LoggerAwareInterface
     public function count(
         array $query,
         array $indexes = [],
+        ?float $minScore = null,
     ): int;
 }

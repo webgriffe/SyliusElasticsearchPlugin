@@ -78,13 +78,13 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
             'properties' => [
                 'sylius-id' => $this->keyword(false),
                 'code' => $this->keyword(),
-                'name' => $this->nestedTranslationValues(),
+                'name' => $this->nestedTranslationTexts(),
                 'enabled' => $this->boolean(),
-                'description' => $this->nestedTranslationValues(),
-                'short-description' => $this->nestedTranslationValues(),
-                'slug' => $this->nestedTranslationValues(),
-                'meta-keywords' => $this->nestedTranslationValues(),
-                'meta-description' => $this->nestedTranslationValues(),
+                'description' => $this->nestedTranslationTexts(),
+                'short-description' => $this->nestedTranslationTexts(),
+                'slug' => $this->nestedTranslationKeywords(),
+                'meta-keywords' => $this->nestedTranslationTexts(),
+                'meta-description' => $this->nestedTranslationTexts(),
                 'variant-selection-method' => $this->keyword(),
                 'variant-selection-method-label' => $this->keyword(),
                 'created-at' => $this->date(),
@@ -140,6 +140,14 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         return $event->getMappings();
     }
 
+    private function text(bool $index = true): array
+    {
+        return [
+            'type' => 'text',
+            'index' => $index,
+        ];
+    }
+
     private function keyword(bool $index = true): array
     {
         return [
@@ -180,7 +188,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         ];
     }
 
-    private function nestedTranslationValues(bool $indexValue = true): array
+    private function nestedTranslationKeywords(bool $indexValue = true): array
     {
         $locales = $this->localeRepository->findAll();
         $properties = [];
@@ -198,13 +206,31 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         ];
     }
 
+    private function nestedTranslationTexts(bool $indexValue = true): array
+    {
+        $locales = $this->localeRepository->findAll();
+        $properties = [];
+        foreach ($locales as $locale) {
+            $localeCode = $locale->getCode();
+            Assert::string($localeCode);
+            $properties[$localeCode] = $this->text($indexValue);
+        }
+
+        return [
+            'type' => 'nested',
+            'dynamic' => 'false',
+            'include_in_parent' => true,
+            'properties' => $properties,
+        ];
+    }
+
     private function taxonProperties(): array
     {
         return [
             'sylius-id' => $this->keyword(),
             'code' => $this->keyword(false),
             'position' => $this->integer(false),
-            'name' => $this->nestedTranslationValues(false),
+            'name' => $this->nestedTranslationKeywords(false),
         ];
     }
 
@@ -234,7 +260,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
             'position' => $this->integer(false),
             'translatable' => $this->boolean(false),
             'filterable' => $this->boolean(true),
-            'name' => $this->nestedTranslationValues(false),
+            'name' => $this->nestedTranslationKeywords(false),
             'values' => [
                 'type' => 'nested',
                 'dynamic' => false,
@@ -256,7 +282,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
             'integer-value' => $this->integer(),
             'percent-value' => $this->float(),
             'select-value' => $this->keyword(),
-            'textarea-value' => $this->keyword(),
+            'textarea-value' => $this->text(),
             'text-value' => $this->keyword(),
         ];
     }
@@ -289,7 +315,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         return [
             'sylius-id' => $this->keyword(false),
             'code' => $this->keyword(),
-            'name' => $this->nestedTranslationValues(false),
+            'name' => $this->nestedTranslationKeywords(false),
             'filterable' => $this->boolean(true),
             'value' => [
                 'type' => 'object',
@@ -307,7 +333,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
             'sylius-id' => $this->keyword(false),
             'code' => $this->keyword(false),
             'value' => $this->keyword(),
-            'name' => $this->nestedTranslationValues(false),
+            'name' => $this->nestedTranslationKeywords(false),
         ];
     }
 
@@ -326,7 +352,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
             'on-hold' => $this->integer(false),
             'is-tracked' => $this->boolean(false),
             'shipping-required' => $this->boolean(false),
-            'name' => $this->nestedTranslationValues(),
+            'name' => $this->nestedTranslationKeywords(),
             'price' => [
                 'type' => 'object',
                 'dynamic' => false,
@@ -362,8 +388,8 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         return [
             'sylius-id' => $this->keyword(false),
             'code' => $this->keyword(),
-            'label' => $this->nestedTranslationValues(),
-            'description' => $this->nestedTranslationValues(),
+            'label' => $this->nestedTranslationKeywords(),
+            'description' => $this->nestedTranslationKeywords(),
         ];
     }
 }

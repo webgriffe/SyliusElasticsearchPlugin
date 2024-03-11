@@ -8,23 +8,15 @@ use const JSON_THROW_ON_ERROR;
 use Psr\Log\LoggerInterface;
 use Sylius\Component\Core\Model\TaxonInterface;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
-use Sylius\Component\Product\Model\ProductAttributeInterface;
-use Sylius\Component\Product\Repository\ProductOptionRepositoryInterface;
-use Sylius\Component\Resource\Repository\RepositoryInterface;
 use Twig\Environment;
 use Webgriffe\SyliusElasticsearchPlugin\FilterHelper;
 
 final readonly class TwigQueryBuilder implements QueryBuilderInterface
 {
-    /**
-     * @param RepositoryInterface<ProductAttributeInterface> $attributeRepository
-     */
     public function __construct(
         private Environment $twig,
         private LocaleContextInterface $localeContext,
         private LoggerInterface $logger,
-        private RepositoryInterface $attributeRepository,
-        private ProductOptionRepositoryInterface $optionRepository,
     ) {
     }
 
@@ -108,6 +100,7 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
         ?array $sorting = null,
         bool $withAggregates = false,
         ?array $filters = null,
+        ?float $minScore = null,
     ): array {
         $localeCode = $this->localeContext->getLocaleCode();
         $query = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/search/query.json.twig', [
@@ -119,6 +112,9 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
         /** @var array $queryNormalized */
         $queryNormalized = json_decode($query, true, 512, JSON_THROW_ON_ERROR);
         $searchQuery['query'] = $queryNormalized;
+        if ($minScore !== null) {
+            $searchQuery['min_score'] = $minScore;
+        }
 
         if ($sorting !== null) {
             foreach ($sorting as $field => $order) {

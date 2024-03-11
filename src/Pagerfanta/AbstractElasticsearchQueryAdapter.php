@@ -46,6 +46,7 @@ abstract class AbstractElasticsearchQueryAdapter implements AdapterInterface
         $this->nbResults = max(0, $this->indexManager->count(
             $this->getCountQuery(),
             $this->indexes,
+            1,
         ));
 
         return $this->nbResults;

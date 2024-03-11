@@ -44,6 +44,7 @@ final class ElasticsearchSearchQueryAdapter extends AbstractElasticsearchQueryAd
             $this->sorting,
             true,
             $this->filters,
+            1,
         );
     }
 }
