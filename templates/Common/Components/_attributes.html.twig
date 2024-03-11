@@ -1,0 +1,32 @@
+{# queryResult \Webgriffe\SyliusElasticsearchPlugin\Model\QueryResultInterface #}
+{# filter \Webgriffe\SyliusElasticsearchPlugin\Model\FilterInterface #}
+{# filterValue \Webgriffe\SyliusElasticsearchPlugin\Model\FilterValueInterface #}
+
+{% set currentAppliedFilters = app.request.query.all('filters') %}
+
+<div class="ui fluid vertical menu">
+    <a href="{{ path(app.request.attributes.get('_route'), app.request.attributes.all('_route_params')) }}"
+       class="ui button">
+        Reset filters
+    </a>
+
+    {% for filter in queryResult.filters %}
+        <h3>{{ filter.name }}</h3>
+        <ul>
+            {% for filterValue in filter.values %}
+                {% set isCurrentOptionValueUsedAsFilter = currentAppliedFilters[filter.type] is defined and
+                    currentAppliedFilters[filter.type][filter.keyCode] is defined and
+                    currentAppliedFilters[filter.type][filter.keyCode] == filterValue.key
+                %}
+
+                <li>
+                    {% set path = path(
+                        app.request.attributes.get('_route'),
+                        app.request.attributes.all('_route_params')|merge(app.request.query.all)|merge({(filter.queryStringKey): filterValue.key}),
+                    ) %}
+                    <a class="item {% if isCurrentOptionValueUsedAsFilter %}disabled{% endif %}" href="{{ path }}">{{ filterValue.label }} ({{ filterValue.occurrences }})</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+</div>

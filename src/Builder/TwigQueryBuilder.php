@@ -140,28 +140,32 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
         }
 
         if ($withAggregates) {
-            $aggs = [];
-            foreach ($this->attributeRepository->findAll() as $attribute) {
-                $aggregation = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/taxon/aggs/attribute.json.twig', [
-                    'attribute' => $attribute,
-                    'searchTerm' => $searchTerm,
-                    'localeCode' => $localeCode,
-                ]);
-                /** @var array $aggregationNormalized */
-                $aggregationNormalized = json_decode($aggregation, true, 512, JSON_THROW_ON_ERROR);
-                $aggs = array_merge($aggs, $aggregationNormalized);
-            }
-            foreach ($this->optionRepository->findAll() as $option) {
-                $aggregation = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/taxon/aggs/option.json.twig', [
-                    'option' => $option,
-                    'searchTerm' => $searchTerm,
-                    'localeCode' => $localeCode,
-                ]);
-                /** @var array $aggregationNormalized */
-                $aggregationNormalized = json_decode($aggregation, true, 512, JSON_THROW_ON_ERROR);
-                $aggs = array_merge($aggs, $aggregationNormalized);
-            }
-            $searchQuery['aggs'] = $aggs;
+            $attributeAggregationRaw = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/search/aggs/attributes.json.twig', [
+                'searchTerm' => $searchTerm,
+                'localeCode' => $localeCode,
+            ]);
+            /** @var array $attributeAggregationNormalized */
+            $attributeAggregationNormalized = json_decode($attributeAggregationRaw, true, 512, JSON_THROW_ON_ERROR);
+
+            $translatedAttributeAggregationRaw = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/search/aggs/translated-attributes.json.twig', [
+                'searchTerm' => $searchTerm,
+                'localeCode' => $localeCode,
+            ]);
+            /** @var array $translatedAttributeAggregationNormalized */
+            $translatedAttributeAggregationNormalized = json_decode($translatedAttributeAggregationRaw, true, 512, JSON_THROW_ON_ERROR);
+
+            $optionAggregationRaw = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/search/aggs/options.json.twig', [
+                'searchTerm' => $searchTerm,
+                'localeCode' => $localeCode,
+            ]);
+            /** @var array $optionAggregationNormalized */
+            $optionAggregationNormalized = json_decode($optionAggregationRaw, true, 512, JSON_THROW_ON_ERROR);
+
+            $searchQuery['aggs'] = array_merge(
+                $attributeAggregationNormalized,
+                $translatedAttributeAggregationNormalized,
+                $optionAggregationNormalized,
+            );
         }
 
         $this->logger->debug(sprintf('Built search query: "%s".', json_encode($searchQuery, JSON_THROW_ON_ERROR)));

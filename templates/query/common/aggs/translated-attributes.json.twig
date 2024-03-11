@@ -1,0 +1,44 @@
+{
+    "translated-attributes": {
+        "filter": {
+            "bool": {
+                "filter": [
+                    {
+                        "term": {
+                            "translated-attributes.filterable": true
+                        }
+                    }
+                ]
+            }
+        },
+        "aggs": {
+            "filtered-translated-attributes": {
+                "nested": {
+                    "path": "translated-attributes"
+                },
+                "aggs": {
+                    "translated-attribute": {
+                        "terms": {
+                            "field": "translated-attributes.code"
+                        },
+                        "aggs": {
+                            "values": {
+                                "terms": {
+                                    "field": "translated-attributes.values.{{ localeCode }}.text-value"
+                                }
+                            },
+                            "label": {
+                                "terms": {
+                                    "field": "translated-attributes.name.{{localeCode}}"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "meta": {
+            "type": "{{ constant('\\Webgriffe\\SyliusElasticsearchPlugin\\Model\\TranslatedAttributeFilter::TYPE') }}"
+        }
+    }
+}

@@ -1,0 +1,13 @@
+{
+    "taxons.position": {
+        "order": "{{ order }}",
+        "nested": {
+            "path": "taxons",
+            "filter": {
+                "term": {
+                    "taxons.sylius-id": "{{ taxon.id }}"
+                }
+            }
+        }
+    }
+}

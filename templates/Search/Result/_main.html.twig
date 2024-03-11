@@ -1,0 +1,20 @@
+{% import '@SyliusUi/Macro/messages.html.twig' as messages %}
+{% import '@SyliusUi/Macro/pagination.html.twig' as pagination %}
+
+{% include '@WebgriffeSyliusElasticsearchPlugin/Search/Result/_pagination.html.twig' %}
+{% include '@WebgriffeSyliusElasticsearchPlugin/Search/Result/_sorting.html.twig' %}
+
+<div class="ui clearing hidden divider"></div>
+
+{% if paginator|length > 0 %}
+    <div class="ui three cards" id="products" {{ sylius_test_html_attribute('results') }}>
+        {% for result in paginator %}
+            {% include '@SyliusShop/Product/_box.html.twig' with {product: result} %}
+        {% endfor %}
+    </div>
+    <div class="ui hidden divider"></div>
+
+    {{ pagination.simple(paginator) }}
+{% else %}
+    {{ messages.info('sylius.ui.no_results_to_display') }}
+{% endif %}
