@@ -109,15 +109,16 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
         bool $withAggregates = false,
         ?array $filters = null,
     ): array {
+        $localeCode = $this->localeContext->getLocaleCode();
         $query = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/search/query.json.twig', [
             'searchTerm' => $searchTerm,
             'filters' => $filters ?? FilterHelper::retrieveFilters(),
+            'localeCode' => $localeCode,
         ]);
         $searchQuery = [];
         /** @var array $queryNormalized */
         $queryNormalized = json_decode($query, true, 512, JSON_THROW_ON_ERROR);
         $searchQuery['query'] = $queryNormalized;
-        $localeCode = $this->localeContext->getLocaleCode();
 
         if ($sorting !== null) {
             foreach ($sorting as $field => $order) {
