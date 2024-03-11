@@ -63,6 +63,9 @@
         }
     },
     "autoload-dev": {
+        "psr-4": {
+            "Tests\\Webgriffe\\SyliusElasticsearchPlugin\\App\\": "tests/Application/src"
+        },
         "classmap": [
             "tests/Application/Kernel.php"
         ]

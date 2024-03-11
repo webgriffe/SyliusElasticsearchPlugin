@@ -16,3 +16,19 @@ sylius_shop:
 
 sylius_api:
     enabled: true
+
+sylius_product:
+    resources:
+        product:
+            classes:
+                repository: Tests\Webgriffe\SyliusElasticsearchPlugin\App\Doctrine\ORM\ProductRepository
+        product_option:
+            classes:
+                model: Tests\Webgriffe\SyliusElasticsearchPlugin\App\Entity\Product\ProductOption
+
+sylius_attribute:
+    resources:
+        product:
+            attribute:
+                classes:
+                    model: Tests\Webgriffe\SyliusElasticsearchPlugin\App\Entity\Product\ProductAttribute
