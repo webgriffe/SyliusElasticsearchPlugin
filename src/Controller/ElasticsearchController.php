@@ -47,6 +47,7 @@ final class ElasticsearchController extends AbstractController
         private readonly QueryResultMapperInterface $queryResultMapper,
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly SortHelperInterface $sortHelper,
+        private readonly int $taxonDefaultPageLimit,
     ) {
     }
 
@@ -129,7 +130,7 @@ final class ElasticsearchController extends AbstractController
         /** @var array<string, string> $sorting */
         $sorting = $request->query->all('sorting');
         $sorting = $this->sortHelper->retrieveSorting($sorting);
-        $size = $request->query->getInt('limit', 3);
+        $size = $request->query->getInt('limit', $this->taxonDefaultPageLimit);
         $page = $request->query->getInt('page', 1);
 
         /** @var array<string, array<string, string>> $requestFilters */
