@@ -8,11 +8,10 @@ final class SortHelper implements SortHelperInterface
 {
     public function retrieveSorting(array $sortingQueryParams = []): array
     {
-        $sorting = [];
         if ($sortingQueryParams === []) {
-            $sorting = ['position' => 'asc'];
+            return ['position' => 'asc'];
         }
 
-        return $sorting;
+        return $sortingQueryParams;
     }
 }
