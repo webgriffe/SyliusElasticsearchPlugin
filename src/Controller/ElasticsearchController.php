@@ -79,7 +79,7 @@ final class ElasticsearchController extends AbstractController
 
         /** @var array<string, string> $sorting */
         $sorting = $request->query->all('sorting');
-        $sorting = $this->sortHelper->retrieveSorting($sorting);
+        $sorting = $this->sortHelper->retrieveSearchSorting($sorting);
         $size = $request->query->getInt('limit', $this->searchDefaultPageLimit);
         $page = $request->query->getInt('page', 1);
 
@@ -105,14 +105,13 @@ final class ElasticsearchController extends AbstractController
             $size,
         );
         // This prevents Pagerfanta from querying ES from a template
+        /** @var ResponseInterface[] $results */
         $results = $paginator->getCurrentPageResults();
         if (count($results) === 1) {
             $result = $results[0];
-            Assert::isInstanceOf($result, ResponseInterface::class);
 
             return $this->redirectToRoute($result->getRouteName(), $result->getRouteParams());
         }
-
 
         return $this->render('@WebgriffeSyliusElasticsearchPlugin/Search/results.html.twig', [
             'query' => $query,
@@ -139,7 +138,7 @@ final class ElasticsearchController extends AbstractController
 
         /** @var array<string, string> $sorting */
         $sorting = $request->query->all('sorting');
-        $sorting = $this->sortHelper->retrieveSorting($sorting);
+        $sorting = $this->sortHelper->retrieveTaxonSorting($sorting);
         $size = $request->query->getInt('limit', $this->taxonDefaultPageLimit);
         $page = $request->query->getInt('page', 1);
 

@@ -11,5 +11,12 @@ interface SortHelperInterface
      *
      * @return array<string, string>
      */
-    public function retrieveSorting(array $sortingQueryParams = []): array;
+    public function retrieveSearchSorting(array $sortingQueryParams = []): array;
+
+    /**
+     * @param array<string, string> $sortingQueryParams
+     *
+     * @return array<string, string>
+     */
+    public function retrieveTaxonSorting(array $sortingQueryParams = []): array;
 }

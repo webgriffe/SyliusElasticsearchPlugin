@@ -6,7 +6,12 @@ namespace Webgriffe\SyliusElasticsearchPlugin\Helper;
 
 final class SortHelper implements SortHelperInterface
 {
-    public function retrieveSorting(array $sortingQueryParams = []): array
+    public function retrieveSearchSorting(array $sortingQueryParams = []): array
+    {
+        return $sortingQueryParams;
+    }
+
+    public function retrieveTaxonSorting(array $sortingQueryParams = []): array
     {
         if ($sortingQueryParams === []) {
             return ['position' => 'asc'];
