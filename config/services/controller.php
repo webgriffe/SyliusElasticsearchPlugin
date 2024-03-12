@@ -9,6 +9,7 @@ use Webgriffe\SyliusElasticsearchPlugin\Controller\ElasticsearchController;
 return static function (ContainerConfigurator $containerConfigurator) {
     $parameters = $containerConfigurator->parameters();
     $parameters->set('webgriffe.sylius_elasticsearch_plugin.taxon_default_page_limit', 3);
+    $parameters->set('webgriffe.sylius_elasticsearch_plugin.search_default_page_limit', 3);
 
     $services = $containerConfigurator->services();
 
@@ -26,6 +27,7 @@ return static function (ContainerConfigurator $containerConfigurator) {
             service('event_dispatcher'),
             service('webgriffe.sylius_elasticsearch_plugin.helper.sort'),
             param('webgriffe.sylius_elasticsearch_plugin.taxon_default_page_limit'),
+            param('webgriffe.sylius_elasticsearch_plugin.search_default_page_limit'),
         ])
         ->call('setContainer', [service('service_container')])
         ->tag('controller.service_arguments')
