@@ -79,6 +79,7 @@ final class ElasticsearchController extends AbstractController
 
         /** @var array<string, string> $sorting */
         $sorting = $request->query->all('sorting');
+        $sorting = $this->sortHelper->retrieveSorting($sorting);
         $size = $request->query->getInt('limit', $this->searchDefaultPageLimit);
         $page = $request->query->getInt('page', 1);
 
