@@ -43,7 +43,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
     {
         $documents = [];
         /** @var ProductInterface $documentToIndex */
-        foreach ($this->documentTypeRepository->findDocumentsToIndex() as $documentToIndex) {
+        foreach ($this->documentTypeRepository->findDocumentsToIndex($channel) as $documentToIndex) {
             $documents[] = $this->normalizer->normalize($documentToIndex, null, [
                 'type' => 'webgriffe_sylius_elasticsearch_plugin',
                 'channel' => $channel,

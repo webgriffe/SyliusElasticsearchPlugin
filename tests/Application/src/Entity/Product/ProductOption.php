@@ -6,7 +6,7 @@ namespace Tests\Webgriffe\SyliusElasticsearchPlugin\App\Entity\Product;
 
 use Doctrine\ORM\Mapping as ORM;
 use Sylius\Component\Product\Model\ProductOption as BaseProductOption;
-use Webgriffe\SyliusElasticsearchPlugin\Model\DoctrineORMFilterableTrait;
+use Webgriffe\SyliusElasticsearchPlugin\Doctrine\ORM\FilterableTrait;
 use Webgriffe\SyliusElasticsearchPlugin\Model\FilterableInterface;
 
 /**
@@ -15,5 +15,5 @@ use Webgriffe\SyliusElasticsearchPlugin\Model\FilterableInterface;
  */
 class ProductOption extends BaseProductOption implements FilterableInterface
 {
-    use DoctrineORMFilterableTrait;
+    use FilterableTrait;
 }

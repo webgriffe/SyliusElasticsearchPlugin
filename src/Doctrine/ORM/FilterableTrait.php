@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Webgriffe\SyliusElasticsearchPlugin\Model;
+namespace Webgriffe\SyliusElasticsearchPlugin\Doctrine\ORM;
 
 use Doctrine\ORM\Mapping as ORM;
 
-trait DoctrineORMFilterableTrait
+trait FilterableTrait
 {
     /** @ORM\Column(name="filterable", type="boolean", nullable=false, options={"default"=false}) */
     #[ORM\Column(name: 'filterable', type: 'boolean', nullable: false, options: ['default' => false])]
