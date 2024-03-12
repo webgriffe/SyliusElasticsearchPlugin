@@ -5,12 +5,7 @@
                 "filter": [
                     {
                         "term": {
-                            "variants.enabled": true
-                        }
-                    },
-                    {
-                        "term": {
-                            "variants.options.filterable": true
+                            "product-options.filterable": true
                         }
                     }
                 ]
@@ -19,29 +14,36 @@
         "aggs": {
             "filtered_options": {
                 "nested": {
-                    "path": "variants.options"
+                    "path": "product-options"
                 },
                 "aggs": {
                     "option": {
                         "terms": {
-                            "field": "variants.options.code"
+                            "field": "product-options.code"
                         },
                         "aggs": {
                             "values": {
-                                "terms": {
-                                    "field": "variants.options.value.code"
+                                "nested": {
+                                    "path": "product-options.values"
                                 },
                                 "aggs": {
-                                    "label": {
+                                    "value": {
                                         "terms": {
-                                            "field": "variants.options.value.name.{{localeCode}}"
+                                            "field": "product-options.values.code"
+                                        },
+                                        "aggs": {
+                                            "label": {
+                                                "terms": {
+                                                    "field": "product-options.values.name.{{localeCode}}"
+                                                }
+                                            }
                                         }
                                     }
                                 }
                             },
                             "label": {
                                 "terms": {
-                                    "field": "variants.options.name.{{localeCode}}"
+                                    "field": "product-options.name.{{localeCode}}"
                                 }
                             }
                         }
@@ -50,7 +52,7 @@
             }
         },
         "meta": {
-            "type": "{{ constant('\\Webgriffe\\SyliusElasticsearchPlugin\\Model\\OptionFilter::TYPE') }}"
+            "type": "option"
         }
     }
 }

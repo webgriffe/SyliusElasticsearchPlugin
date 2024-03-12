@@ -39,7 +39,7 @@ final readonly class OptionFilter extends Filter
             }
 
             $optionValues = [];
-            foreach ($bucket['values']['buckets'] as $optionValueBucket) {
+            foreach ($bucket['values']['value']['buckets'] as $optionValueBucket) {
                 $optionValueLabel = $optionValueBucket['key'];
                 $optionValueLabelBuckets = $optionValueBucket['label']['buckets'];
                 $optionValueLabelBucket = reset($optionValueLabelBuckets);

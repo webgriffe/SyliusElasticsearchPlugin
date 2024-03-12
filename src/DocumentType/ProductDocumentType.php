@@ -120,6 +120,12 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
                     'include_in_parent' => true,
                     'properties' => $this->attributeProperties(true),
                 ],
+                'product-options' => [
+                    'type' => 'nested',
+                    'dynamic' => false,
+                    'include_in_parent' => true,
+                    'properties' => $this->productOptionProperties(),
+                ],
                 'images' => [
                     'type' => 'nested',
                     'dynamic' => false,
@@ -310,13 +316,34 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         ];
     }
 
+    private function productOptionProperties(): array
+    {
+        $properties = $this->optionValueProperties();
+
+        return [
+            'sylius-id' => $this->keyword(false),
+            'code' => $this->keyword(),
+            'name' => $this->nestedTranslationKeywords(false),
+            'position' => $this->integer(false),
+            'filterable' => $this->boolean(),
+            'values' => [
+                'type' => 'nested',
+                'dynamic' => false,
+                'include_in_parent' => true,
+                'properties' => $properties,
+            ],
+        ];
+    }
+
     private function optionProperties(): array
     {
         return [
             'sylius-id' => $this->keyword(false),
             'code' => $this->keyword(),
             'name' => $this->nestedTranslationKeywords(false),
-            'filterable' => $this->boolean(true),
+            'position' => $this->integer(false),
+            'translatable' => $this->boolean(false),
+            'filterable' => $this->boolean(),
             'value' => [
                 'type' => 'object',
                 'dynamic' => false,

@@ -68,6 +68,7 @@ final readonly class ProductNormalizer implements NormalizerInterface
             'main-taxon' => null,
             'attributes' => [],
             'translated-attributes' => [],
+            'product-options' => [],
             'images' => [],
         ];
         /** @var ProductTranslationInterface $productTranslation */
@@ -109,6 +110,8 @@ final readonly class ProductNormalizer implements NormalizerInterface
             $normalizedProduct['variants'][] = $this->normalizeProductVariant($variant, $channel);
         }
 
+        // Product attributes indexing for filters
+
         /** @var array<string|int, array{attribute: ProductAttributeInterface, values: ProductAttributeValueInterface[]}> $translatedAttributes */
         $translatedAttributes = [];
         /** @var array<string|int, array{attribute: ProductAttributeInterface, values: ProductAttributeValueInterface[]}> $attributes */
@@ -145,11 +148,48 @@ final readonly class ProductNormalizer implements NormalizerInterface
             $attributes[$attributeId]['values'][] = $attributeValue;
         }
         foreach ($translatedAttributes as $attribute) {
-            $normalizedProduct['translated-attributes'][] = $this->normalizeAttribute($attribute);
+            $normalizedProduct['translated-attributes'][] = $this->normalizeAttributeWithValues($attribute);
         }
         foreach ($attributes as $attribute) {
-            $normalizedProduct['attributes'][] = $this->normalizeAttribute($attribute);
+            $normalizedProduct['attributes'][] = $this->normalizeAttributeWithValues($attribute);
         }
+
+        // Product options indexing for filters
+
+        /** @var array<string|int, array{option: ProductOptionInterface, values: array<array-key, ProductOptionValueInterface>}> $optionsWithValues */
+        $optionsWithValues = [];
+
+        /** @var ProductVariantInterface $variant */
+        foreach ($product->getEnabledVariants() as $variant) {
+            foreach ($variant->getOptionValues() as $optionValue) {
+                $option = $optionValue->getOption();
+                Assert::isInstanceOf($option, ProductOptionInterface::class);
+
+                $optionId = $option->getId();
+                if (!is_string($optionId) && !is_int($optionId)) {
+                    throw new RuntimeException('Option ID different from string or integer is not supported.');
+                }
+                $optionValueId = $optionValue->getId();
+                if (!is_string($optionValueId) && !is_int($optionValueId)) {
+                    throw new RuntimeException('Option value ID different from string or integer is not supported.');
+                }
+
+                if (!array_key_exists($optionId, $optionsWithValues)) {
+                    $optionsWithValues[$optionId] = [
+                        'option' => $option,
+                        'values' => [],
+                    ];
+                }
+                if (array_key_exists($optionValueId, $optionsWithValues[$optionId]['values'])) {
+                    continue;
+                }
+                $optionsWithValues[$optionId]['values'][$optionValueId] = $optionValue;
+            }
+        }
+        foreach ($optionsWithValues as $optionWithValues) {
+            $normalizedProduct['product-options'][] = $this->normalizeOptionWithValues($optionWithValues);
+        }
+
         /** @var ProductImageInterface $image */
         foreach ($product->getImages() as $image) {
             $normalizedProduct['images'][] = $this->normalizeProductImage($image);
@@ -261,7 +301,7 @@ final readonly class ProductNormalizer implements NormalizerInterface
     /**
      * @param array{attribute: ProductAttributeInterface, values: ProductAttributeValueInterface[]} $attributeWithValues
      */
-    private function normalizeAttribute(array $attributeWithValues): array
+    private function normalizeAttributeWithValues(array $attributeWithValues): array
     {
         $attribute = $attributeWithValues['attribute'];
         $isTranslatable = $attribute->isTranslatable();
@@ -314,6 +354,39 @@ final readonly class ProductNormalizer implements NormalizerInterface
             'locale' => $attributeValue->getLocaleCode(),
             $storageType . '-value' => $attributeValue->getValue(),
         ];
+    }
+
+    /**
+     * @param array{option: ProductOptionInterface, values: ProductOptionValueInterface[]} $optionWithValues
+     */
+    private function normalizeOptionWithValues(array $optionWithValues): array
+    {
+        $option = $optionWithValues['option'];
+        $filterable = false;
+        if ($option instanceof FilterableInterface) {
+            $filterable = $option->isFilterable();
+        }
+        $normalizedOptionValue = [
+            'sylius-id' => $option->getId(),
+            'code' => $option->getCode(),
+            'name' => [],
+            'position' => $option->getPosition(),
+            'filterable' => $filterable,
+            'values' => [],
+        ];
+        /** @var ProductOptionTranslationInterface $optionTranslation */
+        foreach ($option->getTranslations() as $optionTranslation) {
+            $localeCode = $optionTranslation->getLocale();
+            Assert::string($localeCode);
+            $normalizedOptionValue['name'][] = [
+                $localeCode => $optionTranslation->getName(),
+            ];
+        }
+        foreach ($optionWithValues['values'] as $optionValue) {
+            $normalizedOptionValue['values'][] = $this->normalizeProductOptionValue($optionValue);
+        }
+
+        return $normalizedOptionValue;
     }
 
     private function normalizeProductOptionAndProductOptionValue(
