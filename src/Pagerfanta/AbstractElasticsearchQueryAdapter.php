@@ -38,6 +38,8 @@ abstract class AbstractElasticsearchQueryAdapter implements AdapterInterface
      */
     abstract protected function getQuery(int $page, int $size): array;
 
+    abstract protected function getMinScore(): float;
+
     public function getNbResults(): int
     {
         if ($this->nbResults !== null) {
@@ -46,7 +48,7 @@ abstract class AbstractElasticsearchQueryAdapter implements AdapterInterface
         $this->nbResults = max(0, $this->indexManager->count(
             $this->getCountQuery(),
             $this->indexes,
-            1,
+            $this->getMinScore(),
         ));
 
         return $this->nbResults;

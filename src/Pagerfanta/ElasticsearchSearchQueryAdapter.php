@@ -32,7 +32,19 @@ final class ElasticsearchSearchQueryAdapter extends AbstractElasticsearchQueryAd
 
     protected function getCountQuery(): array
     {
-        return $this->queryBuilder->buildSearchQuery($this->searchTerm);
+        return $this->queryBuilder->buildSearchQuery(
+            $this->searchTerm,
+            null,
+            null,
+            null,
+            false,
+            $this->filters,
+        );
+    }
+
+    protected function getMinScore(): float
+    {
+        return 1;
     }
 
     protected function getQuery(int $page, int $size): array
@@ -44,7 +56,7 @@ final class ElasticsearchSearchQueryAdapter extends AbstractElasticsearchQueryAd
             $this->sorting,
             true,
             $this->filters,
-            1,
+            $this->getMinScore(),
         );
     }
 }

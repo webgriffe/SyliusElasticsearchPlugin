@@ -31,9 +31,21 @@ final class ElasticsearchTaxonQueryAdapter extends AbstractElasticsearchQueryAda
         parent::__construct($indexManager, $queryResultMapper, $indexes);
     }
 
+    protected function getMinScore(): float
+    {
+        return 0;
+    }
+
     protected function getCountQuery(): array
     {
-        return $this->queryBuilder->buildTaxonQuery($this->taxon);
+        return $this->queryBuilder->buildTaxonQuery(
+            $this->taxon,
+            null,
+            null,
+            null,
+            false,
+            $this->filters,
+        );
     }
 
     protected function getQuery(int $page, int $size): array
