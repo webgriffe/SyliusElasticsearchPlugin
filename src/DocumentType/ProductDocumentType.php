@@ -331,8 +331,8 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
     {
         return [
             'sylius-id' => $this->keyword(false),
-            'code' => $this->keyword(false),
-            'value' => $this->keyword(),
+            'code' => $this->keyword(),
+            'value' => $this->keyword(false),
             'name' => $this->nestedTranslationKeywords(false),
         ];
     }
