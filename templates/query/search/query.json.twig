@@ -9,6 +9,21 @@
         ],
         "should": [
             {
+                "term": {
+                    "code": "{{ searchTerm }}"
+                }
+            },
+            {
+                "nested": {
+                    "path": "variants",
+                    "query": {
+                        "term": {
+                            "variants.code": "{{ searchTerm }}"
+                        }
+                    }
+                }
+            },
+            {
                 "nested": {
                     "path": "name",
                     "query": {
@@ -26,12 +41,156 @@
             },
             {
                 "nested": {
+                    "path": "variants",
+                    "query": {
+                        "match": {
+                            "variants.name.{{ localeCode }}": {
+                                "query": "{{ searchTerm }}",
+                                "boost": 9,
+                                "fuzziness": "AUTO",
+                                "fuzzy_transpositions": true,
+                                "operator": "OR"
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "nested": {
                     "path": "description",
                     "query": {
                         "match": {
                             "description.{{ localeCode }}": {
                                 "query": "{{ searchTerm }}",
+                                "boost": 8,
+                                "fuzziness": "AUTO",
+                                "fuzzy_transpositions": true,
+                                "operator": "OR"
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "nested": {
+                    "path": "short-description",
+                    "query": {
+                        "match": {
+                            "short-description.{{ localeCode }}": {
+                                "query": "{{ searchTerm }}",
+                                "boost": 7,
+                                "fuzziness": "AUTO",
+                                "fuzzy_transpositions": true,
+                                "operator": "OR"
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "nested": {
+                    "path": "slug",
+                    "query": {
+                        "match": {
+                            "slug.{{ localeCode }}": {
+                                "query": "{{ searchTerm }}",
+                                "boost": 6,
+                                "fuzziness": "AUTO",
+                                "fuzzy_transpositions": true,
+                                "operator": "OR"
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "nested": {
+                    "path": "meta-description",
+                    "query": {
+                        "match": {
+                            "meta-description.{{ localeCode }}": {
+                                "query": "{{ searchTerm }}",
                                 "boost": 5,
+                                "fuzziness": "AUTO",
+                                "fuzzy_transpositions": true,
+                                "operator": "OR"
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "nested": {
+                    "path": "meta-keywords",
+                    "query": {
+                        "match": {
+                            "meta-keywords.{{ localeCode }}": {
+                                "query": "{{ searchTerm }}",
+                                "boost": 4,
+                                "fuzziness": "AUTO",
+                                "fuzzy_transpositions": true,
+                                "operator": "OR"
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "nested": {
+                    "path": "taxons",
+                    "query": {
+                        "match": {
+                            "taxons.name.{{ localeCode }}": {
+                                "query": "{{ searchTerm }}",
+                                "boost": 3,
+                                "fuzziness": "AUTO",
+                                "fuzzy_transpositions": true,
+                                "operator": "OR"
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "nested": {
+                    "path": "translated-attributes",
+                    "query": {
+                        "match": {
+                            "translated-attributes.values.{{ localeCode }}.text-value": {
+                                "query": "{{ searchTerm }}",
+                                "boost": 3,
+                                "fuzziness": "AUTO",
+                                "fuzzy_transpositions": true,
+                                "operator": "OR"
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "nested": {
+                    "path": "attributes",
+                    "query": {
+                        "match": {
+                            "attributes.values.text-value": {
+                                "query": "{{ searchTerm }}",
+                                "boost": 3,
+                                "fuzziness": "AUTO",
+                                "fuzzy_transpositions": true,
+                                "operator": "OR"
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "nested": {
+                    "path": "product-options",
+                    "query": {
+                        "match": {
+                            "product-options.values.name.{{ localeCode }}": {
+                                "query": "{{ searchTerm }}",
+                                "boost": 3,
                                 "fuzziness": "AUTO",
                                 "fuzzy_transpositions": true,
                                 "operator": "OR"

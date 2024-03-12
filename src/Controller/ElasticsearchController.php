@@ -25,6 +25,7 @@ use Webgriffe\SyliusElasticsearchPlugin\Form\Type\SearchType;
 use Webgriffe\SyliusElasticsearchPlugin\Generator\IndexNameGeneratorInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Helper\SortHelperInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Mapper\QueryResultMapperInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Model\ResponseInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Pagerfanta\ElasticsearchSearchQueryAdapter;
 use Webgriffe\SyliusElasticsearchPlugin\Pagerfanta\ElasticsearchTaxonQueryAdapter;
 use Webgriffe\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
@@ -103,7 +104,14 @@ final class ElasticsearchController extends AbstractController
             $size,
         );
         // This prevents Pagerfanta from querying ES from a template
-        $paginator->getCurrentPageResults();
+        $results = $paginator->getCurrentPageResults();
+        if (count($results) === 1) {
+            $result = $results[0];
+            Assert::isInstanceOf($result, ResponseInterface::class);
+
+            return $this->redirectToRoute($result->getRouteName(), $result->getRouteParams());
+        }
+
 
         return $this->render('@WebgriffeSyliusElasticsearchPlugin/Search/results.html.twig', [
             'query' => $query,

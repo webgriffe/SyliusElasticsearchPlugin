@@ -236,7 +236,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
             'sylius-id' => $this->keyword(),
             'code' => $this->keyword(false),
             'position' => $this->integer(false),
-            'name' => $this->nestedTranslationKeywords(false),
+            'name' => $this->nestedTranslationKeywords(),
         ];
     }
 
@@ -360,7 +360,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
             'sylius-id' => $this->keyword(false),
             'code' => $this->keyword(),
             'value' => $this->keyword(false),
-            'name' => $this->nestedTranslationKeywords(false),
+            'name' => $this->nestedTranslationKeywords(),
         ];
     }
 
