@@ -16,6 +16,7 @@ use Webgriffe\SyliusElasticsearchPlugin\ClientBuilder\Exception\ClientConnection
 
 /**
  * @psalm-import-type ESQueryResult from ClientInterface
+ * @psalm-import-type ESSuggests from ClientInterface
  */
 final class ElasticsearchClient implements ClientInterface
 {
@@ -212,6 +213,19 @@ final class ElasticsearchClient implements ClientInterface
         ]);
 
         return $result['count'];
+    }
+
+    public function suggesters(
+        array $query,
+        array $indexes = [],
+    ): array {
+        /** @var array{took: int, timed_out: bool, _shards: array, hits: array, suggest: ESSuggests} $result */
+        $result = $this->getClient()->search([
+            'index' => implode(',', $indexes),
+            'body' => $query,
+        ]);
+
+        return $result['suggest'];
     }
 
     private function getClient(): Client

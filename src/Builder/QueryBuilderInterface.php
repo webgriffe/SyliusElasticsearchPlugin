@@ -39,4 +39,6 @@ interface QueryBuilderInterface
         ?array $filters = null,
         ?float $minScore = null,
     ): array;
+
+    public function buildSuggestersQuery(string $searchTerm): array;
 }

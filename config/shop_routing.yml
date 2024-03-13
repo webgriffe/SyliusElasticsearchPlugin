@@ -16,3 +16,11 @@ sylius_shop_search:
         query: null
     requirements:
         query: .+(?<!/)
+
+sylius_shop_instant_search:
+    path: /instant-search/{query}
+    methods: [GET]
+    defaults:
+        _controller: webgriffe.sylius_elasticsearch_plugin.controller.elasticsearch::instantSearchAction
+    requirements:
+        query: .+(?<!/)

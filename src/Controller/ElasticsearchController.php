@@ -33,6 +33,8 @@ use Webmozart\Assert\Assert;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
+ *
+ * @psalm-import-type ESSuggests from ClientInterface
  */
 final class ElasticsearchController extends AbstractController
 {
@@ -121,6 +123,37 @@ final class ElasticsearchController extends AbstractController
         ]);
     }
 
+    public function instantSearchAction(Request $request, string $query): Response
+    {
+        $channel = $this->channelContext->getChannel();
+        Assert::isInstanceOf($channel, ChannelInterface::class);
+
+        $indexAliasNames = [];
+        foreach ($this->documentTypeProvider->getDocumentsType() as $documentType) {
+            $indexAliasNames[] = $this->indexNameGenerator->generateAlias(
+                $channel,
+                $documentType,
+            );
+        }
+
+        $suggesters = $this->indexManager->suggesters(
+            $this->queryBuilder->buildSuggestersQuery($query),
+            $indexAliasNames,
+        );
+
+        $esResult = $this->indexManager->query(
+            $this->queryBuilder->buildSearchQuery($query),
+            $indexAliasNames,
+        );
+        $queryResult = $this->queryResultMapper->map($esResult);
+
+        return $this->render('@WebgriffeSyliusElasticsearchPlugin/InstantSearch/results.html.twig', [
+            'query' => $query,
+            'queryResult' => $queryResult,
+            'suggesters' => $this->buildSuggestions($suggesters),
+        ]);
+    }
+
     public function taxonAction(Request $request, string $slug): Response
     {
         $localeCode = $this->localeContext->getLocaleCode();
@@ -176,5 +209,31 @@ final class ElasticsearchController extends AbstractController
             'filters' => $esTaxonQueryAdapter->getQueryResult()->getFilters(),
             'queryResult' => $esTaxonQueryAdapter->getQueryResult(),
         ]);
+    }
+
+    /**
+     * @param ESSuggests $suggesters
+     */
+    private function buildSuggestions(array $suggesters): array
+    {
+        $suggestions = [];
+        foreach ($suggesters as $field => $suggestion) {
+            foreach ($suggestion as $suggestionData) {
+                if (count($suggestionData['options']) === 0) {
+                    $suggestions[$field][] = $suggestionData['text'];
+
+                    continue;
+                }
+                foreach ($suggestionData['options'] as $option) {
+                    $suggestions[$field][] = $option['text'];
+                }
+            }
+        }
+
+        foreach ($suggestions as $field => $suggestion) {
+            $suggestions[$field] = implode(' ', $suggestion);
+        }
+
+        return $suggestions;
     }
 }

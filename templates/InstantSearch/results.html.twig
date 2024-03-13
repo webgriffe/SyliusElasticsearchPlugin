@@ -1,0 +1,18 @@
+{# queryResult \Webgriffe\SyliusElasticsearchPlugin\Model\QueryResultInterface #}
+
+<div>
+    Maybe you were looking for:
+    <ul>
+        {% for suggestion in suggesters %}
+            <li><a href="{{ path('sylius_shop_search', {'query': suggestion}) }}">{{ suggestion }}</a></li>
+        {% endfor %}
+    </ul>
+</div>
+
+<div>
+    Results for "{{ query }}":
+
+    {% for result in queryResult.hints(1, 10) %}
+        {% include '@SyliusShop/Product/_box.html.twig' with {product: result} %}
+    {% endfor %}
+</div>

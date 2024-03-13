@@ -169,4 +169,22 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
 
         return $searchQuery;
     }
+
+    public function buildSuggestersQuery(
+        string $searchTerm,
+    ): array {
+        $localeCode = $this->localeContext->getLocaleCode();
+        $query = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/suggesters/query.json.twig', [
+            'searchTerm' => $searchTerm,
+            'localeCode' => $localeCode,
+        ]);
+        $suggestersQuery = [];
+        /** @var array $queryNormalized */
+        $queryNormalized = json_decode($query, true, 512, JSON_THROW_ON_ERROR);
+        $suggestersQuery['suggest'] = $queryNormalized;
+
+        $this->logger->debug(sprintf('Built suggesters query: "%s".', json_encode($suggestersQuery, JSON_THROW_ON_ERROR)));
+
+        return $suggestersQuery;
+    }
 }
