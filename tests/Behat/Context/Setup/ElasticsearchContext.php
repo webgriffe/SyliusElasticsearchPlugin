@@ -30,6 +30,6 @@ final readonly class ElasticsearchContext implements Context
             }
         }
 
-        sleep(2); // Wait for the indexing to be completed, TODO: find a way to query the client for the indexing status
+        sleep(1); // Wait for the indexing to be completed, TODO: find a way to query the client for the indexing status
     }
 }

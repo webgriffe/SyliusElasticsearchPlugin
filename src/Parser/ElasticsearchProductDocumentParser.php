@@ -74,12 +74,22 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
             $productResponse->addImage($productImage);
         }
 
+        // Doing this sorting here could avoid to make any DB query to get the variants in the right order just for
+        // getting the "default variant"
+        $sortedVariants = $source['variants'];
+        usort(
+            $sortedVariants,
+            static function (array $a, array $b): int {
+                return $a['position'] <=> $b['position'];
+            }
+        );
         /** @var array{code: ?string, enabled: ?bool, price: array{price: ?int, original-price: ?int, applied-promotions: array}} $esVariant */
-        foreach ($source['variants'] as $esVariant) {
+        foreach ($sortedVariants as $esVariant) {
             $productVariant = $this->productVariantFactory->createForProduct($productResponse);
             Assert::isInstanceOf($productVariant, ProductVariantInterface::class);
             $productVariant->setCode($esVariant['code']);
             $productVariant->setEnabled($esVariant['enabled']);
+            $productVariant->setPosition($esVariant['position']);
 
             $channelPricing = $this->channelPricingFactory->createNew();
             $channelPricing->setPrice($esVariant['price']['price']);
