@@ -13,8 +13,8 @@
                         "bool": {
                             "filter": [
                                 {
-                                    "term": {
-                                        "taxons.sylius-id": "{{ taxon.id }}"
+                                    "terms": {
+                                        "taxons.sylius-id": [{{ taxonIdsToSearch|join(', ') }}]
                                     }
                                 }
                             ]

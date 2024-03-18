@@ -81,9 +81,9 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
             $sortedVariants,
             static function (array $a, array $b): int {
                 return $a['position'] <=> $b['position'];
-            }
+            },
         );
-        /** @var array{code: ?string, enabled: ?bool, price: array{price: ?int, original-price: ?int, applied-promotions: array}} $esVariant */
+        /** @var array{code: ?string, enabled: ?bool, position: int, price: array{price: ?int, original-price: ?int, applied-promotions: array}} $esVariant */
         foreach ($sortedVariants as $esVariant) {
             $productVariant = $this->productVariantFactory->createForProduct($productResponse);
             Assert::isInstanceOf($productVariant, ProductVariantInterface::class);

@@ -29,10 +29,18 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
         ?array $filters = null,
     ): array {
         $localeCode = $this->localeContext->getLocaleCode();
+        $taxonIdsToSearch = array_merge(
+            [$taxon->getId()],
+            array_map(
+                static fn (TaxonInterface $taxon) => $taxon->getId(),
+                $this->getTaxonChildren($taxon),
+            ),
+        );
         $query = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/taxon/query.json.twig', [
             'taxon' => $taxon,
             'filters' => $filters ?? FilterHelper::retrieveFilters(),
             'localeCode' => $localeCode,
+            'taxonIdsToSearch' => $taxonIdsToSearch,
         ]);
         $taxonQuery = [];
         /** @var array $queryNormalized */
@@ -186,5 +194,21 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
         $this->logger->debug(sprintf('Built suggesters query: "%s".', json_encode($suggestersQuery, JSON_THROW_ON_ERROR)));
 
         return $suggestersQuery;
+    }
+
+    /**
+     * @return TaxonInterface[]
+     */
+    private function getTaxonChildren(TaxonInterface $taxon): array
+    {
+        $children = [];
+        foreach ($taxon->getChildren() as $child) {
+            if (!$child instanceof TaxonInterface) {
+                continue;
+            }
+            $children = array_merge($children, $this->getTaxonChildren($child));
+        }
+
+        return array_merge($children, [$taxon]);
     }
 }

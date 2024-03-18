@@ -8,8 +8,8 @@ use Webgriffe\SyliusElasticsearchPlugin\Controller\ElasticsearchController;
 
 return static function (ContainerConfigurator $containerConfigurator) {
     $parameters = $containerConfigurator->parameters();
-    $parameters->set('webgriffe.sylius_elasticsearch_plugin.taxon_default_page_limit', 3);
-    $parameters->set('webgriffe.sylius_elasticsearch_plugin.search_default_page_limit', 3);
+    $parameters->set('webgriffe.sylius_elasticsearch_plugin.taxon_default_page_limit', 9);
+    $parameters->set('webgriffe.sylius_elasticsearch_plugin.search_default_page_limit', 9);
 
     $services = $containerConfigurator->services();
 
