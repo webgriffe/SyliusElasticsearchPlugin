@@ -219,7 +219,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         foreach ($locales as $locale) {
             $localeCode = $locale->getCode();
             Assert::string($localeCode);
-            $properties[$localeCode] = $this->text($indexValue);
+            $properties[$localeCode] = $this->keyword($indexValue);
         }
 
         return [
