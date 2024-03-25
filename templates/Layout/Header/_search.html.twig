@@ -6,7 +6,7 @@
 <div class="fields">
 
     <div>
-        {{ form_row(searchForm.query, {attr: {class: 'ui'}}) }}
+        {{ form_row(searchForm.query, {attr: {class: 'ui', 'data-search-input-element': true}}) }}
     </div>
 
     <div>
@@ -17,3 +17,8 @@
 
 </div>
 {{ form_end(searchForm, {'render_rest': true}) }}
+
+<div data-instant-search-result-content
+     class="ui modal"
+     style="width: auto; max-height: 500px; overflow: scroll;">
+</div>
