@@ -146,14 +146,6 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         return $event->getMappings();
     }
 
-    private function text(bool $index = true): array
-    {
-        return [
-            'type' => 'text',
-            'index' => $index,
-        ];
-    }
-
     private function keyword(bool $index = true): array
     {
         return [
@@ -282,14 +274,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
             'sylius-id' => $this->keyword(false),
             'code' => $this->keyword(false),
             'locale' => $this->keyword(false),
-            'checkbox-value' => $this->keyword(),
-            'date-value' => $this->keyword(),
-            'datetime-value' => $this->keyword(),
-            'integer-value' => $this->integer(),
-            'percent-value' => $this->float(),
-            'select-value' => $this->keyword(),
-            'textarea-value' => $this->text(),
-            'text-value' => $this->keyword(),
+            'values' => $this->keyword(),
         ];
     }
 

@@ -13,6 +13,7 @@ return static function (ContainerConfigurator $containerConfigurator) {
         ->args([
             service('sylius.product_variant_resolver.default'),
             service('event_dispatcher'),
+            param('kernel.default_locale'),
         ])
         ->tag('serializer.normalizer', ['priority' => 200])
     ;

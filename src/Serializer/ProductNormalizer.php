@@ -6,6 +6,7 @@ namespace Webgriffe\SyliusElasticsearchPlugin\Serializer;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use RuntimeException;
+use Sylius\Component\Attribute\Model\AttributeValueInterface;
 use Sylius\Component\Core\Model\CatalogPromotionInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Sylius\Component\Core\Model\ChannelPricingInterface;
@@ -36,6 +37,7 @@ final readonly class ProductNormalizer implements NormalizerInterface
     public function __construct(
         private ProductVariantResolverInterface $productVariantResolver,
         private EventDispatcherInterface $eventDispatcher,
+        private string $defaultLocaleCode,
     ) {
     }
 
@@ -343,16 +345,44 @@ final readonly class ProductNormalizer implements NormalizerInterface
 
     private function normalizeAttributeValue(ProductAttributeValueInterface $attributeValue): array
     {
+        $localeCode = $attributeValue->getLocaleCode();
+        Assert::string($localeCode);
         $attribute = $attributeValue->getAttribute();
         Assert::isInstanceOf($attribute, ProductAttributeInterface::class);
         $storageType = $attribute->getStorageType();
         Assert::stringNotEmpty($storageType);
 
+        $attributeValueToIndex = [$attributeValue->getValue()];
+        if ($storageType === AttributeValueInterface::STORAGE_JSON) {
+            $attributeValueToIndex = [];
+            /** @var array<string, array<string, ?string>> $allAttributeValues */
+            $allAttributeValues = $attribute->getConfiguration()['choices'];
+            /** @var string|array<array-key, string> $attributeValueValues */
+            $attributeValueValues = $attributeValue->getValue();
+            if (is_iterable($attributeValueValues)) {
+                foreach ($attributeValueValues as $attributeValueValue) {
+                    if (array_key_exists($localeCode, $allAttributeValues[$attributeValueValue]) &&
+                        $allAttributeValues[$attributeValueValue][$localeCode] !== null
+                    ) {
+                        $attributeValueToIndex[] = $allAttributeValues[$attributeValueValue][$localeCode];
+                    } else {
+                        $attributeValueToIndex[] = $allAttributeValues[$attributeValueValue][$this->defaultLocaleCode];
+                    }
+                }
+            } else {
+                if ($allAttributeValues[$attributeValueValues][$localeCode] !== null) {
+                    $attributeValueToIndex[] = $allAttributeValues[$attributeValueValues][$localeCode] . ', ';
+                } elseif ($allAttributeValues[$attributeValueValues][$this->defaultLocaleCode] !== null) {
+                    $attributeValueToIndex[] = $allAttributeValues[$attributeValueValues][$this->defaultLocaleCode];
+                }
+            }
+        }
+
         return [
             'sylius-id' => $attributeValue->getId(),
             'code' => $attributeValue->getCode(),
-            'locale' => $attributeValue->getLocaleCode(),
-            $storageType . '-value' => $attributeValue->getValue(),
+            'locale' => $localeCode,
+            'values' => $attributeValueToIndex,
         ];
     }
 

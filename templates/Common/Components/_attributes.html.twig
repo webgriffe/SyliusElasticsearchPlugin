@@ -11,22 +11,28 @@
     </a>
 
     {% for filter in queryResult.filters %}
-        <h3>{{ filter.name }}</h3>
-        <ul>
-            {% for filterValue in filter.values %}
-                {% set isCurrentOptionValueUsedAsFilter = currentAppliedFilters[filter.type] is defined and
-                    currentAppliedFilters[filter.type][filter.keyCode] is defined and
-                    currentAppliedFilters[filter.type][filter.keyCode] == filterValue.key
-                %}
+        <div {{ sylius_test_html_attribute('filter-name', filter.name) }} style="margin: 10px auto;">
+            <h3>{{ filter.name }}</h3>
+            <ul>
+                {% for filterValue in filter.values %}
+                    {% set isCurrentOptionValueUsedAsFilter = currentAppliedFilters[filter.type] is defined and
+                        currentAppliedFilters[filter.type][filter.keyCode] is defined and
+                        currentAppliedFilters[filter.type][filter.keyCode] == filterValue.key
+                    %}
 
-                <li>
-                    {% set path = path(
-                        app.request.attributes.get('_route'),
-                        app.request.attributes.all('_route_params')|merge(app.request.query.all)|merge({(filter.queryStringKey): filterValue.key}),
-                    ) %}
-                    <a class="item {% if isCurrentOptionValueUsedAsFilter %}disabled{% endif %}" href="{{ path }}">{{ filterValue.label }} ({{ filterValue.occurrences }})</a>
-                </li>
-            {% endfor %}
-        </ul>
+                    <li>
+                        {% set path = path(
+                            app.request.attributes.get('_route'),
+                            app.request.attributes.all('_route_params')|merge(app.request.query.all)|merge({(filter.queryStringKey): filterValue.key}),
+                        ) %}
+                        <a class="item {% if isCurrentOptionValueUsedAsFilter %}disabled{% endif %}"
+                           href="{{ path }}"
+                            {{ sylius_test_html_attribute('filter-value', filterValue.label) }}>
+                            {{ filterValue.label }} ({{ filterValue.occurrences }})
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
     {% endfor %}
 </div>
