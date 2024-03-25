@@ -76,6 +76,7 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
 
         // Doing this sorting here could avoid to make any DB query to get the variants in the right order just for
         // getting the "default variant"
+        /** @var array<array-key, array{code: ?string, enabled: ?bool, position: int, price: array{price: ?int, original-price: ?int, applied-promotions: array}}> $sortedVariants */
         $sortedVariants = $source['variants'];
         usort(
             $sortedVariants,
@@ -83,7 +84,6 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
                 return $a['position'] <=> $b['position'];
             },
         );
-        /** @var array{code: ?string, enabled: ?bool, position: int, price: array{price: ?int, original-price: ?int, applied-promotions: array}} $esVariant */
         foreach ($sortedVariants as $esVariant) {
             $productVariant = $this->productVariantFactory->createForProduct($productResponse);
             Assert::isInstanceOf($productVariant, ProductVariantInterface::class);

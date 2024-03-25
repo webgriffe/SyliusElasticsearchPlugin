@@ -34,6 +34,7 @@ use Webmozart\Assert\Assert;
 /**
  * @psalm-suppress PropertyNotSetInConstructor
  *
+ * @psalm-import-type ESSuggestOption from ClientInterface
  * @psalm-import-type ESSuggests from ClientInterface
  */
 final class ElasticsearchController extends AbstractController

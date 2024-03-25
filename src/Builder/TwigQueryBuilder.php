@@ -6,6 +6,7 @@ namespace Webgriffe\SyliusElasticsearchPlugin\Builder;
 
 use const JSON_THROW_ON_ERROR;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Sylius\Component\Core\Model\TaxonInterface;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
 use Twig\Environment;
@@ -32,7 +33,14 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
         $taxonIdsToSearch = array_merge(
             [$taxon->getId()],
             array_map(
-                static fn (TaxonInterface $taxon) => $taxon->getId(),
+                static function (TaxonInterface $taxon): int|string {
+                    $taxonId = $taxon->getId();
+                    if (!is_int($taxonId) && !is_string($taxonId)) {
+                        throw new RuntimeException(sprintf('Taxon ID must be an integer or a string, got "%s".', gettype($taxonId)));
+                    }
+
+                    return $taxonId;
+                },
                 $this->getTaxonChildren($taxon),
             ),
         );
