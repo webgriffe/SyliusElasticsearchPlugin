@@ -346,7 +346,6 @@ final readonly class ProductNormalizer implements NormalizerInterface
     private function normalizeAttributeValue(ProductAttributeValueInterface $attributeValue): array
     {
         $localeCode = $attributeValue->getLocaleCode();
-        Assert::string($localeCode);
         $attribute = $attributeValue->getAttribute();
         Assert::isInstanceOf($attribute, ProductAttributeInterface::class);
         $storageType = $attribute->getStorageType();
@@ -361,7 +360,7 @@ final readonly class ProductNormalizer implements NormalizerInterface
             $attributeValueValues = $attributeValue->getValue();
             if (is_iterable($attributeValueValues)) {
                 foreach ($attributeValueValues as $attributeValueValue) {
-                    if (array_key_exists($localeCode, $allAttributeValues[$attributeValueValue]) &&
+                    if ($localeCode !== null && array_key_exists($localeCode, $allAttributeValues[$attributeValueValue]) &&
                         $allAttributeValues[$attributeValueValue][$localeCode] !== null
                     ) {
                         $attributeValueToIndex[] = $allAttributeValues[$attributeValueValue][$localeCode];
@@ -370,7 +369,7 @@ final readonly class ProductNormalizer implements NormalizerInterface
                     }
                 }
             } else {
-                if ($allAttributeValues[$attributeValueValues][$localeCode] !== null) {
+                if ($localeCode !== null && $allAttributeValues[$attributeValueValues][$localeCode] !== null) {
                     $attributeValueToIndex[] = $allAttributeValues[$attributeValueValues][$localeCode] . ', ';
                 } elseif ($allAttributeValues[$attributeValueValues][$this->defaultLocaleCode] !== null) {
                     $attributeValueToIndex[] = $allAttributeValues[$attributeValueValues][$this->defaultLocaleCode];
