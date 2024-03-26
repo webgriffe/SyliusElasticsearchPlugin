@@ -14,6 +14,8 @@ use Sylius\Component\Core\Model\ProductVariantInterface;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
 use Sylius\Component\Locale\Model\LocaleInterface;
 use Sylius\Component\Product\Factory\ProductVariantFactoryInterface;
+use Sylius\Component\Product\Model\ProductOptionInterface;
+use Sylius\Component\Product\Model\ProductOptionValueInterface;
 use Sylius\Component\Resource\Factory\FactoryInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Factory\ProductResponseFactoryInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Model\ProductResponseInterface;
@@ -30,6 +32,8 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
      * @param FactoryInterface<ProductImageInterface> $productImageFactory
      * @param FactoryInterface<ChannelPricingInterface> $channelPricingFactory
      * @param FactoryInterface<CatalogPromotionInterface> $catalogPromotionFactory
+     * @param FactoryInterface<ProductOptionInterface> $productOptionFactory
+     * @param FactoryInterface<ProductOptionValueInterface> $productOptionValueFactory
      */
     public function __construct(
         private readonly ProductResponseFactoryInterface $productResponseFactory,
@@ -39,6 +43,8 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
         private readonly ProductVariantFactoryInterface $productVariantFactory,
         private readonly FactoryInterface $channelPricingFactory,
         private readonly FactoryInterface $catalogPromotionFactory,
+        private readonly FactoryInterface $productOptionFactory,
+        private readonly FactoryInterface $productOptionValueFactory,
         private readonly string $fallbackLocaleCode,
     ) {
     }
@@ -55,7 +61,7 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
                 $this->defaultLocale = $defaultLocaleCode;
             }
         }
-        /** @var array{sylius-id: int, code: string, name: LocalizedField, description: LocalizedField, short-description: LocalizedField, taxons: array, main_taxon: array, slug: LocalizedField, images: array, variants: array} $source */
+        /** @var array{sylius-id: int, code: string, name: LocalizedField, description: LocalizedField, short-description: LocalizedField, taxons: array, main_taxon: array, slug: LocalizedField, images: array, variants: array, product-options: array} $source */
         $source = $document['_source'];
         $localeCode = $this->localeContext->getLocaleCode();
         $productResponse = $this->productResponseFactory->createNew();
@@ -107,6 +113,28 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
             $productVariant->addChannelPricing($channelPricing);
 
             $productResponse->addVariant($productVariant);
+        }
+        /** @var array{sylius-id: int|string, code: string, name: array<array-key, array<string, string>>, position: int, filterable: bool, values: array} $esProductOption */
+        foreach ($source['product-options'] as $esProductOption) {
+            $productOption = $this->productOptionFactory->createNew();
+            $productOption->setCode($esProductOption['code']);
+            $productOption->setPosition($esProductOption['position']);
+            $productOption->setCurrentLocale($localeCode);
+            $productOption->setName($this->getValueFromLocalizedField($esProductOption['name'], $localeCode));
+
+            /** @var array{sylius-id: int|string, code: string, value: string, name: array<array-key, array<string, string>>} $esProductOptionValue */
+            foreach ($esProductOption['values'] as $esProductOptionValue) {
+                $productOptionValue = $this->productOptionValueFactory->createNew();
+                $productOptionValue->setCode($esProductOptionValue['code']);
+                $productOptionValue->setOption($productOption);
+                $productOptionValue->setCurrentLocale($localeCode);
+                $productOptionValue->setFallbackLocale($this->fallbackLocaleCode);
+                $productOptionValue->setValue($esProductOptionValue['value']);
+
+                $productOption->addValue($productOptionValue);
+            }
+
+            $productResponse->addOption($productOption);
         }
 
         return $productResponse;

@@ -18,6 +18,8 @@ return static function (ContainerConfigurator $containerConfigurator) {
             service('sylius.factory.product_variant'),
             service('sylius.factory.channel_pricing'),
             service('sylius.factory.catalog_promotion'),
+            service('sylius.factory.product_option'),
+            service('sylius.factory.product_option_value'),
             param('sylius_locale.locale'),
         ])
     ;
