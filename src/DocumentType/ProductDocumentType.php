@@ -78,11 +78,12 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
             'properties' => [
                 'sylius-id' => $this->keyword(false),
                 'code' => $this->keyword(),
+                'name-as-keyword' => $this->nestedTranslationKeywords(),
                 'name' => $this->nestedTranslationTexts(),
                 'enabled' => $this->boolean(),
                 'description' => $this->nestedTranslationTexts(),
                 'short-description' => $this->nestedTranslationTexts(),
-                'slug' => $this->nestedTranslationKeywords(),
+                'slug' => $this->nestedTranslationTexts(),
                 'meta-keywords' => $this->nestedTranslationTexts(),
                 'meta-description' => $this->nestedTranslationTexts(),
                 'variant-selection-method' => $this->keyword(),

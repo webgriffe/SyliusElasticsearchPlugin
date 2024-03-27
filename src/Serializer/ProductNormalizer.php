@@ -58,6 +58,7 @@ final readonly class ProductNormalizer implements NormalizerInterface
             'variant-selection-method' => $product->getVariantSelectionMethod(),
             'variant-selection-method-label' => $product->getVariantSelectionMethodLabel(),
             'created-at' => $product->getCreatedAt()?->format('c'),
+            'name-as-keyword' => [],
             'name' => [],
             'description' => [],
             'short-description' => [],
@@ -77,6 +78,9 @@ final readonly class ProductNormalizer implements NormalizerInterface
         foreach ($product->getTranslations() as $productTranslation) {
             $localeCode = $productTranslation->getLocale();
             Assert::string($localeCode);
+            $normalizedProduct['name-as-keyword'][] = [
+                $localeCode => $productTranslation->getName(),
+            ];
             $normalizedProduct['name'][] = [
                 $localeCode => $productTranslation->getName(),
             ];
