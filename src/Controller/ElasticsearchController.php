@@ -115,12 +115,17 @@ final class ElasticsearchController extends AbstractController
 
             return $this->redirectToRoute($result->getRouteName(), $result->getRouteParams());
         }
+        $suggesters = $this->indexManager->suggesters(
+            $this->queryBuilder->buildSuggestersQuery($query),
+            $indexAliasNames,
+        );
 
         return $this->render('@WebgriffeSyliusElasticsearchPlugin/Search/results.html.twig', [
             'query' => $query,
             'paginator' => $paginator,
             'filters' => $esSearchQueryAdapter->getQueryResult()->getFilters(),
             'queryResult' => $esSearchQueryAdapter->getQueryResult(),
+            'suggesters' => $this->buildSuggestions($suggesters),
         ]);
     }
 

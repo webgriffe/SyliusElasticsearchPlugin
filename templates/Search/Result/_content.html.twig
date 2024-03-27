@@ -3,3 +3,14 @@
     Search
     <div class="sub header">Search results for "{{ query }}"</div>
 </h1>
+
+{% if suggesters|length > 0 %}
+    <div class="ui section header">
+        Maybe you were looking for:
+        <ul>
+            {% for suggestion in suggesters %}
+                <li><a href="{{ path('sylius_shop_search', {'query': suggestion}) }}">{{ suggestion }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
