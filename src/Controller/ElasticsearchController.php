@@ -42,7 +42,7 @@ final class ElasticsearchController extends AbstractController
     public function __construct(
         private readonly TaxonRepositoryInterface $taxonRepository,
         private readonly LocaleContextInterface $localeContext,
-        private readonly ClientInterface $indexManager,
+        private readonly ClientInterface $client,
         private readonly ChannelContextInterface $channelContext,
         private readonly IndexNameGeneratorInterface $indexNameGenerator,
         private readonly DocumentTypeProviderInterface $documentTypeProvider,
@@ -92,7 +92,7 @@ final class ElasticsearchController extends AbstractController
 
         $esSearchQueryAdapter = new ElasticsearchSearchQueryAdapter(
             $this->queryBuilder,
-            $this->indexManager,
+            $this->client,
             $this->queryResultMapper,
             $indexAliasNames,
             $sorting,
@@ -115,7 +115,7 @@ final class ElasticsearchController extends AbstractController
 
             return $this->redirectToRoute($result->getRouteName(), $result->getRouteParams());
         }
-        $suggesters = $this->indexManager->suggesters(
+        $suggesters = $this->client->suggesters(
             $this->queryBuilder->buildSuggestersQuery($query),
             $indexAliasNames,
         );
@@ -142,12 +142,12 @@ final class ElasticsearchController extends AbstractController
             );
         }
 
-        $suggesters = $this->indexManager->suggesters(
+        $suggesters = $this->client->suggesters(
             $this->queryBuilder->buildSuggestersQuery($query),
             $indexAliasNames,
         );
 
-        $esResult = $this->indexManager->query(
+        $esResult = $this->client->query(
             $this->queryBuilder->buildSearchQuery($query),
             $indexAliasNames,
         );
@@ -187,7 +187,7 @@ final class ElasticsearchController extends AbstractController
 
         $esTaxonQueryAdapter = new ElasticsearchTaxonQueryAdapter(
             $this->queryBuilder,
-            $this->indexManager,
+            $this->client,
             $this->queryResultMapper,
             [$productIndexAliasName],
             $sorting,

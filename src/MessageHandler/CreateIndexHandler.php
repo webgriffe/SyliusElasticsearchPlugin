@@ -17,7 +17,7 @@ final readonly class CreateIndexHandler
     public function __construct(
         private ChannelRepositoryInterface $channelRepository,
         private IndexNameGeneratorInterface $indexNameGenerator,
-        private ClientInterface $indexManager,
+        private ClientInterface $client,
         private DocumentTypeProviderInterface $documentTypeProvider,
     ) {
     }
@@ -38,9 +38,9 @@ final readonly class CreateIndexHandler
         $aliasName = $this->indexNameGenerator->generateAlias($channel, $documentType);
         $indexesToRemoveWildcard = $this->indexNameGenerator->generateWildcardPattern($channel, $documentType);
 
-        $this->indexManager->createIndex($indexName, $documentType->getMappings(), $documentType->getSettings());
-        $this->indexManager->bulk($indexName, $documentType->getDocuments($channel));
-        $this->indexManager->switchAlias($aliasName, $indexName);
-        $this->indexManager->removeIndexes($indexesToRemoveWildcard, [$indexName]);
+        $this->client->createIndex($indexName, $documentType->getMappings(), $documentType->getSettings());
+        $this->client->bulk($indexName, $documentType->getDocuments($channel));
+        $this->client->switchAlias($aliasName, $indexName);
+        $this->client->removeIndexes($indexesToRemoveWildcard, [$indexName]);
     }
 }

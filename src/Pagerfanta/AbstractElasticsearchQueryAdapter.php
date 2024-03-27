@@ -25,7 +25,7 @@ abstract class AbstractElasticsearchQueryAdapter implements AdapterInterface
      * @param array<array-key, string> $indexes
      */
     public function __construct(
-        private readonly ClientInterface $indexManager,
+        private readonly ClientInterface $client,
         private readonly QueryResultMapperInterface $queryResultMapper,
         private readonly array $indexes,
     ) {
@@ -45,7 +45,7 @@ abstract class AbstractElasticsearchQueryAdapter implements AdapterInterface
         if ($this->nbResults !== null) {
             return $this->nbResults;
         }
-        $this->nbResults = max(0, $this->indexManager->count(
+        $this->nbResults = max(0, $this->client->count(
             $this->getCountQuery(),
             $this->indexes,
             $this->getMinScore(),
@@ -85,7 +85,7 @@ abstract class AbstractElasticsearchQueryAdapter implements AdapterInterface
             return $this->queryResult;
         }
         $query = $this->getQuery($page, $size);
-        $esResult = $this->indexManager->query($query, $this->indexes);
+        $esResult = $this->client->query($query, $this->indexes);
         $this->queryResult = $this->queryResultMapper->map($esResult);
         $this->nbResults = max(0, $this->queryResult->getTotalHits());
 

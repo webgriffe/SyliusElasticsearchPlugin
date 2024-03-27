@@ -21,14 +21,14 @@ final class ElasticsearchTaxonQueryAdapter extends AbstractElasticsearchQueryAda
      */
     public function __construct(
         private readonly QueryBuilderInterface $queryBuilder,
-        ClientInterface $indexManager,
+        ClientInterface $client,
         QueryResultMapperInterface $queryResultMapper,
         array $indexes,
         private readonly array $sorting,
         private readonly array $filters,
         private readonly TaxonInterface $taxon,
     ) {
-        parent::__construct($indexManager, $queryResultMapper, $indexes);
+        parent::__construct($client, $queryResultMapper, $indexes);
     }
 
     protected function getMinScore(): float
