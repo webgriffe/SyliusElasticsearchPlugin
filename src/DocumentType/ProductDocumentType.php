@@ -154,6 +154,15 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         ];
     }
 
+    private function text(bool $index = true): array
+    {
+        return [
+            'type' => 'text',
+            'index' => $index,
+            'analyzer' => 'standard',
+        ];
+    }
+
     private function boolean(bool $index = true): array
     {
         return [
@@ -211,7 +220,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         foreach ($locales as $locale) {
             $localeCode = $locale->getCode();
             Assert::string($localeCode);
-            $properties[$localeCode] = $this->keyword($indexValue);
+            $properties[$localeCode] = $this->text($indexValue);
         }
 
         return [
