@@ -58,9 +58,10 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         $settings = [
             'analysis' => [
                 'analyzer' => [
-                    'search_standard' => [
+                    'store' => [
                         'type' => 'custom',
                         'tokenizer' => 'icu_tokenizer',
+                        'char_filter' => ['html_strip'],
                         'filter' => ['lowercase', 'icu_folding', 'elision'],
                     ],
                 ],
@@ -160,7 +161,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         return [
             'type' => 'text',
             'index' => $index,
-            'analyzer' => 'standard',
+            'analyzer' => 'store',
         ];
     }
 
