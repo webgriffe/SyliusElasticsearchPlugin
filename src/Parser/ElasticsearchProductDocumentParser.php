@@ -28,6 +28,12 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
 {
     private ?string $defaultLocale = null;
 
+    /** @var array<string|int, ProductVariantInterface> */
+    private array $productVariants = [];
+
+    /** @var array<string|int, ProductOptionValueInterface> */
+    private array $productOptionValues = [];
+
     /**
      * @param FactoryInterface<ProductImageInterface> $productImageFactory
      * @param FactoryInterface<ChannelPricingInterface> $channelPricingFactory
@@ -72,48 +78,7 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
         $productResponse->setDescription($this->getValueFromLocalizedField($source['description'], $localeCode));
         $productResponse->setShortDescription($this->getValueFromLocalizedField($source['short-description'], $localeCode));
 
-        /** @var array{path: ?string, type: ?string} $esImage */
-        foreach ($source['images'] as $esImage) {
-            $productImage = $this->productImageFactory->createNew();
-            $productImage->setPath($esImage['path']);
-            $productImage->setType($esImage['type']);
-            $productResponse->addImage($productImage);
-        }
-
-        // Doing this sorting here could avoid to make any DB query to get the variants in the right order just for
-        // getting the "default variant"
-        /** @var array<array-key, array{code: ?string, enabled: ?bool, position: int, price: array{price: ?int, original-price: ?int, applied-promotions: array}}> $sortedVariants */
-        $sortedVariants = $source['variants'];
-        usort(
-            $sortedVariants,
-            static function (array $a, array $b): int {
-                return $a['position'] <=> $b['position'];
-            },
-        );
-        foreach ($sortedVariants as $esVariant) {
-            $productVariant = $this->productVariantFactory->createForProduct($productResponse);
-            Assert::isInstanceOf($productVariant, ProductVariantInterface::class);
-            $productVariant->setCode($esVariant['code']);
-            $productVariant->setEnabled($esVariant['enabled']);
-            $productVariant->setPosition($esVariant['position']);
-
-            $channelPricing = $this->channelPricingFactory->createNew();
-            $channelPricing->setPrice($esVariant['price']['price']);
-            $channelPricing->setOriginalPrice($esVariant['price']['original-price']);
-            $channelPricing->setChannelCode($channel->getCode());
-            /** @var array{label: LocalizedField} $esAppliedPromotion */
-            foreach ($esVariant['price']['applied-promotions'] as $esAppliedPromotion) {
-                $catalogPromotion = $this->catalogPromotionFactory->createNew();
-                $catalogPromotion->setCurrentLocale($localeCode);
-                $catalogPromotion->setLabel($this->getValueFromLocalizedField($esAppliedPromotion['label'], $localeCode));
-
-                $channelPricing->addAppliedPromotion($catalogPromotion);
-            }
-
-            $productVariant->addChannelPricing($channelPricing);
-
-            $productResponse->addVariant($productVariant);
-        }
+        $this->productOptionValues = [];
         /** @var array{sylius-id: int|string, code: string, name: array<array-key, array<string, string>>, position: int, filterable: bool, values: array} $esProductOption */
         foreach ($source['product-options'] as $esProductOption) {
             $productOption = $this->productOptionFactory->createNew();
@@ -130,11 +95,72 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
                 $productOptionValue->setCurrentLocale($localeCode);
                 $productOptionValue->setFallbackLocale($this->fallbackLocaleCode);
                 $productOptionValue->setValue($esProductOptionValue['value']);
+                $this->productOptionValues[$esProductOptionValue['sylius-id']] = $productOptionValue;
 
                 $productOption->addValue($productOptionValue);
             }
 
             $productResponse->addOption($productOption);
+        }
+
+        // Doing this sorting here could avoid to make any DB query to get the variants in the right order just for
+        // getting the "default variant"
+        /** @var array<array-key, array{sylius-id: int|string, code: ?string, enabled: ?bool, position: int, price: array{price: ?int, original-price: ?int, applied-promotions: array}, options: array}> $sortedVariants */
+        $sortedVariants = $source['variants'];
+        usort(
+            $sortedVariants,
+            static function (array $a, array $b): int {
+                return $a['position'] <=> $b['position'];
+            },
+        );
+        $this->productVariants = [];
+        foreach ($sortedVariants as $esVariant) {
+            $productVariant = $this->productVariantFactory->createForProduct($productResponse);
+            Assert::isInstanceOf($productVariant, ProductVariantInterface::class);
+            $productVariant->setCode($esVariant['code']);
+            $productVariant->setEnabled($esVariant['enabled']);
+            $productVariant->setPosition($esVariant['position']);
+            $this->productVariants[$esVariant['sylius-id']] = $productVariant;
+
+            $channelPricing = $this->channelPricingFactory->createNew();
+            $channelPricing->setPrice($esVariant['price']['price']);
+            $channelPricing->setOriginalPrice($esVariant['price']['original-price']);
+            $channelPricing->setChannelCode($channel->getCode());
+            /** @var array{label: LocalizedField} $esAppliedPromotion */
+            foreach ($esVariant['price']['applied-promotions'] as $esAppliedPromotion) {
+                $catalogPromotion = $this->catalogPromotionFactory->createNew();
+                $catalogPromotion->setCurrentLocale($localeCode);
+                $catalogPromotion->setLabel($this->getValueFromLocalizedField($esAppliedPromotion['label'], $localeCode));
+
+                $channelPricing->addAppliedPromotion($catalogPromotion);
+            }
+            $productVariant->addChannelPricing($channelPricing);
+
+            /** @var array{sylius-id: int|string, code: string, name: array, filterable: bool, value: array{sylius-id: int|string, code: string, value: string, name: array}} $esOption */
+            foreach ($esVariant['options'] as $esOption) {
+                if (!array_key_exists($esOption['value']['sylius-id'], $this->productOptionValues)) {
+                    continue;
+                }
+                $productVariant->addOptionValue($this->productOptionValues[$esOption['value']['sylius-id']]);
+            }
+
+            $productResponse->addVariant($productVariant);
+        }
+
+        /** @var array{path: ?string, type: ?string, variants: array} $esImage */
+        foreach ($source['images'] as $esImage) {
+            $productImage = $this->productImageFactory->createNew();
+            $productImage->setPath($esImage['path']);
+            $productImage->setType($esImage['type']);
+            /** @var array{sylius-id: int|string, code: string} $esVariantImage */
+            foreach ($esImage['variants'] as $esVariantImage) {
+                if (!array_key_exists($esVariantImage['sylius-id'], $this->productVariants)) {
+                    continue;
+                }
+                $productVariant = $this->productVariants[$esVariantImage['sylius-id']];
+                $productImage->addProductVariant($productVariant);
+            }
+            $productResponse->addImage($productImage);
         }
 
         return $productResponse;
