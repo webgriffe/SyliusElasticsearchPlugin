@@ -8,7 +8,7 @@ use InvalidArgumentException;
 use Sylius\Component\Channel\Repository\ChannelRepositoryInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Helper\ProgressIndicator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -46,17 +46,9 @@ final class IndexCommand extends Command
         $channels = $this->channelRepository->findAll();
         $documentTypes = $this->documentTypeProvider->getDocumentsType();
 
-        ProgressBar::setFormatDefinition('custom', ' %current%/%max% -- %message%');
-        $progressBar = new ProgressBar($output, count($channels) * count($documentTypes));
-        $progressBar->setBarCharacter('<fg=green>⚬</>');
-        $progressBar->setEmptyBarCharacter('<fg=red>⚬</>');
-        $progressBar->setProgressCharacter('<fg=green>➤</>');
-        $progressBar->setFormat(
-            "<fg=white;bg=cyan> %message:-45s%</>\n%current%/%max% [%bar%] %percent:3s%%\n?  %estimated:-20s%  %memory:20s%",
-        );
+        $progressIndicator = new ProgressIndicator($output, null, 5);
         if (!$runAsynchronously) {
-            $progressBar->setMessage('Start');
-            $progressBar->start();
+            $progressIndicator->start(sprintf('Creating indexes for %d channels and %d document types.', count($channels), count($documentTypes)));
         }
         foreach ($channels as $channel) {
             foreach ($documentTypes as $documentType) {
@@ -70,14 +62,13 @@ final class IndexCommand extends Command
                     continue;
                 }
                 foreach ($this->indexManager->create($channel, $documentType) as $message) {
-                    $progressBar->setMessage((string) $message);
+                    $progressIndicator->setMessage((string) $message);
+                    $progressIndicator->advance();
                 }
-                $progressBar->advance();
             }
         }
         if (!$runAsynchronously) {
-            $progressBar->setMessage('Finished');
-            $progressBar->finish();
+            $progressIndicator->finish(sprintf('Finished creating indexes for %d channels and %d document types.', count($channels), count($documentTypes)));
         }
 
         return Command::SUCCESS;

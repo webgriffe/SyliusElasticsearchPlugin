@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Webgriffe\SyliusElasticsearchPlugin\Client;
 
+use Generator;
 use Psr\Log\LoggerAwareInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\BulkException;
 use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\CreateIndexException;
@@ -41,9 +42,11 @@ interface ClientInterface extends LoggerAwareInterface
     public function removeIndexes(string $wildcard = null, array $skips = []): void;
 
     /**
+     * @return Generator<array-key, int> Number of executed actions at each step
+     *
      * @throws BulkException
      */
-    public function bulk(string $indexName, array $actions): void;
+    public function bulk(string $indexName, array $actions): Generator;
 
     /**
      * @param string[] $indexes

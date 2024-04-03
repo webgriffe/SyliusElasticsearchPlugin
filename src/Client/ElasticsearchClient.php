@@ -6,6 +6,7 @@ namespace Webgriffe\SyliusElasticsearchPlugin\Client;
 
 use Elasticsearch\Client;
 use Elasticsearch\ClientBuilder;
+use Generator;
 use Psr\Log\LoggerInterface;
 use Throwable;
 use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\BulkException;
@@ -66,14 +67,15 @@ final class ElasticsearchClient implements ClientInterface
         }
     }
 
-    public function bulk(string $indexName, array $actions): void
+    public function bulk(string $indexName, array $actions): Generator
     {
         $params = ['body' => []];
 
-        $count = 0;
+        $count = $totalCount = 0;
         /** @var array $action */
         foreach ($actions as $action) {
             ++$count;
+            ++$totalCount;
             $params['body'][] = [
                 'index' => [
                     '_index' => $indexName,
@@ -82,7 +84,7 @@ final class ElasticsearchClient implements ClientInterface
 
             $params['body'][] = $action;
 
-            // Every 1000 actions stop and send the bulk request
+            // Every 250 actions stop and send the bulk request
             if ($count % 250 === 0) {
                 /** @var array{took: int, errors: bool, items: array} $result */
                 $result = $this->getClient()->bulk($params);
@@ -91,6 +93,7 @@ final class ElasticsearchClient implements ClientInterface
 
                     throw new BulkException('An error occurred while populating the index. Check logs for more information.');
                 }
+                yield $totalCount;
 
                 // erase the old bulk request
                 $params = ['body' => []];
@@ -111,6 +114,8 @@ final class ElasticsearchClient implements ClientInterface
                 throw new BulkException('An error occurred while populating the index. Check logs for more information.');
             }
         }
+
+        yield $totalCount;
     }
 
     public function switchAlias(string $aliasName, string $toIndexName): void

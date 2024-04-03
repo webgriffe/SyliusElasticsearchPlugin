@@ -26,13 +26,20 @@ final readonly class ElasticsearchIndexManager implements IndexManagerInterface
         $indexesToRemoveWildcard = $this->indexNameGenerator->generateWildcardPattern($channel, $documentType);
 
         $this->client->createIndex($indexName, $documentType->getMappings(), $documentType->getSettings());
-        yield Message::createMessage(sprintf('Creating index named "%s" having alias "%s".', $indexName, $aliasName));
+        yield Message::createMessage(sprintf('Creating mapped index named "%s".', $indexName));
 
-        $this->client->bulk($indexName, $documentType->getDocuments($channel));
+        $documents = $documentType->getDocuments($channel);
+        yield Message::createMessage(sprintf('Populating index "%s" with %d documents.', $indexName, count($documents)));
+
+        foreach ($this->client->bulk($indexName, $documents) as $documentsIndexed) {
+            yield Message::createMessage(sprintf('Indexed %d/%d documents.', $documentsIndexed, count($documents)));
+        }
+        yield Message::createMessage(sprintf('Populated index "%s".', $indexName));
 
         $this->client->switchAlias($aliasName, $indexName);
-        yield Message::createMessage('Switched alias.');
+        yield Message::createMessage(sprintf('Switched alias "%s" to index "%s".', $aliasName, $indexName));
 
         $this->client->removeIndexes($indexesToRemoveWildcard, [$indexName]);
+        yield Message::createMessage(sprintf('Removed old indexes responding to wildcard "%s".', $indexesToRemoveWildcard));
     }
 }
