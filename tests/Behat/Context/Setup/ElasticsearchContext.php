@@ -6,8 +6,7 @@ namespace Tests\Webgriffe\SyliusElasticsearchPlugin\Behat\Context\Setup;
 
 use Behat\Behat\Context\Context;
 use Sylius\Component\Channel\Repository\ChannelRepositoryInterface;
-use Symfony\Component\Messenger\MessageBusInterface;
-use Webgriffe\SyliusElasticsearchPlugin\Message\CreateIndex;
+use Webgriffe\SyliusElasticsearchPlugin\IndexManager\IndexManagerInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
 
 final readonly class ElasticsearchContext implements Context
@@ -15,7 +14,7 @@ final readonly class ElasticsearchContext implements Context
     public function __construct(
         private ChannelRepositoryInterface $channelRepository,
         private DocumentTypeProviderInterface $documentTypeProvider,
-        private MessageBusInterface $messageBus,
+        private IndexManagerInterface $indexManager,
     ) {
     }
 
@@ -26,7 +25,9 @@ final readonly class ElasticsearchContext implements Context
     {
         foreach ($this->channelRepository->findAll() as $channel) {
             foreach ($this->documentTypeProvider->getDocumentsType() as $documentType) {
-                $this->messageBus->dispatch(new CreateIndex($channel->getId(), $documentType->getCode()));
+                foreach ($this->indexManager->create($channel, $documentType) as $message) {
+                    // Just for cycling the generator
+                }
             }
         }
 

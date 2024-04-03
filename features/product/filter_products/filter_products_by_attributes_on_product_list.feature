@@ -14,21 +14,26 @@ Feature: Filter products by attributes from a specific taxon
         And this product attribute has a value "Nike" in "English (United States)" locale
         And this product attribute has a value "Adidas" in "English (United States)" locale
         And the product attribute "Brand" is filterable
+        And the store has a textarea product attribute "Description"
+        And the product attribute "Description" is filterable
 
         And the store has a product "T-Shirt Banana" available in "Default" channel
         And this product belongs to "T-Shirts"
         And this product has a text attribute "T-Shirt material" with value "Cotton"
-        And this product has also a select attribute "Brand" with value "Nike"
+        And this product has a select attribute "Brand" with value "Nike"
+        And this product has a textarea attribute "Description" with value "Yellow t-shirt with a banana print"
 
         And the store has a product "T-Shirt Apple" available in "Default" channel
         And this product belongs to "T-Shirts"
         And this product has a text attribute "T-Shirt material" with value "Linen"
-        And this product has also a select attribute "Brand" with value "Nike"
+        And this product has a select attribute "Brand" with value "Nike"
+        And this product has a textarea attribute "Description" with value "Green t-shirt with an apple print"
 
         And the store has a product "T-Shirt Orange" available in "Default" channel
         And this product belongs to "T-Shirts"
         And this product has a text attribute "T-Shirt material" with value "Cotton"
-        And this product has also a select attribute "Brand" with value "Adidas"
+        And this product has a select attribute "Brand" with value "Adidas"
+        And this product has a textarea attribute "Description" with value "Orange t-shirt with an orange print"
 
         And the store is indexed on Elasticsearch
 
@@ -53,3 +58,14 @@ Feature: Filter products by attributes from a specific taxon
         Then I should see the product "T-Shirt Orange"
         And I should not see the product "T-Shirt Banana"
         And I should not see the product "T-Shirt Apple"
+
+    @ui
+    Scenario: Filter products by textarea attribute from a specific taxon
+        When I browse products from taxon "T-Shirts"
+        Then I should see the filter "T-Shirt material"
+        And I should see the value "Cotton" for filter "T-Shirt material" with counter "2"
+        And I should see the value "Linen" for filter "T-Shirt material" with counter "1"
+        When I filter products by "T-Shirt material" with value "Linen"
+        Then I should see the product "T-Shirt Apple"
+        And I should not see the product "T-Shirt Banana"
+        And I should not see the product "T-Shirt Orange"

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Webgriffe\SyliusElasticsearchPlugin\Parser;
 
 use RuntimeException;
+use Sylius\Component\Attribute\Model\AttributeValueInterface;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
 use Sylius\Component\Core\Model\CatalogPromotionInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
@@ -126,7 +127,7 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
                 $productAttributeValue->setAttribute($productAttribute);
                 $productAttributeValue->setLocaleCode($localeCode);
                 $productAttributeValue->setSubject($productResponse);
-                $productAttributeValue->setValue(reset($esProductAttributeValue['values']));
+                $productAttributeValue->setValue($this->getAttributeValueByStorageType($esProductAttributeValue['values'], $esTranslatedAttribute['storage-type']));
                 $productResponse->addAttribute($productAttributeValue);
             }
         }
@@ -248,5 +249,14 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
         }
 
         throw new RuntimeException('Slug not found');
+    }
+
+    private function getAttributeValueByStorageType(array $values, string $storageType): array|string
+    {
+        if ($storageType === AttributeValueInterface::STORAGE_JSON) {
+            return $values;
+        }
+
+        return reset($values);
     }
 }
