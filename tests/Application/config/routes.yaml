@@ -1,9 +1,9 @@
 webgriffe_sylius_elasticsearch_shop:
-    resource: "@WebgriffeSyliusElasticsearchPlugin/config/shop_routing.yml"
+    resource: "@WebgriffeSyliusElasticsearchPlugin/config/shop_routing.php"
     prefix: /{_locale}
     requirements:
         _locale: ^[a-z]{2}(?:_[A-Z]{2})?$
 
 webgriffe_sylius_elasticsearch_admin:
-    resource: "@WebgriffeSyliusElasticsearchPlugin/config/admin_routing.yml"
+    resource: "@WebgriffeSyliusElasticsearchPlugin/config/admin_routing.php"
     prefix: /admin
