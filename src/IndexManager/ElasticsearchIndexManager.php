@@ -25,21 +25,24 @@ final readonly class ElasticsearchIndexManager implements IndexManagerInterface
         $aliasName = $this->indexNameGenerator->generateAlias($channel, $documentType);
         $indexesToRemoveWildcard = $this->indexNameGenerator->generateWildcardPattern($channel, $documentType);
 
-        $this->client->createIndex($indexName, $documentType->getMappings(), $documentType->getSettings());
         yield Message::createMessage(sprintf('Creating mapped index named "%s".', $indexName));
+        $this->client->createIndex($indexName, $documentType->getMappings(), $documentType->getSettings());
 
+        // @TODO: speed up this step by introducing a batch size
+        yield Message::createMessage('Retrieving normalized documents to populate the index.');
         $documents = $documentType->getDocuments($channel);
-        yield Message::createMessage(sprintf('Populating index "%s" with %d documents.', $indexName, count($documents)));
 
+        $countDocuments = count($documents);
+        yield Message::createMessage(sprintf('Indexed 0/%d documents.', $countDocuments));
         foreach ($this->client->bulk($indexName, $documents) as $documentsIndexed) {
-            yield Message::createMessage(sprintf('Indexed %d/%d documents.', $documentsIndexed, count($documents)));
+            yield Message::createMessage(sprintf('Indexed %d/%d documents.', $documentsIndexed, $countDocuments));
         }
-        yield Message::createMessage(sprintf('Populated index "%s".', $indexName));
+        yield Message::createMessage(sprintf('Populated index "%s" with %d documents.', $indexName, $countDocuments));
 
+        yield Message::createMessage(sprintf('Switching alias "%s" to index "%s".', $aliasName, $indexName));
         $this->client->switchAlias($aliasName, $indexName);
-        yield Message::createMessage(sprintf('Switched alias "%s" to index "%s".', $aliasName, $indexName));
 
+        yield Message::createMessage(sprintf('Removing old indexes responding to wildcard "%s".', $indexesToRemoveWildcard));
         $this->client->removeIndexes($indexesToRemoveWildcard, [$indexName]);
-        yield Message::createMessage(sprintf('Removed old indexes responding to wildcard "%s".', $indexesToRemoveWildcard));
     }
 }
