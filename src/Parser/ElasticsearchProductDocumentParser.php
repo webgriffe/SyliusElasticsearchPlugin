@@ -14,6 +14,8 @@ use Sylius\Component\Core\Model\ProductVariantInterface;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
 use Sylius\Component\Locale\Model\LocaleInterface;
 use Sylius\Component\Product\Factory\ProductVariantFactoryInterface;
+use Sylius\Component\Product\Model\ProductAttributeInterface;
+use Sylius\Component\Product\Model\ProductAttributeValueInterface;
 use Sylius\Component\Product\Model\ProductOptionInterface;
 use Sylius\Component\Product\Model\ProductOptionValueInterface;
 use Sylius\Component\Resource\Factory\FactoryInterface;
@@ -40,6 +42,8 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
      * @param FactoryInterface<CatalogPromotionInterface> $catalogPromotionFactory
      * @param FactoryInterface<ProductOptionInterface> $productOptionFactory
      * @param FactoryInterface<ProductOptionValueInterface> $productOptionValueFactory
+     * @param FactoryInterface<ProductAttributeInterface> $productAttributeFactory
+     * @param FactoryInterface<ProductAttributeValueInterface> $productAttributeValueFactory
      */
     public function __construct(
         private readonly ProductResponseFactoryInterface $productResponseFactory,
@@ -51,6 +55,8 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
         private readonly FactoryInterface $catalogPromotionFactory,
         private readonly FactoryInterface $productOptionFactory,
         private readonly FactoryInterface $productOptionValueFactory,
+        private readonly FactoryInterface $productAttributeFactory,
+        private readonly FactoryInterface $productAttributeValueFactory,
         private readonly string $fallbackLocaleCode,
     ) {
     }
@@ -67,7 +73,7 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
                 $this->defaultLocale = $defaultLocaleCode;
             }
         }
-        /** @var array{sylius-id: int, code: string, name: LocalizedField, description: LocalizedField, short-description: LocalizedField, taxons: array, main_taxon: array, slug: LocalizedField, images: array, variants: array, product-options: array} $source */
+        /** @var array{sylius-id: int, code: string, name: LocalizedField, description: LocalizedField, short-description: LocalizedField, taxons: array, main_taxon: array, slug: LocalizedField, images: array, variants: array, product-options: array, translated-attributes: array, attributes: array} $source */
         $source = $document['_source'];
         $localeCode = $this->localeContext->getLocaleCode();
         $productResponse = $this->productResponseFactory->createNew();
@@ -101,6 +107,50 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
             }
 
             $productResponse->addOption($productOption);
+        }
+
+        /** @var array{sylius-id: int|string, code: string, type: string, storage-type: string, position: int, translatable: bool, filterable: bool, name: array<array-key, array<string, string>>, values: array} $esTranslatedAttribute */
+        foreach ($source['translated-attributes'] as $esTranslatedAttribute) {
+            $productAttribute = $this->productAttributeFactory->createNew();
+            $productAttribute->setCode($esTranslatedAttribute['code']);
+            $productAttribute->setStorageType($esTranslatedAttribute['storage-type']);
+            $productAttribute->setType($esTranslatedAttribute['type']);
+            $productAttribute->setTranslatable(true);
+            $productAttribute->setPosition($esTranslatedAttribute['position']);
+            $productAttribute->setCurrentLocale($localeCode);
+            $productAttribute->setName($this->getValueFromLocalizedField($esTranslatedAttribute['name'], $localeCode));
+
+            /** @var array{sylius-id: int|string, code: string, locale: string, values: array<array-key, string>} $esProductAttributeValue */
+            foreach ($esTranslatedAttribute['values'][$localeCode] as $esProductAttributeValue) {
+                $productAttributeValue = $this->productAttributeValueFactory->createNew();
+                $productAttributeValue->setAttribute($productAttribute);
+                $productAttributeValue->setLocaleCode($localeCode);
+                $productAttributeValue->setSubject($productResponse);
+                $productAttributeValue->setValue(reset($esProductAttributeValue['values']));
+                $productResponse->addAttribute($productAttributeValue);
+            }
+        }
+
+        /** @var array{sylius-id: int|string, code: string, type: string, storage-type: string, position: int, translatable: bool, filterable: bool, name: array<array-key, array<string, string>>, values: array} $esTranslatedAttribute */
+        foreach ($source['attributes'] as $esTranslatedAttribute) {
+            $productAttribute = $this->productAttributeFactory->createNew();
+            $productAttribute->setCode($esTranslatedAttribute['code']);
+            $productAttribute->setStorageType($esTranslatedAttribute['storage-type']);
+            $productAttribute->setType($esTranslatedAttribute['type']);
+            $productAttribute->setTranslatable(false);
+            $productAttribute->setPosition($esTranslatedAttribute['position']);
+            $productAttribute->setCurrentLocale($localeCode);
+            $productAttribute->setName($this->getValueFromLocalizedField($esTranslatedAttribute['name'], $localeCode));
+
+            /** @var array{sylius-id: int|string, code: string, locale: string, values: array<array-key, string>} $esProductAttributeValue */
+            foreach ($esTranslatedAttribute['values'] as $esProductAttributeValue) {
+                $productAttributeValue = $this->productAttributeValueFactory->createNew();
+                $productAttributeValue->setAttribute($productAttribute);
+                $productAttributeValue->setLocaleCode($localeCode);
+                $productAttributeValue->setSubject($productResponse);
+                $productAttributeValue->setValue(reset($esProductAttributeValue['values']));
+                $productResponse->addAttribute($productAttributeValue);
+            }
         }
 
         // Doing this sorting here could avoid to make any DB query to get the variants in the right order just for
