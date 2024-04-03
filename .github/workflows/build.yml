@@ -26,7 +26,7 @@ jobs:
                 sylius: [ "^1.12" ]
                 node: [ "18.x" ]
                 mysql: [ "5.7", "8.0" ]
-                elasticsearch: [ "7", "8" ]
+                elasticsearch: [ "7.17", "8.13" ]
 
         env:
             APP_ENV: test
