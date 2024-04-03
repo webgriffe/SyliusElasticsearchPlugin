@@ -251,7 +251,10 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
         throw new RuntimeException('Slug not found');
     }
 
-    private function getAttributeValueByStorageType(array $values, string $storageType): array|string
+    /**
+     * @param array<array-key, string> $values
+     */
+    private function getAttributeValueByStorageType(array $values, string $storageType): array|string|bool
     {
         if ($storageType === AttributeValueInterface::STORAGE_JSON) {
             return $values;

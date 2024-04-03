@@ -6,6 +6,7 @@ namespace Tests\Webgriffe\SyliusElasticsearchPlugin\Behat\Context\Setup;
 
 use Behat\Behat\Context\Context;
 use Sylius\Component\Channel\Repository\ChannelRepositoryInterface;
+use Sylius\Component\Core\Model\ChannelInterface;
 use Webgriffe\SyliusElasticsearchPlugin\IndexManager\IndexManagerInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
 
@@ -23,6 +24,7 @@ final readonly class ElasticsearchContext implements Context
      */
     public function theStoreIsIndexedOnElasticsearch(): void
     {
+        /** @var ChannelInterface $channel */
         foreach ($this->channelRepository->findAll() as $channel) {
             foreach ($this->documentTypeProvider->getDocumentsType() as $documentType) {
                 foreach ($this->indexManager->create($channel, $documentType) as $message) {
