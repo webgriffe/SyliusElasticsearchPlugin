@@ -26,7 +26,7 @@ jobs:
                 sylius: [ "^1.12" ]
                 node: [ "18.x" ]
                 mysql: [ "5.7", "8.0" ]
-                elasticsearch: [ "7.17.19", "8.13.1" ]
+                elasticsearch: [ "7.17.19", "8.11.4" ]
 
         env:
             APP_ENV: test
@@ -60,12 +60,13 @@ jobs:
                     sudo sysctl -w vm.max_map_count=262144
 
             -
-                name: Runs Elasticsearch
-                uses: elastic/elastic-github-actions/elasticsearch@cd0dfb41acc8f74d65fbee9ad04ce43031fbf488
+                name: Setup Elasticsearch
+                uses: elastic/elastic-github-actions/elasticsearch@master
                 with:
                     stack-version: "${{ matrix.elasticsearch }}"
                     plugins: |
                         analysis-icu
+                    security-enabled: false
 
             -
                 name: Shutdown default MySQL
