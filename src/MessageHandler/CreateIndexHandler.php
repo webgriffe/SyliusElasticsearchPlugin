@@ -7,8 +7,7 @@ namespace Webgriffe\SyliusElasticsearchPlugin\MessageHandler;
 use InvalidArgumentException;
 use Sylius\Component\Channel\Repository\ChannelRepositoryInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
-use Webgriffe\SyliusElasticsearchPlugin\Client\ClientInterface;
-use Webgriffe\SyliusElasticsearchPlugin\Generator\IndexNameGeneratorInterface;
+use Webgriffe\SyliusElasticsearchPlugin\IndexManager\IndexManagerInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Message\CreateIndex;
 use Webgriffe\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
 
@@ -16,9 +15,8 @@ final readonly class CreateIndexHandler
 {
     public function __construct(
         private ChannelRepositoryInterface $channelRepository,
-        private IndexNameGeneratorInterface $indexNameGenerator,
-        private ClientInterface $client,
         private DocumentTypeProviderInterface $documentTypeProvider,
+        private IndexManagerInterface $indexManager,
     ) {
     }
 
@@ -34,13 +32,6 @@ final readonly class CreateIndexHandler
 
         $documentType = $this->documentTypeProvider->getDocumentType($message->getDocumentTypeCode());
 
-        $indexName = $this->indexNameGenerator->generateName($channel, $documentType);
-        $aliasName = $this->indexNameGenerator->generateAlias($channel, $documentType);
-        $indexesToRemoveWildcard = $this->indexNameGenerator->generateWildcardPattern($channel, $documentType);
-
-        $this->client->createIndex($indexName, $documentType->getMappings(), $documentType->getSettings());
-        $this->client->bulk($indexName, $documentType->getDocuments($channel));
-        $this->client->switchAlias($aliasName, $indexName);
-        $this->client->removeIndexes($indexesToRemoveWildcard, [$indexName]);
+        $this->indexManager->create($channel, $documentType);
     }
 }

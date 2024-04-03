@@ -8,9 +8,12 @@ use InvalidArgumentException;
 use Sylius\Component\Channel\Repository\ChannelRepositoryInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Webgriffe\SyliusElasticsearchPlugin\IndexManager\IndexManagerInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Message\CreateIndex;
 use Webgriffe\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
 
@@ -20,23 +23,61 @@ final class IndexCommand extends Command
         private readonly ChannelRepositoryInterface $channelRepository,
         private readonly MessageBusInterface $messageBus,
         private readonly DocumentTypeProviderInterface $documentTypeProvider,
+        private readonly IndexManagerInterface $indexManager,
         string $name = null,
     ) {
         parent::__construct($name);
     }
 
+    protected function configure(): void
+    {
+        $this
+            ->setDescription('Creates the indexes for all the channels and document types.')
+            ->addOption('run-asynchronously', 'async', InputOption::VALUE_OPTIONAL, 'Run the command asynchronously using the message bus.', false)
+        ;
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        /** @var bool $runAsynchronously */
+        $runAsynchronously = $input->getOption('run-asynchronously');
+
         /** @var ChannelInterface[] $channels */
         $channels = $this->channelRepository->findAll();
+        $documentTypes = $this->documentTypeProvider->getDocumentsType();
+
+        ProgressBar::setFormatDefinition('custom', ' %current%/%max% -- %message%');
+        $progressBar = new ProgressBar($output, count($channels) * count($documentTypes));
+        $progressBar->setBarCharacter('<fg=green>⚬</>');
+        $progressBar->setEmptyBarCharacter('<fg=red>⚬</>');
+        $progressBar->setProgressCharacter('<fg=green>➤</>');
+        $progressBar->setFormat(
+            "<fg=white;bg=cyan> %message:-45s%</>\n%current%/%max% [%bar%] %percent:3s%%\n?  %estimated:-20s%  %memory:20s%",
+        );
+        if (!$runAsynchronously) {
+            $progressBar->setMessage('Start');
+            $progressBar->start();
+        }
         foreach ($channels as $channel) {
-            foreach ($this->documentTypeProvider->getDocumentsType() as $documentType) {
+            foreach ($documentTypes as $documentType) {
                 $channelId = $channel->getId();
                 if (!is_string($channelId) && !is_int($channelId)) {
                     throw new InvalidArgumentException('Channel id must be a string or an integer');
                 }
-                $this->messageBus->dispatch(new CreateIndex($channelId, $documentType->getCode()));
+                if ($runAsynchronously) {
+                    $this->messageBus->dispatch(new CreateIndex($channelId, $documentType->getCode()));
+
+                    continue;
+                }
+                foreach ($this->indexManager->create($channel, $documentType) as $message) {
+                    $progressBar->setMessage((string) $message);
+                }
+                $progressBar->advance();
             }
+        }
+        if (!$runAsynchronously) {
+            $progressBar->setMessage('Finished');
+            $progressBar->finish();
         }
 
         return Command::SUCCESS;
