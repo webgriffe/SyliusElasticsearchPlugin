@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Webgriffe\SyliusElasticsearchPlugin\Parser;
 
+use DateTime;
 use RuntimeException;
 use Sylius\Component\Attribute\Model\AttributeValueInterface;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
@@ -121,11 +122,19 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
             $productAttribute->setCurrentLocale($localeCode);
             $productAttribute->setName($this->getValueFromLocalizedField($esTranslatedAttribute['name'], $localeCode));
 
-            /** @var array{sylius-id: int|string, code: string, locale: string, values: array<array-key, string>} $esProductAttributeValue */
-            foreach ($esTranslatedAttribute['values'][$localeCode] as $esProductAttributeValue) {
+            /** @var array<array-key, array{sylius-id: int|string, code: string, locale: string, values: array<array-key, string>}> $attributeValues */
+            $attributeValues = $esTranslatedAttribute['values'][$this->defaultLocale];
+            $usedLocale = $this->defaultLocale;
+            if (array_key_exists($localeCode, $esTranslatedAttribute['values'])) {
+                $usedLocale = $localeCode;
+                /** @var array<array-key, array{sylius-id: int|string, code: string, locale: string, values: array<array-key, string>}> $attributeValues */
+                $attributeValues = $esTranslatedAttribute['values'][$localeCode];
+            }
+
+            foreach ($attributeValues as $esProductAttributeValue) {
                 $productAttributeValue = $this->productAttributeValueFactory->createNew();
                 $productAttributeValue->setAttribute($productAttribute);
-                $productAttributeValue->setLocaleCode($localeCode);
+                $productAttributeValue->setLocaleCode($usedLocale);
                 $productAttributeValue->setSubject($productResponse);
                 $productAttributeValue->setValue($this->getAttributeValueByStorageType($esProductAttributeValue['values'], $esTranslatedAttribute['storage-type']));
                 $productResponse->addAttribute($productAttributeValue);
@@ -252,14 +261,21 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
     }
 
     /**
-     * @param array<array-key, string> $values
+     * @param array<array-key, string|bool|int|float> $values
      */
-    private function getAttributeValueByStorageType(array $values, string $storageType): array|string|bool
+    private function getAttributeValueByStorageType(array $values, string $storageType): array|string|bool|int|float|DateTime
     {
         if ($storageType === AttributeValueInterface::STORAGE_JSON) {
             return $values;
         }
+        $firstValue = reset($values);
+        if ($storageType === AttributeValueInterface::STORAGE_BOOLEAN) {
+            return $firstValue === true;
+        }
+        if ($storageType === AttributeValueInterface::STORAGE_DATETIME || $storageType === AttributeValueInterface::STORAGE_DATE) {
+            return new DateTime((string) $firstValue);
+        }
 
-        return reset($values);
+        return $firstValue;
     }
 }

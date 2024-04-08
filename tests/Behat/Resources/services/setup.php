@@ -23,6 +23,11 @@ return static function (ContainerConfigurator $containerConfigurator) {
         ->public()
         ->args([
             service('sylius.repository.product_attribute'),
+            service('doctrine.orm.entity_manager'),
+            service('sylius.factory.product_attribute_value'),
+            service('sylius.factory.product_attribute_translation'),
+            service('sylius.factory.product_attribute'),
+            service('sylius.behat.shared_storage'),
         ])
     ;
 };

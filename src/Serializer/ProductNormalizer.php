@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Webgriffe\SyliusElasticsearchPlugin\Serializer;
 
+use DateTimeInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use RuntimeException;
 use Sylius\Component\Attribute\Model\AttributeValueInterface;
@@ -32,11 +33,14 @@ use Webgriffe\SyliusElasticsearchPlugin\Event\ProductDocumentType\ProductDocumen
 use Webgriffe\SyliusElasticsearchPlugin\Model\FilterableInterface;
 use Webmozart\Assert\Assert;
 
-final readonly class ProductNormalizer implements NormalizerInterface
+final class ProductNormalizer implements NormalizerInterface
 {
+    /** @var string[] */
+    private array $localeCodes = [];
+
     public function __construct(
-        private ProductVariantResolverInterface $productVariantResolver,
-        private EventDispatcherInterface $eventDispatcher,
+        private readonly ProductVariantResolverInterface $productVariantResolver,
+        private readonly EventDispatcherInterface $eventDispatcher,
         private string $defaultLocaleCode,
     ) {
     }
@@ -50,6 +54,19 @@ final readonly class ProductNormalizer implements NormalizerInterface
         $product = $object;
         Assert::isInstanceOf($product, ProductInterface::class);
         Assert::isInstanceOf($channel, ChannelInterface::class);
+
+        foreach ($channel->getLocales() as $locale) {
+            $localeCode = $locale->getCode();
+            Assert::string($localeCode);
+            $this->localeCodes[] = $localeCode;
+        }
+        $channelDefaultLocale = $channel->getDefaultLocale();
+        if ($channelDefaultLocale !== null) {
+            $channelDefaultLocaleCode = $channelDefaultLocale->getCode();
+            if ($channelDefaultLocaleCode !== null) {
+                $this->defaultLocaleCode = $channelDefaultLocaleCode;
+            }
+        }
 
         $normalizedProduct = [
             'sylius-id' => $product->getId(),
@@ -334,13 +351,25 @@ final readonly class ProductNormalizer implements NormalizerInterface
                 $localeCode => $attributeTranslation->getName(),
             ];
         }
+        $fallbackValue = null;
         foreach ($attributeWithValues['values'] as $attributeValue) {
             $localeCode = $attributeValue->getLocaleCode();
             if ($isTranslatable) {
                 Assert::string($localeCode);
-                $normalizedAttributeValue['values'][$localeCode][] = $this->normalizeAttributeValue($attributeValue);
+                $value = $this->normalizeAttributeValue($attributeValue);
+                $normalizedAttributeValue['values'][$localeCode][] = $value;
+                if ($localeCode === $this->defaultLocaleCode) {
+                    $fallbackValue = $value;
+                }
             } else {
                 $normalizedAttributeValue['values'][] = $this->normalizeAttributeValue($attributeValue);
+            }
+        }
+        if ($fallbackValue !== null && $isTranslatable) {
+            foreach ($this->localeCodes as $localeCode) {
+                if (!array_key_exists($localeCode, $normalizedAttributeValue['values'])) {
+                    $normalizedAttributeValue['values'][$localeCode][] = $fallbackValue;
+                }
             }
         }
 
@@ -355,21 +384,22 @@ final readonly class ProductNormalizer implements NormalizerInterface
         $storageType = $attribute->getStorageType();
         Assert::stringNotEmpty($storageType);
 
-        $attributeValueToIndex = [$attributeValue->getValue()];
+        $attributeValueValue = $attributeValue->getValue();
+        $attributeValueToIndex = [$attributeValueValue];
         if ($storageType === AttributeValueInterface::STORAGE_JSON) {
             $attributeValueToIndex = [];
             /** @var array<string, array<string, ?string>> $allAttributeValues */
             $allAttributeValues = $attribute->getConfiguration()['choices'];
             /** @var string|array<array-key, string> $attributeValueValues */
-            $attributeValueValues = $attributeValue->getValue();
+            $attributeValueValues = $attributeValueValue;
             if (is_iterable($attributeValueValues)) {
-                foreach ($attributeValueValues as $attributeValueValue) {
-                    if ($localeCode !== null && array_key_exists($localeCode, $allAttributeValues[$attributeValueValue]) &&
-                        $allAttributeValues[$attributeValueValue][$localeCode] !== null
+                foreach ($attributeValueValues as $value) {
+                    if ($localeCode !== null && array_key_exists($localeCode, $allAttributeValues[$value]) &&
+                        $allAttributeValues[$value][$localeCode] !== null
                     ) {
-                        $attributeValueToIndex[] = $allAttributeValues[$attributeValueValue][$localeCode];
+                        $attributeValueToIndex[] = $allAttributeValues[$value][$localeCode];
                     } else {
-                        $attributeValueToIndex[] = $allAttributeValues[$attributeValueValue][$this->defaultLocaleCode];
+                        $attributeValueToIndex[] = $allAttributeValues[$value][$this->defaultLocaleCode];
                     }
                 }
             } else {
@@ -379,6 +409,12 @@ final readonly class ProductNormalizer implements NormalizerInterface
                     $attributeValueToIndex[] = $allAttributeValues[$attributeValueValues][$this->defaultLocaleCode];
                 }
             }
+        } elseif ($storageType === AttributeValueInterface::STORAGE_DATE) {
+            Assert::isInstanceOf($attributeValueValue, DateTimeInterface::class);
+            $attributeValueToIndex = [$attributeValueValue->format('Y-m-d')];
+        } elseif ($storageType === AttributeValueInterface::STORAGE_DATETIME) {
+            Assert::isInstanceOf($attributeValueValue, DateTimeInterface::class);
+            $attributeValueToIndex = [$attributeValueValue->format('Y-m-d H:i:s')];
         }
 
         return [
