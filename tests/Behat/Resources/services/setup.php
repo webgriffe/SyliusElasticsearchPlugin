@@ -6,6 +6,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Tests\Webgriffe\SyliusElasticsearchPlugin\Behat\Context\Setup\ElasticsearchContext;
 use Tests\Webgriffe\SyliusElasticsearchPlugin\Behat\Context\Setup\ProductAttributeContext;
+use Tests\Webgriffe\SyliusElasticsearchPlugin\Behat\Context\Setup\ProductContext;
 
 return static function (ContainerConfigurator $containerConfigurator) {
     $services = $containerConfigurator->services();
@@ -28,6 +29,13 @@ return static function (ContainerConfigurator $containerConfigurator) {
             service('sylius.factory.product_attribute_translation'),
             service('sylius.factory.product_attribute'),
             service('sylius.behat.shared_storage'),
+        ])
+    ;
+
+    $services->set('webgriffe.sylius_elasticsearch_plugin.behat.context.setup.product', ProductContext::class)
+        ->public()
+        ->args([
+            service('doctrine.orm.entity_manager'),
         ])
     ;
 };
