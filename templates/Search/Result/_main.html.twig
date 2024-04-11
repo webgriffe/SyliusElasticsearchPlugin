@@ -9,7 +9,9 @@
 {% if paginator|length > 0 %}
     <div class="ui three cards" id="products" {{ sylius_test_html_attribute('results') }}>
         {% for result in paginator %}
-            {% include '@SyliusShop/Product/_box.html.twig' with {product: result} %}
+            <div {{ sylius_test_html_attribute('result') }}>
+                {% include '@SyliusShop/Product/_box.html.twig' with {product: result} %}
+            </div>
         {% endfor %}
     </div>
     <div class="ui hidden divider"></div>

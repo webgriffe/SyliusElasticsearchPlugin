@@ -375,7 +375,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
             'on-hold' => $this->integer(false),
             'is-tracked' => $this->boolean(false),
             'shipping-required' => $this->boolean(false),
-            'name' => $this->nestedTranslationKeywords(),
+            'name' => $this->nestedTranslationTexts(),
             'price' => [
                 'type' => 'object',
                 'dynamic' => false,

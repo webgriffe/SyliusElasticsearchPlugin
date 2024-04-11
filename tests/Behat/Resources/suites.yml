@@ -1,3 +1,4 @@
 imports:
     - suites/viewing_products.yaml
     - suites/filter_products.yaml
+    - suites/search_products.yaml
