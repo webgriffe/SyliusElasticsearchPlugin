@@ -20,7 +20,7 @@ use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\SwitchAliasException;
  * @psalm-type ESHit = array{_index: string, _id: string, score: float, _source: array}
  * @psalm-type ESQueryResult = array{took: int, timed_out: bool, _shards: array, hits: array{total: array{value: int, relation: string}, max_score: ?int, hits: array<array-key, ESHit>}, aggregations?: array<string, array|ESAggregation|ESDefaultOptionAggregation>}
  * @psalm-type ESSuggestOption = array{text: string, score: float, freq: int}
- * @psalm-type ESSuggests = array<string, array<array-key, array{text: string, offset: int, length: int, options: array<array-key, ESSuggestOption>}>>
+ * @psalm-type ESCompletionSuggesters = array<string, array<array-key, array{text: string, offset: int, length: int, options: array<array-key, ESSuggestOption>}>>
  */
 interface ClientInterface extends LoggerAwareInterface
 {
@@ -71,9 +71,9 @@ interface ClientInterface extends LoggerAwareInterface
     /**
      * @param string[] $indexes
      *
-     * @return ESSuggests
+     * @return ESCompletionSuggesters
      */
-    public function suggesters(
+    public function completionSuggesters(
         array $query,
         array $indexes = [],
     ): array;

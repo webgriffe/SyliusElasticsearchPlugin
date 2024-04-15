@@ -3,8 +3,8 @@
 <div>
     Maybe you were looking for:
     <ul>
-        {% for suggestion in suggesters %}
-            <li><a href="{{ path('sylius_shop_search', {'query': suggestion}) }}">{{ suggestion }}</a></li>
+        {% for completionSuggest in completionSuggesters %}
+            <li><a href="{{ path('sylius_shop_search', {'query': completionSuggest}) }}">{{ completionSuggest }}</a></li>
         {% endfor %}
     </ul>
 </div>

@@ -27,7 +27,7 @@ use Webmozart\Assert\Assert;
  * @psalm-suppress PropertyNotSetInConstructor
  *
  * @psalm-import-type ESSuggestOption from ClientInterface
- * @psalm-import-type ESSuggests from ClientInterface
+ * @psalm-import-type ESCompletionSuggesters from ClientInterface
  */
 final class SearchController extends AbstractController implements SearchControllerInterface
 {
@@ -103,8 +103,8 @@ final class SearchController extends AbstractController implements SearchControl
 
             return $this->redirectToRoute($result->getRouteName(), $result->getRouteParams());
         }
-        $suggesters = $this->client->suggesters(
-            $this->queryBuilder->buildSuggestersQuery($query),
+        $completionSuggesters = $this->client->completionSuggesters(
+            $this->queryBuilder->buildCompletionSuggestersQuery($query),
             $indexAliasNames,
         );
 
@@ -113,12 +113,12 @@ final class SearchController extends AbstractController implements SearchControl
             'paginator' => $paginator,
             'filters' => $esSearchQueryAdapter->getQueryResult()->getFilters(),
             'queryResult' => $esSearchQueryAdapter->getQueryResult(),
-            'suggesters' => $this->buildSuggestions($suggesters),
+            'completionSuggesters' => $this->buildSuggestions($completionSuggesters),
         ]);
     }
 
     /**
-     * @param ESSuggests $suggesters
+     * @param ESCompletionSuggesters $suggesters
      */
     private function buildSuggestions(array $suggesters): array
     {

@@ -40,5 +40,7 @@ interface QueryBuilderInterface
         ?float $minScore = null,
     ): array;
 
-    public function buildSuggestersQuery(string $searchTerm): array;
+    public function buildCompletionSuggestersQuery(
+        string $searchTerm,
+    ): array;
 }
