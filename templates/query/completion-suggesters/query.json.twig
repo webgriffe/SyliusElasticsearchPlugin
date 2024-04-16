@@ -1,8 +1,15 @@
 {
     "name": {
-        "text": "{{ searchTerm }}",
-        "term": {
-            "field": "name.{{ localeCode }}"
+        "prefix": "{{ searchTerm }}",
+        "completion": {
+            "field": "suggest",
+            "size": 5,
+            "skip_duplicates": true,
+            "fuzzy": {
+                "fuzziness": 2,
+                "transpositions": true,
+                "min_length": 4
+            }
         }
     }
 }

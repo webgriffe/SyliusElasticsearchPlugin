@@ -61,31 +61,26 @@ final class InstantSearchController extends AbstractController implements Instan
         return $this->render('@WebgriffeSyliusElasticsearchPlugin/InstantSearch/results.html.twig', [
             'query' => $query,
             'queryResult' => $queryResult,
-            'completionSuggesters' => $this->buildSuggestions($completionSuggesters),
+            'completionSuggesters' => $this->buildCompletionSuggesters($completionSuggesters),
         ]);
     }
 
     /**
-     * @param ESCompletionSuggesters $suggesters
+     * @param ESCompletionSuggesters $completionSuggesters
      */
-    private function buildSuggestions(array $suggesters): array
+    private function buildCompletionSuggesters(array $completionSuggesters): array
     {
         $suggestions = [];
-        foreach ($suggesters as $field => $suggestion) {
+        foreach ($completionSuggesters as $field => $suggestion) {
             foreach ($suggestion as $suggestionData) {
-                if (count($suggestionData['options']) === 0) {
-                    $suggestions[$field][] = $suggestionData['text'];
-
+                $options = $suggestionData['options'];
+                if (count($options) === 0) {
                     continue;
                 }
-                foreach ($suggestionData['options'] as $option) {
-                    $suggestions[$field][] = $option['text'];
+                foreach ($options as $option) {
+                    $suggestions[$field] = $option['text'];
                 }
             }
-        }
-
-        foreach ($suggestions as $field => $suggestion) {
-            $suggestions[$field] = implode(' ', $suggestion);
         }
 
         return $suggestions;

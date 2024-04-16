@@ -42,5 +42,6 @@ interface QueryBuilderInterface
 
     public function buildCompletionSuggestersQuery(
         string $searchTerm,
+        ?string $source = 'suggest',
     ): array;
 }

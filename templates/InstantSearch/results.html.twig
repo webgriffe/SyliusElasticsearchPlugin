@@ -1,16 +1,22 @@
 {# queryResult \Webgriffe\SyliusElasticsearchPlugin\Model\QueryResultInterface #}
 
-<div>
-    Maybe you were looking for:
-    <ul>
-        {% for completionSuggest in completionSuggesters %}
-            <li><a href="{{ path('sylius_shop_search', {'query': completionSuggest}) }}">{{ completionSuggest }}</a></li>
-        {% endfor %}
-    </ul>
-</div>
+{% if completionSuggesters|length > 0 %}
+    <div>
+        <ul>
+            {% for completionSuggest in completionSuggesters %}
+                <li>
+                    <a href="{{ path('sylius_shop_search', {'query': completionSuggest}) }}">
+                        {{ completionSuggest }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
 
 <div>
-    Results for "{{ query }}":
+    {{ 'webgriffe_sylius_elasticsearch_plugin.ui.results_for_query'|trans({'{query}': query}) }}
+
 
     {% for result in queryResult.hints(1, 10) %}
         {% include '@SyliusShop/Product/_box.html.twig' with {product: result} %}

@@ -188,6 +188,7 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
 
     public function buildCompletionSuggestersQuery(
         string $searchTerm,
+        ?string $source = 'suggest',
     ): array {
         $localeCode = $this->localeContext->getLocaleCode();
         $query = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/completion-suggesters/query.json.twig', [
@@ -198,6 +199,9 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
         /** @var array $queryNormalized */
         $queryNormalized = json_decode($query, true, 512, JSON_THROW_ON_ERROR);
         $completionSuggestersQuery['suggest'] = $queryNormalized;
+        if ($source !== null) {
+            $completionSuggestersQuery['_source'] = $source;
+        }
 
         $this->logger->debug(sprintf(
             'Built completion suggesters query: "%s".',

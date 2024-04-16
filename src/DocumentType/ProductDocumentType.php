@@ -140,6 +140,13 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
                     'include_in_parent' => true,
                     'properties' => $this->variantProperties(),
                 ],
+                'suggest' => [
+                    'type' => 'completion',
+                    'search_analyzer' => 'store',
+                    'preserve_separators' => false,
+                    'preserve_position_increments' => true,
+                    'max_input_length' => 50,
+                ],
             ],
         ];
         $event = new ProductDocumentTypeMappingsEvent($mappings);

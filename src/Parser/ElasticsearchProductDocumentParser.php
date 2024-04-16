@@ -30,7 +30,7 @@ use Webmozart\Assert\Assert;
  */
 final class ElasticsearchProductDocumentParser implements DocumentParserInterface
 {
-    private ?string $defaultLocale = null;
+    private ?string $defaultLocaleCode = null;
 
     /** @var array<string|int, ProductVariantInterface> */
     private array $productVariants = [];
@@ -68,11 +68,11 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
         /** @var ChannelInterface $channel */
         $channel = $this->channelContext->getChannel();
         $defaultLocale = $channel->getDefaultLocale();
-        $this->defaultLocale = $this->fallbackLocaleCode;
+        $this->defaultLocaleCode = $this->fallbackLocaleCode;
         if ($defaultLocale instanceof LocaleInterface) {
             $defaultLocaleCode = $defaultLocale->getCode();
             if ($defaultLocaleCode !== null) {
-                $this->defaultLocale = $defaultLocaleCode;
+                $this->defaultLocaleCode = $defaultLocaleCode;
             }
         }
         /** @var array{sylius-id: int, code: string, name: LocalizedField, description: LocalizedField, short-description: LocalizedField, taxons: array, main_taxon: array, slug: LocalizedField, images: array, variants: array, product-options: array, translated-attributes: array, attributes: array} $source */
@@ -122,9 +122,15 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
             $productAttribute->setCurrentLocale($localeCode);
             $productAttribute->setName($this->getValueFromLocalizedField($esTranslatedAttribute['name'], $localeCode));
 
-            /** @var array<array-key, array{sylius-id: int|string, code: string, locale: string, values: array<array-key, string>}> $attributeValues */
-            $attributeValues = $esTranslatedAttribute['values'][$this->defaultLocale];
-            $usedLocale = $this->defaultLocale;
+            if (!array_key_exists($this->defaultLocaleCode, $esTranslatedAttribute['values'])) {
+                /** @var array<array-key, array{sylius-id: int|string, code: string, locale: string, values: array<array-key, string>}> $attributeValues */
+                $attributeValues = $esTranslatedAttribute['values'][$this->fallbackLocaleCode];
+                $usedLocale = $this->fallbackLocaleCode;
+            } else {
+                /** @var array<array-key, array{sylius-id: int|string, code: string, locale: string, values: array<array-key, string>}> $attributeValues */
+                $attributeValues = $esTranslatedAttribute['values'][$this->defaultLocaleCode];
+                $usedLocale = $this->defaultLocaleCode;
+            }
             if (array_key_exists($localeCode, $esTranslatedAttribute['values'])) {
                 $usedLocale = $localeCode;
                 /** @var array<array-key, array{sylius-id: int|string, code: string, locale: string, values: array<array-key, string>}> $attributeValues */
@@ -240,7 +246,7 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
     private function getValueFromLocalizedField(array $localizedField, string $localeCode): ?string
     {
         $fallbackValue = null;
-        $defaultLocale = $this->defaultLocale;
+        $defaultLocale = $this->defaultLocaleCode;
         Assert::string($defaultLocale);
         foreach ($localizedField as $field) {
             if (array_key_exists($localeCode, $field)) {

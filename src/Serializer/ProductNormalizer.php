@@ -38,6 +38,9 @@ final class ProductNormalizer implements NormalizerInterface
     /** @var string[] */
     private array $localeCodes = [];
 
+    /** @var array<array-key, array{input: string, weight: positive-int}> */
+    private array $productSuggesters = [];
+
     public function __construct(
         private readonly ProductVariantResolverInterface $productVariantResolver,
         private readonly EventDispatcherInterface $eventDispatcher,
@@ -67,6 +70,7 @@ final class ProductNormalizer implements NormalizerInterface
                 $this->defaultLocaleCode = $channelDefaultLocaleCode;
             }
         }
+        $this->productSuggesters = [];
 
         $normalizedProduct = [
             'sylius-id' => $product->getId(),
@@ -90,16 +94,19 @@ final class ProductNormalizer implements NormalizerInterface
             'translated-attributes' => [],
             'product-options' => [],
             'images' => [],
+            'suggest' => [],
         ];
+        $this->productSuggesters[] = ['input' => (string) $product->getCode(), 'weight' => 100];
         /** @var ProductTranslationInterface $productTranslation */
         foreach ($product->getTranslations() as $productTranslation) {
             $localeCode = $productTranslation->getLocale();
             Assert::string($localeCode);
+            $productName = (string) $productTranslation->getName();
             $normalizedProduct['name-as-keyword'][] = [
-                $localeCode => $productTranslation->getName(),
+                $localeCode => $productName,
             ];
             $normalizedProduct['name'][] = [
-                $localeCode => $productTranslation->getName(),
+                $localeCode => $productName,
             ];
             $normalizedProduct['description'][] = [
                 $localeCode => $productTranslation->getDescription(),
@@ -116,6 +123,7 @@ final class ProductNormalizer implements NormalizerInterface
             $normalizedProduct['meta-description'][] = [
                 $localeCode => $productTranslation->getMetaDescription(),
             ];
+            $this->productSuggesters[] = ['input' => $productName, 'weight' => 50];
         }
         $defaultVariant = $this->productVariantResolver->getVariant($product);
         if ($defaultVariant instanceof ProductVariantInterface) {
@@ -217,6 +225,8 @@ final class ProductNormalizer implements NormalizerInterface
         foreach ($product->getImages() as $image) {
             $normalizedProduct['images'][] = $this->normalizeProductImage($image);
         }
+        $normalizedProduct['suggest'] = $this->productSuggesters;
+
         $event = new ProductDocumentTypeProductNormalizeEvent($product, $channel, $normalizedProduct);
         $this->eventDispatcher->dispatch($event);
 
@@ -250,6 +260,7 @@ final class ProductNormalizer implements NormalizerInterface
             $normalizedTaxon['name'][] = [
                 $localeCode => $taxonTranslation->getName(),
             ];
+            $this->productSuggesters[] = ['input' => (string) $taxonTranslation->getName(), 'weight' => 10];
         }
 
         return $normalizedTaxon;

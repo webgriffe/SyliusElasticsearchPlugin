@@ -103,43 +103,12 @@ final class SearchController extends AbstractController implements SearchControl
 
             return $this->redirectToRoute($result->getRouteName(), $result->getRouteParams());
         }
-        $completionSuggesters = $this->client->completionSuggesters(
-            $this->queryBuilder->buildCompletionSuggestersQuery($query),
-            $indexAliasNames,
-        );
 
         return $this->render('@WebgriffeSyliusElasticsearchPlugin/Search/results.html.twig', [
             'query' => $query,
             'paginator' => $paginator,
             'filters' => $esSearchQueryAdapter->getQueryResult()->getFilters(),
             'queryResult' => $esSearchQueryAdapter->getQueryResult(),
-            'completionSuggesters' => $this->buildSuggestions($completionSuggesters),
         ]);
-    }
-
-    /**
-     * @param ESCompletionSuggesters $suggesters
-     */
-    private function buildSuggestions(array $suggesters): array
-    {
-        $suggestions = [];
-        foreach ($suggesters as $field => $suggestion) {
-            foreach ($suggestion as $suggestionData) {
-                if (count($suggestionData['options']) === 0) {
-                    $suggestions[$field][] = $suggestionData['text'];
-
-                    continue;
-                }
-                foreach ($suggestionData['options'] as $option) {
-                    $suggestions[$field][] = $option['text'];
-                }
-            }
-        }
-
-        foreach ($suggestions as $field => $suggestion) {
-            $suggestions[$field] = implode(' ', $suggestion);
-        }
-
-        return $suggestions;
     }
 }
