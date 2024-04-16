@@ -158,7 +158,15 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
                 $productAttributeValue->setAttribute($productAttribute);
                 $productAttributeValue->setLocaleCode($localeCode);
                 $productAttributeValue->setSubject($productResponse);
-                $productAttributeValue->setValue(reset($esProductAttributeValue['values']));
+                $firstValue = reset($esProductAttributeValue['values']);
+                if ($productAttribute->getStorageType() === AttributeValueInterface::STORAGE_DATETIME ||
+                    $productAttribute->getStorageType() === AttributeValueInterface::STORAGE_DATE
+                ) {
+                    $firstValue = new DateTime((string) $firstValue);
+                } elseif ($productAttribute->getStorageType() === AttributeValueInterface::STORAGE_JSON) {
+                    $firstValue = [$firstValue];
+                }
+                $productAttributeValue->setValue($firstValue);
                 $productResponse->addAttribute($productAttributeValue);
             }
         }
