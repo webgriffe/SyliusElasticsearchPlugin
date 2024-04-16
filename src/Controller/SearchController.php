@@ -27,7 +27,7 @@ use Webmozart\Assert\Assert;
  * @psalm-suppress PropertyNotSetInConstructor
  *
  * @psalm-import-type ESSuggestOption from ClientInterface
- * @psalm-import-type ESCompletionSuggesters from ClientInterface
+ * @psalm-import-type ESTermSuggesters from ClientInterface
  */
 final class SearchController extends AbstractController implements SearchControllerInterface
 {
@@ -95,20 +95,53 @@ final class SearchController extends AbstractController implements SearchControl
             $page,
             $size,
         );
-        // This prevents Pagerfanta from querying ES from a template
-        /** @var ResponseInterface[] $results */
+        /**
+         * This prevents Pagerfanta from querying ES from a template
+         *
+         * @var ResponseInterface[] $results
+         */
         $results = $paginator->getCurrentPageResults();
         if (count($results) === 1) {
             $result = $results[0];
 
             return $this->redirectToRoute($result->getRouteName(), $result->getRouteParams());
         }
+        $termSuggesters = $this->client->termSuggesters(
+            $this->queryBuilder->buildTermSuggestersQuery($query),
+            $indexAliasNames,
+        );
 
         return $this->render('@WebgriffeSyliusElasticsearchPlugin/Search/results.html.twig', [
             'query' => $query,
             'paginator' => $paginator,
             'filters' => $esSearchQueryAdapter->getQueryResult()->getFilters(),
             'queryResult' => $esSearchQueryAdapter->getQueryResult(),
+            'termSuggesters' => $this->buildTermSuggesters($query, $termSuggesters),
         ]);
+    }
+
+    /**
+     * @param ESTermSuggesters $termSuggesters
+     */
+    private function buildTermSuggesters(string $query, array $termSuggesters): array
+    {
+        $suggestions = [];
+        foreach ($termSuggesters as $suggestion) {
+            foreach ($suggestion as $suggestionData) {
+                $options = $suggestionData['options'];
+                if (count($options) === 0) {
+                    continue;
+                }
+                $textToReplace = $suggestionData['text'];
+                foreach ($options as $option) {
+                    $replaceTerm = $option['text'];
+                    $suggestionKey = str_replace($textToReplace, $replaceTerm, $query);
+                    $suggestionHtml = str_replace($textToReplace, '<strong>' . $replaceTerm . '</strong>', $query);
+                    $suggestions[$suggestionKey] = $suggestionHtml;
+                }
+            }
+        }
+
+        return $suggestions;
     }
 }

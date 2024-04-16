@@ -21,6 +21,7 @@ use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\SwitchAliasException;
  * @psalm-type ESQueryResult = array{took: int, timed_out: bool, _shards: array, hits: array{total: array{value: int, relation: string}, max_score: ?int, hits: array<array-key, ESHit>}, aggregations?: array<string, array|ESAggregation|ESDefaultOptionAggregation>}
  * @psalm-type ESSuggestOption = array{text: string, _index: string, _type: string, _id: string, _score: float, _source: array{suggest: array<array-key, string>}}
  * @psalm-type ESCompletionSuggesters = array<string, array<array-key, array{text: string, offset: int, length: int, options: array<array-key, ESSuggestOption>}>>
+ * @psalm-type ESTermSuggesters = array<string, array<array-key, array{text: string, offset: int, length: int, options: array<array-key, ESSuggestOption>}>>
  */
 interface ClientInterface extends LoggerAwareInterface
 {
@@ -74,6 +75,16 @@ interface ClientInterface extends LoggerAwareInterface
      * @return ESCompletionSuggesters
      */
     public function completionSuggesters(
+        array $query,
+        array $indexes = [],
+    ): array;
+
+    /**
+     * @param string[] $indexes
+     *
+     * @return ESTermSuggesters
+     */
+    public function termSuggesters(
         array $query,
         array $indexes = [],
     ): array;

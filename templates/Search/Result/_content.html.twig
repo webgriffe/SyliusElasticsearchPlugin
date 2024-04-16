@@ -1,15 +1,21 @@
 <h1 class="ui monster section dividing header"
     style="position: relative; max-width: 800px; margin: 50px auto 120px auto; text-align: center; border: 0;">
-    Search
-    <div class="sub header">Search results for "{{ query }}"</div>
+    {{ 'webgriffe_sylius_elasticsearch_plugin.ui.search'|trans }}
+    <div class="sub header">
+        {{ 'webgriffe_sylius_elasticsearch_plugin.ui.results_for_query'|trans({'{query}': query}) }}
+    </div>
 </h1>
 
-{% if suggesters|length > 0 %}
+{% if termSuggesters|length > 0 %}
     <div class="ui section header">
-        Maybe you were looking for:
+        {{ 'webgriffe_sylius_elasticsearch_plugin.ui.maybe_you_were_looking_for'|trans }}
         <ul>
-            {% for completionSuggest in completionSuggesters %}
-                <li><a href="{{ path('sylius_shop_search', {'query': completionSuggest}) }}">{{ completionSuggest }}</a></li>
+            {% for termSuggestKey, termSuggestHtml in termSuggesters %}
+                <li>
+                    <a href="{{ path('sylius_shop_search', {'query': termSuggestKey}) }}">
+                        {{ termSuggestHtml|raw }}
+                    </a>
+                </li>
             {% endfor %}
         </ul>
     </div>

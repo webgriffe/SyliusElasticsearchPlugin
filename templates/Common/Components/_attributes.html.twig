@@ -7,7 +7,7 @@
 <div class="ui fluid vertical menu">
     <a href="{{ path(app.request.attributes.get('_route'), app.request.attributes.all('_route_params')) }}"
        class="ui button">
-        Reset filters
+        {{ 'webgriffe_sylius_elasticsearch_plugin.ui.reset_filters'|trans }}
     </a>
 
     {% for filter in queryResult.filters %}

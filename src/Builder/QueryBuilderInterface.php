@@ -44,4 +44,8 @@ interface QueryBuilderInterface
         string $searchTerm,
         ?string $source = 'suggest',
     ): array;
+
+    public function buildTermSuggestersQuery(
+        string $searchTerm,
+    ): array;
 }
