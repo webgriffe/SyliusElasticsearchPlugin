@@ -71,15 +71,17 @@ final class InstantSearchController extends AbstractController implements Instan
     private function buildCompletionSuggesters(array $completionSuggesters): array
     {
         $suggestions = [];
-        foreach ($completionSuggesters as $field => $suggestion) {
-            foreach ($suggestion as $suggestionData) {
-                $options = $suggestionData['options'];
-                if (count($options) === 0) {
-                    continue;
-                }
-                foreach ($options as $option) {
-                    $suggestions[$field] = $option['text'];
-                }
+        foreach ($completionSuggesters as $suggestion) {
+            $suggestionData = reset($suggestion);
+            if ($suggestionData === false) {
+                continue;
+            }
+            $options = $suggestionData['options'];
+            if (count($options) === 0) {
+                continue;
+            }
+            foreach ($options as $option) {
+                $suggestions[] = $option['text'];
             }
         }
 
