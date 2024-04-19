@@ -43,6 +43,7 @@ interface QueryBuilderInterface
     public function buildCompletionSuggestersQuery(
         string $searchTerm,
         ?string $source = 'suggest',
+        int $size = 5,
     ): array;
 
     public function buildTermSuggestersQuery(

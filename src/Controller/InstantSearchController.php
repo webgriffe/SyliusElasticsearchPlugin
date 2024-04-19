@@ -24,6 +24,9 @@ use Webmozart\Assert\Assert;
  */
 final class InstantSearchController extends AbstractController implements InstantSearchControllerInterface
 {
+    /**
+     * @param int<1,10_000> $maxResults
+     */
     public function __construct(
         private readonly ClientInterface $client,
         private readonly ChannelContextInterface $channelContext,
@@ -31,6 +34,8 @@ final class InstantSearchController extends AbstractController implements Instan
         private readonly DocumentTypeProviderInterface $documentTypeProvider,
         private readonly QueryBuilderInterface $queryBuilder,
         private readonly QueryResultMapperInterface $queryResultMapper,
+        private readonly int $maxResults,
+        private readonly int $completionSuggestersSize,
     ) {
     }
 
@@ -48,12 +53,12 @@ final class InstantSearchController extends AbstractController implements Instan
         }
 
         $completionSuggesters = $this->client->completionSuggesters(
-            $this->queryBuilder->buildCompletionSuggestersQuery($query),
+            $this->queryBuilder->buildCompletionSuggestersQuery($query, 'suggest', $this->completionSuggestersSize),
             $indexAliasNames,
         );
 
         $esResult = $this->client->query(
-            $this->queryBuilder->buildSearchQuery($query),
+            $this->queryBuilder->buildSearchQuery($query, null, $this->maxResults),
             $indexAliasNames,
         );
         $queryResult = $this->queryResultMapper->map($esResult);

@@ -3,7 +3,7 @@
         "prefix": "{{ searchTerm }}",
         "completion": {
             "field": "suggest",
-            "size": 5,
+            "size": {{ size }},
             "skip_duplicates": true,
             "fuzzy": {
                 "fuzziness": 1,

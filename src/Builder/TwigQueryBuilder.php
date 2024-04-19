@@ -189,11 +189,13 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
     public function buildCompletionSuggestersQuery(
         string $searchTerm,
         ?string $source = 'suggest',
+        int $size = 5,
     ): array {
         $localeCode = $this->localeContext->getLocaleCode();
         $query = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/completion-suggesters/query.json.twig', [
             'searchTerm' => $searchTerm,
             'localeCode' => $localeCode,
+            'size' => $size,
         ]);
         $completionSuggestersQuery = [];
         /** @var array $queryNormalized */
