@@ -142,7 +142,6 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
                 ],
                 'suggest' => [
                     'type' => 'completion',
-                    'search_analyzer' => 'store',
                     'preserve_separators' => false,
                     'preserve_position_increments' => true,
                     'max_input_length' => 50,
