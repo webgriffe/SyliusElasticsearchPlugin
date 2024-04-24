@@ -74,7 +74,7 @@ final class SearchController extends AbstractController implements SearchControl
         $size = $request->query->getInt('limit', $this->searchDefaultPageLimit);
         $page = $request->query->getInt('page', 1);
 
-        /** @var array<string, array<string, string>> $requestFilters */
+        /** @var array<string, array<array-key, array{code: string, value: string}>> $requestFilters */
         $requestFilters = $request->query->all('filters');
         $filters = FilterHelper::retrieveFilters($requestFilters);
 

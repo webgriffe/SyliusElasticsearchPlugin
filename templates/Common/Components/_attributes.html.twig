@@ -15,15 +15,14 @@
             <h3>{{ filter.name }}</h3>
             <ul>
                 {% for filterValue in filter.values %}
-                    {% set isCurrentOptionValueUsedAsFilter = currentAppliedFilters[filter.type] is defined and
-                        currentAppliedFilters[filter.type][filter.keyCode] is defined and
-                        currentAppliedFilters[filter.type][filter.keyCode] == filterValue.key
-                    %}
+                    {% set isCurrentOptionValueUsedAsFilter = filterValue|is_filter_active(filter, currentAppliedFilters) %}
 
                     <li>
                         {% set path = path(
                             app.request.attributes.get('_route'),
-                            app.request.attributes.all('_route_params')|merge(app.request.query.all)|merge({(filter.queryStringKey): filterValue.key}),
+                            app.request.attributes.all('_route_params')|merge({
+                                'filters': merge_filter_value_with_current_active_filters(filterValue, filter, currentAppliedFilters),
+                            }),
                         ) %}
                         <a class="item {% if isCurrentOptionValueUsedAsFilter %}disabled{% endif %}"
                            href="{{ path }}"

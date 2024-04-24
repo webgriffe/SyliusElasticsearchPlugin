@@ -15,7 +15,7 @@ use Webgriffe\SyliusElasticsearchPlugin\Model\TranslatedAttributeFilter;
 final class FilterHelper
 {
     /**
-     * @param array<string, array<string, string>> $requestFilters
+     * @param array<string, array<array-key, array{code: string, value: string}>> $requestFilters
      *
      * @return QueryFilters
      */
@@ -31,10 +31,10 @@ final class FilterHelper
             if (!array_key_exists($type, $filters)) {
                 continue;
             }
-            foreach ($filter as $code => $value) {
+            foreach ($filter as $value) {
                 $filters[$type][] = [
-                    'code' => $code,
-                    'value' => $value,
+                    'code' => $value['code'],
+                    'value' => $value['value'],
                 ];
             }
         }

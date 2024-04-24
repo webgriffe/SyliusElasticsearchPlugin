@@ -70,7 +70,7 @@ final class ProductController extends AbstractController implements ProductContr
         $size = $request->query->getInt('limit', $this->taxonDefaultPageLimit);
         $page = $request->query->getInt('page', 1);
 
-        /** @var array<string, array<string, string>> $requestFilters */
+        /** @var array<string, array<array-key, array{code: string, value: string}>> $requestFilters */
         $requestFilters = $request->query->all('filters');
         $filters = FilterHelper::retrieveFilters($requestFilters);
 
