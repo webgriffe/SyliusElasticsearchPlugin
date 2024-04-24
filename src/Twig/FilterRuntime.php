@@ -31,6 +31,9 @@ final class FilterRuntime implements RuntimeExtensionInterface
     }
 
     /**
+     * If the filter value is already applied, it will be removed from the active filters, so that it can be toggled.
+     * Otherwise, it will be added to the active filters.
+     *
      * @param array<string, array<array-key, array{code: string, value: string}>> $activeFilters
      */
     public function mergeFilterValueWithCurrentActiveFilters(
@@ -42,9 +45,11 @@ final class FilterRuntime implements RuntimeExtensionInterface
         if (!array_key_exists($filterType, $activeFilters)) {
             $activeFilters[$filterType] = [];
         }
-        foreach ($activeFilters[$filterType] as $appliedFilterValue) {
+        foreach ($activeFilters[$filterType] as $key => $appliedFilterValue) {
             if ($appliedFilterValue['code'] === $filter->getKeyCode() &&
                 $appliedFilterValue['value'] === $filterValue->getKey()) {
+                unset($activeFilters[$filterType][$key]);
+
                 return $activeFilters;
             }
         }
