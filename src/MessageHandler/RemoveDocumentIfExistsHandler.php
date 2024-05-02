@@ -8,10 +8,10 @@ use InvalidArgumentException;
 use Sylius\Component\Channel\Repository\ChannelRepositoryInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Webgriffe\SyliusElasticsearchPlugin\IndexManager\IndexManagerInterface;
-use Webgriffe\SyliusElasticsearchPlugin\Message\UpsertDocument;
+use Webgriffe\SyliusElasticsearchPlugin\Message\RemoveDocumentIfExists;
 use Webgriffe\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
 
-final readonly class UpsertDocumentHandler
+final readonly class RemoveDocumentIfExistsHandler
 {
     public function __construct(
         private ChannelRepositoryInterface $channelRepository,
@@ -23,7 +23,7 @@ final readonly class UpsertDocumentHandler
     /**
      * @psalm-suppress UnusedForeachValue
      */
-    public function __invoke(UpsertDocument $message): void
+    public function __invoke(RemoveDocumentIfExists $message): void
     {
         $channel = $this->channelRepository->find($message->getChannelId());
         if (!$channel instanceof ChannelInterface) {
@@ -35,7 +35,7 @@ final readonly class UpsertDocumentHandler
 
         $documentType = $this->documentTypeProvider->getDocumentType($message->getDocumentTypeCode());
 
-        foreach ($this->indexManager->upsertDocuments($channel, $documentType, $message->getDocumentIdentifier()) as $outputMessage) {
+        foreach ($this->indexManager->removeDocuments($channel, $documentType, $message->getDocumentIdentifier()) as $outputMessage) {
         }
     }
 }

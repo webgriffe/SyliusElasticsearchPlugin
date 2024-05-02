@@ -57,7 +57,7 @@ final readonly class ElasticsearchIndexManager implements IndexManagerInterface
         $this->client->removeIndexes($indexesToRemoveWildcard, [$indexName]);
     }
 
-    public function upsertDocument(
+    public function upsertDocuments(
         ChannelInterface $channel,
         DocumentTypeInterface $documentType,
         string|int ...$identifiers,
@@ -76,5 +76,25 @@ final readonly class ElasticsearchIndexManager implements IndexManagerInterface
             yield Message::createMessage(sprintf('Indexed %d/%d documents.', $documentsIndexed, $countBulkActions));
         }
         yield Message::createMessage(sprintf('Updated %d documents in alias "%s".', $countBulkActions, $aliasName));
+    }
+
+    public function removeDocuments(
+        ChannelInterface $channel,
+        DocumentTypeInterface $documentType,
+        int|string ...$identifiers,
+    ): Generator {
+        $aliasName = $this->indexNameGenerator->generateAlias($channel, $documentType);
+
+        $bulkActions = [];
+        foreach ($identifiers as $identifier) {
+            $bulkActions[] = new BulkAction(Action::DELETE, $aliasName, null, null, $identifier);
+        }
+
+        $countBulkActions = count($bulkActions);
+        yield Message::createMessage(sprintf('Removed 0/%d documents.', $countBulkActions));
+        foreach ($this->client->bulk($aliasName, $bulkActions) as $documentsIndexed) {
+            yield Message::createMessage(sprintf('Removed %d/%d documents.', $documentsIndexed, $countBulkActions));
+        }
+        yield Message::createMessage(sprintf('Removed %d documents in alias "%s".', $countBulkActions, $aliasName));
     }
 }

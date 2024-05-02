@@ -11,7 +11,7 @@ final readonly class BulkAction
     public function __construct(
         private Action $action,
         private string $index,
-        private array $payload,
+        private ?array $payload = null,
         private ?string $type = null,
         private null|string|int $id = null,
     ) {
@@ -32,7 +32,7 @@ final readonly class BulkAction
         return $this->type;
     }
 
-    public function getPayload(): array
+    public function getPayload(): ?array
     {
         return $this->payload;
     }

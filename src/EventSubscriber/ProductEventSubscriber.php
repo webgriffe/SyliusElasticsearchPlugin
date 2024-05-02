@@ -30,7 +30,7 @@ final readonly class ProductEventSubscriber implements EventSubscriberInterface
         return [
             'sylius.product.post_create' => 'onProductPostCreateOrUpdate',
             'sylius.product.post_update' => 'onProductPostCreateOrUpdate',
-            'sylius.product.post_delete' => 'onProductPostDelete',
+            'sylius.product.pre_delete' => 'onProductPreDelete',
         ];
     }
 
@@ -74,7 +74,7 @@ final readonly class ProductEventSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onProductPostDelete(GenericEvent $event): void
+    public function onProductPreDelete(GenericEvent $event): void
     {
         $product = $event->getSubject();
         if (!$product instanceof ProductInterface) {

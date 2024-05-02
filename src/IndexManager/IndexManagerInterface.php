@@ -19,9 +19,18 @@ interface IndexManagerInterface
     /**
      * @return Generator<array-key, MessageInterface>
      */
-    public function upsertDocument(
+    public function upsertDocuments(
         ChannelInterface $channel,
         DocumentTypeInterface $documentType,
         string|int ...$identifiers,
+    ): Generator;
+
+    /**
+     * @return Generator<array-key, MessageInterface>
+     */
+    public function removeDocuments(
+        ChannelInterface $channel,
+        DocumentTypeInterface $documentType,
+        int|string ...$identifiers,
     ): Generator;
 }
