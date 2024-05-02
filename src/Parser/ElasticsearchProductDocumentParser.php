@@ -179,7 +179,7 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
 
         // Doing this sorting here could avoid to make any DB query to get the variants in the right order just for
         // getting the "default variant"
-        /** @var array<array-key, array{sylius-id: int|string, code: ?string, enabled: ?bool, position: int, price: array{price: ?int, original-price: ?int, applied-promotions: array}, options: array}> $sortedVariants */
+        /** @var array<array-key, array{sylius-id: int|string, code: ?string, enabled: ?bool, position: int, price: array{price: ?int, original-price: ?int, applied-promotions: array}, options: array, on-hand: ?int, on-hold: ?int, is-tracked: bool}> $sortedVariants */
         $sortedVariants = $source['variants'];
         usort(
             $sortedVariants,
@@ -194,6 +194,9 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
             $productVariant->setCode($esVariant['code']);
             $productVariant->setEnabled($esVariant['enabled']);
             $productVariant->setPosition($esVariant['position']);
+            $productVariant->setOnHand($esVariant['on-hand']);
+            $productVariant->setOnHold($esVariant['on-hold']);
+            $productVariant->setTracked($esVariant['is-tracked']);
             $this->productVariants[$esVariant['sylius-id']] = $productVariant;
 
             $channelPricing = $this->channelPricingFactory->createNew();
