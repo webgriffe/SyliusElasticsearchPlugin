@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Webgriffe\SyliusElasticsearchPlugin\DocumentType;
 
+use InvalidArgumentException;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Locale\Model\LocaleInterface;
@@ -44,13 +45,30 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         $documents = [];
         /** @var ProductInterface $documentToIndex */
         foreach ($this->documentTypeRepository->findDocumentsToIndex($channel) as $documentToIndex) {
-            $documents[] = $this->normalizer->normalize($documentToIndex, null, [
+            $result = $this->normalizer->normalize($documentToIndex, null, [
                 'type' => 'webgriffe_sylius_elasticsearch_plugin',
                 'channel' => $channel,
             ]);
+            Assert::isArray($result);
+            $documents[] = $result;
         }
 
         return $documents;
+    }
+
+    public function getDocument(string|int $identifier, ChannelInterface $channel): array
+    {
+        $product = $this->documentTypeRepository->findDocumentToIndex($identifier, $channel);
+        if ($product === null) {
+            throw new InvalidArgumentException(sprintf('Product with identifier "%s" not found.', $identifier));
+        }
+        $result = $this->normalizer->normalize($product, null, [
+            'type' => 'webgriffe_sylius_elasticsearch_plugin',
+            'channel' => $channel,
+        ]);
+        Assert::isArray($result);
+
+        return $result;
     }
 
     public function getSettings(): array

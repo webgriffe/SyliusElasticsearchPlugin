@@ -20,4 +20,16 @@ trait ProductDocumentTypeRepositoryTrait
             ->getResult()
         ;
     }
+
+    public function findDocumentToIndex(string|int $identifier, ChannelInterface $channel): ?object
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.id = :id')
+            ->andWhere(':channel MEMBER OF p.channels')
+            ->setParameter('id', $identifier)
+            ->setParameter('channel', $channel)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
 }

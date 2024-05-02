@@ -8,10 +8,10 @@ use InvalidArgumentException;
 use Sylius\Component\Channel\Repository\ChannelRepositoryInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Webgriffe\SyliusElasticsearchPlugin\IndexManager\IndexManagerInterface;
-use Webgriffe\SyliusElasticsearchPlugin\Message\CreateIndex;
+use Webgriffe\SyliusElasticsearchPlugin\Message\UpsertDocument;
 use Webgriffe\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
 
-final readonly class CreateIndexHandler
+final readonly class UpsertDocumentHandler
 {
     public function __construct(
         private ChannelRepositoryInterface $channelRepository,
@@ -23,7 +23,7 @@ final readonly class CreateIndexHandler
     /**
      * @psalm-suppress UnusedForeachValue
      */
-    public function __invoke(CreateIndex $message): void
+    public function __invoke(UpsertDocument $message): void
     {
         $channel = $this->channelRepository->find($message->getChannelId());
         if (!$channel instanceof ChannelInterface) {
@@ -35,7 +35,7 @@ final readonly class CreateIndexHandler
 
         $documentType = $this->documentTypeProvider->getDocumentType($message->getDocumentTypeCode());
 
-        foreach ($this->indexManager->create($channel, $documentType) as $outputMessage) {
+        foreach ($this->indexManager->upsertDocument($channel, $documentType, $message->getDocumentIdentifier()) as $outputMessage) {
         }
     }
 }

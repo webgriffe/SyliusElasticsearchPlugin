@@ -73,17 +73,23 @@ final class ElasticsearchClient implements ClientInterface
         $params = ['body' => []];
 
         $count = $totalCount = 0;
-        /** @var array $action */
         foreach ($actions as $action) {
             ++$count;
             ++$totalCount;
+            $headerPayload = [
+                '_index' => $action->getIndex(),
+            ];
+            if ($action->getType() !== null) {
+                $headerPayload['_type'] = $action->getType();
+            }
+            if ($action->getId() !== null) {
+                $headerPayload['_id'] = $action->getId();
+            }
             $params['body'][] = [
-                'index' => [
-                    '_index' => $indexName,
-                ],
+                $action->getAction()->value => $headerPayload,
             ];
 
-            $params['body'][] = $action;
+            $params['body'][] = $action->getPayload();
 
             // Every 250 actions stop and send the bulk request
             if ($count % 250 === 0) {

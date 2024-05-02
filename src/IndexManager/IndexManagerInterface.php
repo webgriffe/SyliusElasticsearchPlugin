@@ -15,4 +15,13 @@ interface IndexManagerInterface
      * @return Generator<array-key, MessageInterface>
      */
     public function create(ChannelInterface $channel, DocumentTypeInterface $documentType): Generator;
+
+    /**
+     * @return Generator<array-key, MessageInterface>
+     */
+    public function upsertDocument(
+        ChannelInterface $channel,
+        DocumentTypeInterface $documentType,
+        string|int ...$identifiers,
+    ): Generator;
 }

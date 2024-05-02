@@ -12,4 +12,6 @@ interface DocumentTypeRepositoryInterface
      * @return object[]
      */
     public function findDocumentsToIndex(ChannelInterface $channel): array;
+
+    public function findDocumentToIndex(string|int $identifier, ChannelInterface $channel): ?object;
 }

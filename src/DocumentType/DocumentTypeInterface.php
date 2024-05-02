@@ -11,7 +11,7 @@ interface DocumentTypeInterface
     public function getCode(): string;
 
     /**
-     * @return array<array-key, mixed>
+     * @return array<array-key, array>
      */
     public function getDocuments(ChannelInterface $channel): array;
 
@@ -20,4 +20,6 @@ interface DocumentTypeInterface
 
     /** @return array<string, array> */
     public function getSettings(): array;
+
+    public function getDocument(string|int $identifier, ChannelInterface $channel): array;
 }

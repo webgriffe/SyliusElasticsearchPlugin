@@ -10,6 +10,7 @@ use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\BulkException;
 use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\CreateIndexException;
 use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\RemoveIndexesException;
 use Webgriffe\SyliusElasticsearchPlugin\Client\Exception\SwitchAliasException;
+use Webgriffe\SyliusElasticsearchPlugin\Client\ValueObject\BulkAction;
 
 /**
  * @psalm-type ESValuesAggregation = array{doc_count_error_upper_bound: int, sum_other_doc_count: int, buckets: array<int, array{key: string, doc_count: int}>}
@@ -43,6 +44,8 @@ interface ClientInterface extends LoggerAwareInterface
     public function removeIndexes(string $wildcard = null, array $skips = []): void;
 
     /**
+     * @param BulkAction[] $actions
+     *
      * @return Generator<array-key, int> Number of executed actions at each step
      *
      * @throws BulkException
