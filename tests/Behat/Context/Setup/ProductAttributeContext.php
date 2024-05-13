@@ -24,6 +24,7 @@ final readonly class ProductAttributeContext implements Context
      * @param RepositoryInterface<ProductAttributeInterface> $productAttributeRepository
      * @param FactoryInterface<ProductAttributeValueInterface> $productAttributeValueFactory
      * @param FactoryInterface<ProductAttributeTranslationInterface> $productAttributeTranslationFactory
+     * @param AttributeFactoryInterface<ProductAttributeInterface> $productAttributeFactory
      */
     public function __construct(
         private RepositoryInterface $productAttributeRepository,

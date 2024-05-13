@@ -12,6 +12,9 @@ use Webgriffe\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
 
 final readonly class ElasticsearchContext implements Context
 {
+    /**
+     * @param ChannelRepositoryInterface<ChannelInterface> $channelRepository
+     */
     public function __construct(
         private ChannelRepositoryInterface $channelRepository,
         private DocumentTypeProviderInterface $documentTypeProvider,

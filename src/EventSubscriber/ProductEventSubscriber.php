@@ -18,6 +18,9 @@ use Webgriffe\SyliusElasticsearchPlugin\Message\UpsertDocument;
 
 final readonly class ProductEventSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @param ChannelRepositoryInterface<ChannelInterface> $channelRepository
+     */
     public function __construct(
         private MessageBusInterface $messageBus,
         private LoggerInterface $logger,

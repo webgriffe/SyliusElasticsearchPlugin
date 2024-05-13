@@ -13,6 +13,9 @@ use Webgriffe\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
 
 final readonly class RemoveDocumentIfExistsHandler
 {
+    /**
+     * @param ChannelRepositoryInterface<ChannelInterface> $channelRepository
+     */
     public function __construct(
         private ChannelRepositoryInterface $channelRepository,
         private DocumentTypeProviderInterface $documentTypeProvider,

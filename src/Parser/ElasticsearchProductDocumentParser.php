@@ -40,6 +40,7 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
 
     /**
      * @param FactoryInterface<ProductImageInterface> $productImageFactory
+     * @param ProductVariantFactoryInterface<ProductVariantInterface> $productVariantFactory
      * @param FactoryInterface<ChannelPricingInterface> $channelPricingFactory
      * @param FactoryInterface<CatalogPromotionInterface> $catalogPromotionFactory
      * @param FactoryInterface<ProductOptionInterface> $productOptionFactory

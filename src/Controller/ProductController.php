@@ -34,6 +34,9 @@ use Webmozart\Assert\Assert;
  */
 final class ProductController extends AbstractController implements ProductControllerInterface
 {
+    /**
+     * @param TaxonRepositoryInterface<TaxonInterface> $taxonRepository
+     */
     public function __construct(
         private readonly TaxonRepositoryInterface $taxonRepository,
         private readonly LocaleContextInterface $localeContext,

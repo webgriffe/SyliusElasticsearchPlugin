@@ -19,6 +19,9 @@ use Webgriffe\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
 
 final class IndexCommand extends Command
 {
+    /**
+     * @param ChannelRepositoryInterface<ChannelInterface> $channelRepository
+     */
     public function __construct(
         private readonly ChannelRepositoryInterface $channelRepository,
         private readonly MessageBusInterface $messageBus,
