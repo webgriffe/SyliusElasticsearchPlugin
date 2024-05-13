@@ -9,6 +9,9 @@ use Twig\TwigFunction;
 
 final class SearchExtension extends AbstractExtension
 {
+    /**
+     * @psalm-suppress InvalidArgument
+     */
     public function getFunctions(): array
     {
         return [

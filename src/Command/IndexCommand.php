@@ -45,7 +45,6 @@ final class IndexCommand extends Command
         /** @var bool $runAsynchronously */
         $runAsynchronously = $input->getOption('run-asynchronously');
 
-        /** @var ChannelInterface[] $channels */
         $channels = $this->channelRepository->findAll();
         $documentTypes = $this->documentTypeProvider->getDocumentsType();
 

@@ -10,6 +10,9 @@ use Twig\TwigFunction;
 
 final class FilterExtension extends AbstractExtension
 {
+    /**
+     * @psalm-suppress InvalidArgument
+     */
     public function getFilters(): array
     {
         return [
@@ -17,6 +20,9 @@ final class FilterExtension extends AbstractExtension
         ];
     }
 
+    /**
+     * @psalm-suppress InvalidArgument
+     */
     public function getFunctions(): array
     {
         return [
