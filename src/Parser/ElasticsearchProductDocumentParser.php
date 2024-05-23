@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Webgriffe\SyliusElasticsearchPlugin\Parser;
 
 use DateTime;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use RuntimeException;
 use Sylius\Component\Attribute\Model\AttributeValueInterface;
 use Sylius\Component\Channel\Context\ChannelContextInterface;
@@ -21,6 +22,13 @@ use Sylius\Component\Product\Model\ProductAttributeValueInterface;
 use Sylius\Component\Product\Model\ProductOptionInterface;
 use Sylius\Component\Product\Model\ProductOptionValueInterface;
 use Sylius\Component\Resource\Factory\FactoryInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Event\ProductDocumentParser\ProductAttributeDocumentParserEvent;
+use Webgriffe\SyliusElasticsearchPlugin\Event\ProductDocumentParser\ProductAttributeValueDocumentParserEvent;
+use Webgriffe\SyliusElasticsearchPlugin\Event\ProductDocumentParser\ProductDocumentParserEvent;
+use Webgriffe\SyliusElasticsearchPlugin\Event\ProductDocumentParser\ProductImageDocumentParserEvent;
+use Webgriffe\SyliusElasticsearchPlugin\Event\ProductDocumentParser\ProductOptionDocumentParserEvent;
+use Webgriffe\SyliusElasticsearchPlugin\Event\ProductDocumentParser\ProductOptionValueDocumentParserEvent;
+use Webgriffe\SyliusElasticsearchPlugin\Event\ProductDocumentParser\ProductVariantDocumentParserEvent;
 use Webgriffe\SyliusElasticsearchPlugin\Factory\ProductResponseFactoryInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Model\ProductResponseInterface;
 use Webmozart\Assert\Assert;
@@ -60,6 +68,7 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
         private readonly FactoryInterface $productOptionValueFactory,
         private readonly FactoryInterface $productAttributeFactory,
         private readonly FactoryInterface $productAttributeValueFactory,
+        private readonly EventDispatcherInterface $eventDispatcher,
         private readonly string $fallbackLocaleCode,
     ) {
     }
@@ -105,9 +114,13 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
                 $productOptionValue->setFallbackLocale($this->fallbackLocaleCode);
                 $productOptionValue->setValue($esProductOptionValue['value']);
                 $this->productOptionValues[$esProductOptionValue['sylius-id']] = $productOptionValue;
+                $event = new ProductOptionValueDocumentParserEvent($esProductOptionValue, $productOptionValue, $productOption, $productResponse);
+                $this->eventDispatcher->dispatch($event);
 
                 $productOption->addValue($productOptionValue);
             }
+            $event = new ProductOptionDocumentParserEvent($esProductOption, $productOption, $productResponse);
+            $this->eventDispatcher->dispatch($event);
 
             $productResponse->addOption($productOption);
         }
@@ -122,6 +135,8 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
             $productAttribute->setPosition($esTranslatedAttribute['position']);
             $productAttribute->setCurrentLocale($localeCode);
             $productAttribute->setName($this->getValueFromLocalizedField($esTranslatedAttribute['name'], $localeCode));
+            $event = new ProductAttributeDocumentParserEvent($esTranslatedAttribute, $productAttribute, $productResponse);
+            $this->eventDispatcher->dispatch($event);
 
             if (!array_key_exists($this->defaultLocaleCode, $esTranslatedAttribute['values'])) {
                 /** @var array<array-key, array{sylius-id: int|string, code: string, locale: string, values: array<array-key, string>}> $attributeValues */
@@ -144,6 +159,9 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
                 $productAttributeValue->setLocaleCode($usedLocale);
                 $productAttributeValue->setSubject($productResponse);
                 $productAttributeValue->setValue($this->getAttributeValueByStorageType($esProductAttributeValue['values'], $esTranslatedAttribute['storage-type']));
+                $event = new ProductAttributeValueDocumentParserEvent($esProductAttributeValue, $productAttributeValue, $productAttribute, $productResponse);
+                $this->eventDispatcher->dispatch($event);
+
                 $productResponse->addAttribute($productAttributeValue);
             }
         }
@@ -158,6 +176,8 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
             $productAttribute->setPosition($esTranslatedAttribute['position']);
             $productAttribute->setCurrentLocale($localeCode);
             $productAttribute->setName($this->getValueFromLocalizedField($esTranslatedAttribute['name'], $localeCode));
+            $event = new ProductAttributeDocumentParserEvent($esTranslatedAttribute, $productAttribute, $productResponse);
+            $this->eventDispatcher->dispatch($event);
 
             /** @var array{sylius-id: int|string, code: string, locale: string, values: array<array-key, string>} $esProductAttributeValue */
             foreach ($esTranslatedAttribute['values'] as $esProductAttributeValue) {
@@ -174,6 +194,9 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
                     $firstValue = [$firstValue];
                 }
                 $productAttributeValue->setValue($firstValue);
+                $event = new ProductAttributeValueDocumentParserEvent($esProductAttributeValue, $productAttributeValue, $productAttribute, $productResponse);
+                $this->eventDispatcher->dispatch($event);
+
                 $productResponse->addAttribute($productAttributeValue);
             }
         }
@@ -221,6 +244,8 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
                 }
                 $productVariant->addOptionValue($this->productOptionValues[$esOption['value']['sylius-id']]);
             }
+            $event = new ProductVariantDocumentParserEvent($esVariant, $productVariant, $productResponse);
+            $this->eventDispatcher->dispatch($event);
 
             $productResponse->addVariant($productVariant);
         }
@@ -238,8 +263,14 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
                 $productVariant = $this->productVariants[$esVariantImage['sylius-id']];
                 $productImage->addProductVariant($productVariant);
             }
+            $event = new ProductImageDocumentParserEvent($esImage, $productImage, $productResponse);
+            $this->eventDispatcher->dispatch($event);
+
             $productResponse->addImage($productImage);
         }
+
+        $event = new ProductDocumentParserEvent($source, $productResponse);
+        $this->eventDispatcher->dispatch($event);
 
         return $productResponse;
     }
