@@ -58,7 +58,15 @@ final class InstantSearchController extends AbstractController implements Instan
         );
 
         $esResult = $this->client->query(
-            $this->queryBuilder->buildSearchQuery($query, null, $this->maxResults),
+            $this->queryBuilder->buildSearchQuery(
+                $query,
+                null,
+                $this->maxResults,
+                null,
+                false,
+                null,
+                1,
+            ),
             $indexAliasNames,
         );
         $queryResult = $this->queryResultMapper->map($esResult);
