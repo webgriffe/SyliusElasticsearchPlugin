@@ -8,7 +8,7 @@ final class SortHelper implements SortHelperInterface
 {
     public function retrieveSearchSorting(array $sortingQueryParams = []): array
     {
-        return $sortingQueryParams;
+        return $sortingQueryParams; // If empty it will sort by _score desc as default
     }
 
     public function retrieveTaxonSorting(array $sortingQueryParams = []): array
