@@ -6,6 +6,11 @@
                     "enabled": true
                 }
             }
+            {% for filterType, filters in filters %}
+                {% if filters|length > 0 %}
+                    ,{% include '@WebgriffeSyliusElasticsearchPlugin/query/search/search/' ~ filterType ~ '.json.twig' %}
+                {% endif %}
+            {% endfor %}
         ],
         "should": [
             {

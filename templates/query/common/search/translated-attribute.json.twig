@@ -1,0 +1,23 @@
+{% for filter in filters %}
+    {
+        "nested": {
+            "path": "translated-attributes",
+            "query": {
+                "bool": {
+                    "filter": [
+                        {
+                            "term": {
+                                "translated-attributes.code": "{{ filter.code }}"
+                            }
+                        },
+                        {
+                            "term": {
+                                "translated-attributes.values.{{ localeCode }}.values": "{{ filter.value }}"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    }{% if not loop.last %},{% endif %}
+{% endfor %}

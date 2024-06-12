@@ -1,0 +1,23 @@
+{% for filter in filters %}
+    {
+        "nested": {
+            "path": "variants",
+            "query": {
+                "bool": {
+                    "filter": [
+                        {
+                            "term": {
+                                "variants.enabled": true
+                            }
+                        },
+                        {
+                            "term": {
+                                "variants.options.value.code": "{{ filter.value }}"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    }{% if not loop.last %},{% endif %}
+{% endfor %}
