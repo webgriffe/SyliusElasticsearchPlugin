@@ -57,7 +57,11 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
 
         if ($sorting !== null) {
             foreach ($sorting as $field => $order) {
-                $sort = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/taxon/sort/' . $field . '.json.twig', [
+                $sortFileName = '@WebgriffeSyliusElasticsearchPlugin/query/taxon/sort/' . $field . '.json.twig';
+                if (!$this->twig->getLoader()->exists($sortFileName)) {
+                    $sortFileName = '@WebgriffeSyliusElasticsearchPlugin/query/common/sort/default.json.twig';
+                }
+                $sort = $this->twig->render($sortFileName, [
                     'field' => $field,
                     'order' => $order,
                     'taxon' => $taxon,
@@ -134,7 +138,11 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
 
         if ($sorting !== null) {
             foreach ($sorting as $field => $order) {
-                $sort = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/search/sort/' . $field . '.json.twig', [
+                $sortFileName = '@WebgriffeSyliusElasticsearchPlugin/query/search/sort/' . $field . '.json.twig';
+                if (!$this->twig->getLoader()->exists($sortFileName)) {
+                    $sortFileName = '@WebgriffeSyliusElasticsearchPlugin/query/common/sort/default.json.twig';
+                }
+                $sort = $this->twig->render($sortFileName, [
                     'field' => $field,
                     'order' => $order,
                     'searchTerm' => $searchTerm,
