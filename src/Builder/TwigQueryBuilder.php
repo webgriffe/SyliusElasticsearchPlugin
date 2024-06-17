@@ -18,6 +18,8 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
         private Environment $twig,
         private LocaleContextInterface $localeContext,
         private LoggerInterface $logger,
+        private string $searchQueryTemplate,
+        private string $taxonQueryTemplate,
     ) {
     }
 
@@ -44,7 +46,7 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
                 $this->getTaxonChildren($taxon),
             ),
         );
-        $query = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/taxon/query.json.twig', [
+        $query = $this->twig->render($this->taxonQueryTemplate, [
             'taxon' => $taxon,
             'filters' => $filters ?? FilterHelper::retrieveFilters(),
             'localeCode' => $localeCode,
@@ -123,7 +125,7 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
         ?float $minScore = null,
     ): array {
         $localeCode = $this->localeContext->getLocaleCode();
-        $query = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/search/query.json.twig', [
+        $query = $this->twig->render($this->searchQueryTemplate, [
             'searchTerm' => $searchTerm,
             'filters' => $filters ?? FilterHelper::retrieveFilters(),
             'localeCode' => $localeCode,

@@ -12,12 +12,6 @@ use Webgriffe\SyliusElasticsearchPlugin\Controller\SearchController;
 use Webgriffe\SyliusElasticsearchPlugin\Controller\SearchControllerInterface;
 
 return static function (ContainerConfigurator $containerConfigurator) {
-    $parameters = $containerConfigurator->parameters();
-    $parameters->set('webgriffe.sylius_elasticsearch_plugin.taxon_default_page_limit', 9);
-    $parameters->set('webgriffe.sylius_elasticsearch_plugin.search_default_page_limit', 9);
-    $parameters->set('webgriffe.sylius_elasticsearch_plugin.instant_search_page_limit', 8);
-    $parameters->set('webgriffe.sylius_elasticsearch_plugin.instant_search_completion_suggesters_size', 5);
-
     $services = $containerConfigurator->services();
 
     $services->set('webgriffe.sylius_elasticsearch_plugin.controller.search', SearchController::class)
@@ -30,7 +24,6 @@ return static function (ContainerConfigurator $containerConfigurator) {
             service('webgriffe.sylius_elasticsearch_plugin.builder.query'),
             service('webgriffe.sylius_elasticsearch_plugin.mapper.query_result'),
             service('webgriffe.sylius_elasticsearch_plugin.helper.sort'),
-            param('webgriffe.sylius_elasticsearch_plugin.search_default_page_limit'),
         ])
         ->call('setContainer', [service('service_container')])
         ->tag('controller.service_arguments')
@@ -46,8 +39,6 @@ return static function (ContainerConfigurator $containerConfigurator) {
             service('webgriffe.sylius_elasticsearch_plugin.provider.document_type'),
             service('webgriffe.sylius_elasticsearch_plugin.builder.query'),
             service('webgriffe.sylius_elasticsearch_plugin.mapper.query_result'),
-            param('webgriffe.sylius_elasticsearch_plugin.instant_search_page_limit'),
-            param('webgriffe.sylius_elasticsearch_plugin.instant_search_completion_suggesters_size'),
         ])
         ->call('setContainer', [service('service_container')])
         ->tag('controller.service_arguments')
@@ -67,7 +58,6 @@ return static function (ContainerConfigurator $containerConfigurator) {
             service('webgriffe.sylius_elasticsearch_plugin.mapper.query_result'),
             service('event_dispatcher'),
             service('webgriffe.sylius_elasticsearch_plugin.helper.sort'),
-            param('webgriffe.sylius_elasticsearch_plugin.taxon_default_page_limit'),
         ])
         ->call('setContainer', [service('service_container')])
         ->tag('controller.service_arguments')

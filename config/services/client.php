@@ -9,11 +9,8 @@ use Webgriffe\SyliusElasticsearchPlugin\Client\ElasticsearchClient;
 return static function (ContainerConfigurator $containerConfigurator) {
     $services = $containerConfigurator->services();
 
+    # Arguments added dynamically by plugin configuration
     $services->set('webgriffe.sylius_elasticsearch_plugin.client', ElasticsearchClient::class)
-        ->args([
-            '127.0.0.1',
-            '9200',
-        ])
         ->call('setLogger', [service('logger')->ignoreOnInvalid()])
         ->tag('monolog.logger')
     ;
