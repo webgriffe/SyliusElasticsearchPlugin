@@ -10,7 +10,7 @@
                 {% if filters|length > 0 %}
                     ,{% include '@WebgriffeSyliusElasticsearchPlugin/query/search/search/' ~ filterType ~ '.json.twig' %}
                 {% endif %}
-            {% endfor %}
+            {% endfor %}{% block extra_filter_fields %}{% endblock %}
         ],
         "should": [
             {
@@ -203,7 +203,7 @@
                         }
                     }
                 }
-            }
+            }{% block extra_should_fields %}{% endblock %}
         ]
     }
 }
