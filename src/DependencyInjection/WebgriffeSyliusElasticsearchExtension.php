@@ -32,8 +32,6 @@ final class WebgriffeSyliusElasticsearchExtension extends Extension
         $this->addDefaultInstantSearchQueryValues($container, $config);
     }
 
-
-
     public function getConfiguration(array $config, ContainerBuilder $container): ConfigurationInterface
     {
         return new Configuration();
