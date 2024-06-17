@@ -30,7 +30,7 @@ final readonly class OptionFilter extends Filter
     public static function resolveFromRawData(array $rawData): array
     {
         $filters = [];
-        foreach ($rawData['filtered_options']['option']['buckets'] as $bucket) {
+        foreach ($rawData['option']['filtered_options']['buckets'] as $bucket) {
             $optionLabel = $bucket['key'];
             $optionLabelBuckets = $bucket['label']['buckets'];
             $optionLabelBucket = reset($optionLabelBuckets);

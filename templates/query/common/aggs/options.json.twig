@@ -1,23 +1,23 @@
 {
     "options": {
-        "filter": {
-            "bool": {
-                "filter": [
-                    {
-                        "term": {
-                            "product-options.filterable": true
-                        }
-                    }
-                ]
-            }
+        "nested": {
+            "path": "product-options"
         },
         "aggs": {
-            "filtered_options": {
-                "nested": {
-                    "path": "product-options"
+            "option": {
+                "filter": {
+                    "bool": {
+                        "filter": [
+                            {
+                                "term": {
+                                    "product-options.filterable": true
+                                }
+                            }
+                        ]
+                    }
                 },
                 "aggs": {
-                    "option": {
+                    "filtered_options": {
                         "terms": {
                             "field": "product-options.code"
                         },
