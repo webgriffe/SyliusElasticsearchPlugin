@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Webgriffe\SyliusElasticsearchPlugin\Builder\QueryBuilderInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Client\ClientInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Generator\IndexNameGeneratorInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Helper\SortHelperInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Mapper\QueryResultMapperInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
 use Webmozart\Assert\Assert;
@@ -34,6 +35,7 @@ final class InstantSearchController extends AbstractController implements Instan
         private readonly DocumentTypeProviderInterface $documentTypeProvider,
         private readonly QueryBuilderInterface $queryBuilder,
         private readonly QueryResultMapperInterface $queryResultMapper,
+        private readonly SortHelperInterface $sortHelper,
         private readonly int $maxResults,
         private readonly int $completionSuggestersSize,
     ) {
@@ -62,7 +64,7 @@ final class InstantSearchController extends AbstractController implements Instan
                 $query,
                 null,
                 $this->maxResults,
-                null,
+                $this->sortHelper->retrieveSearchSorting(),
                 false,
                 null,
                 1,
