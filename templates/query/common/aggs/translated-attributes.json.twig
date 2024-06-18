@@ -1,20 +1,20 @@
 {
     "translated-attributes": {
-        "filter": {
-            "bool": {
-                "filter": [
-                    {
-                        "term": {
-                            "translated-attributes.filterable": true
-                        }
-                    }
-                ]
-            }
+        "nested": {
+            "path": "translated-attributes"
         },
         "aggs": {
             "filtered-translated-attributes": {
-                "nested": {
-                    "path": "translated-attributes"
+                "filter": {
+                    "bool": {
+                        "filter": [
+                            {
+                                "term": {
+                                    "translated-attributes.filterable": true
+                                }
+                            }
+                        ]
+                    }
                 },
                 "aggs": {
                     "translated-attribute": {

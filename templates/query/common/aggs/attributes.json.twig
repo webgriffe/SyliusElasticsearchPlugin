@@ -1,20 +1,20 @@
 {
     "attributes": {
-        "filter": {
-            "bool": {
-                "filter": [
-                    {
-                        "term": {
-                            "attributes.filterable": true
-                        }
-                    }
-                ]
-            }
+        "nested": {
+            "path": "attributes"
         },
         "aggs": {
             "filtered-attributes": {
-                "nested": {
-                    "path": "attributes"
+                "filter": {
+                    "bool": {
+                        "filter": [
+                            {
+                                "term": {
+                                    "attributes.filterable": true
+                                }
+                            }
+                        ]
+                    }
                 },
                 "aggs": {
                     "attribute": {
