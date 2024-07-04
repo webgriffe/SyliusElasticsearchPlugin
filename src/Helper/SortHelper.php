@@ -13,7 +13,7 @@ final class SortHelper implements SortHelperInterface
         return $sortingQueryParams; // If empty it will sort by _score desc as default
     }
 
-    public function retrieveTaxonSorting(array $sortingQueryParams = [], ?TaxonInterface $taxon = null): array
+    public function retrieveTaxonSorting(array $sortingQueryParams = [], TaxonInterface $taxon): array
     {
         if ($sortingQueryParams === []) {
             return ['position' => 'asc'];
