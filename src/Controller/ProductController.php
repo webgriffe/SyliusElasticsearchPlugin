@@ -69,7 +69,7 @@ final class ProductController extends AbstractController implements ProductContr
 
         /** @var array<string, string> $sorting */
         $sorting = $request->query->all('sorting');
-        $sorting = $this->sortHelper->retrieveTaxonSorting($sorting);
+        $sorting = $this->sortHelper->retrieveTaxonSorting($taxon, $sorting);
         $size = $request->query->getInt('limit', $this->taxonDefaultPageLimit);
         $page = $request->query->getInt('page', 1);
 

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Webgriffe\SyliusElasticsearchPlugin\Helper;
 
+use Sylius\Component\Core\Model\TaxonInterface;
+
 interface SortHelperInterface
 {
     /**
@@ -18,5 +20,5 @@ interface SortHelperInterface
      *
      * @return array<string, string>
      */
-    public function retrieveTaxonSorting(array $sortingQueryParams = []): array;
+    public function retrieveTaxonSorting(TaxonInterface $taxon, array $sortingQueryParams = []): array;
 }
