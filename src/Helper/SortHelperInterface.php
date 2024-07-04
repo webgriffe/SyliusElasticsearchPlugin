@@ -20,5 +20,5 @@ interface SortHelperInterface
      *
      * @return array<string, string>
      */
-    public function retrieveTaxonSorting(array $sortingQueryParams = [], TaxonInterface $taxon): array;
+    public function retrieveTaxonSorting(TaxonInterface $taxon, array $sortingQueryParams = []): array;
 }
