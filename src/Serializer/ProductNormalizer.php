@@ -30,6 +30,7 @@ use Sylius\Component\Promotion\Model\CatalogPromotionTranslationInterface;
 use Sylius\Component\Taxonomy\Model\TaxonTranslationInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Event\ProductDocumentType\ProductDocumentTypeProductNormalizeEvent;
+use Webgriffe\SyliusElasticsearchPlugin\Event\ProductDocumentType\ProductDocumentTypeProductVariantNormalizeEvent;
 use Webgriffe\SyliusElasticsearchPlugin\Model\FilterableInterface;
 use Webmozart\Assert\Assert;
 
@@ -329,7 +330,10 @@ final class ProductNormalizer implements NormalizerInterface
             ];
         }
 
-        return $normalizedVariant;
+        $event = new ProductDocumentTypeProductVariantNormalizeEvent($variant, $channel, $normalizedVariant);
+        $this->eventDispatcher->dispatch($event);
+
+        return $event->getNormalizedProductVariant();
     }
 
     /**
