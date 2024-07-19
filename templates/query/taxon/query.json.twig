@@ -14,7 +14,7 @@
                             "filter": [
                                 {
                                     "terms": {
-                                        "taxons.sylius-id": [{{ taxonIdsToSearch|join(', ') }}]
+                                        "taxons.sylius-id": {{ taxonIdsToSearch|json_encode|raw }}
                                     }
                                 }
                             ]

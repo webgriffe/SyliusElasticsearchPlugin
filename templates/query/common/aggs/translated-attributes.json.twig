@@ -24,12 +24,12 @@
                         "aggs": {
                             "values": {
                                 "terms": {
-                                    "field": "translated-attributes.values.{{ localeCode }}.values"
+                                    "field": {{ ('translated-attributes.values.' ~ localeCode ~ '.values')|json_encode|raw }}
                                 }
                             },
                             "label": {
                                 "terms": {
-                                    "field": "translated-attributes.name.{{localeCode}}"
+                                    "field": {{ ('translated-attributes.name.' ~ localeCode)|json_encode|raw }}
                                 }
                             }
                         }

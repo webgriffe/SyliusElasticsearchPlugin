@@ -29,7 +29,7 @@
                             },
                             "label": {
                                 "terms": {
-                                    "field": "attributes.name.{{localeCode}}"
+                                    "field": {{ ('attributes.name.' ~ localeCode)|json_encode|raw }}
                                 }
                             }
                         }

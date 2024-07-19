@@ -1,6 +1,6 @@
 {
-    "name-as-keyword.{{ localeCode }}": {
-        "order": "{{ order }}",
+    {{ ('name-as-keyword.' ~ localeCode)|json_encode|raw }}: {
+        "order": {{ order|json_encode|raw }},
         "nested": {
             "path": "name-as-keyword"
         }

@@ -1,8 +1,8 @@
 {
     "suggest": {
-        "text": "{{ searchTerm }}",
+        "text": {{ searchTerm|json_encode|raw }},
         "term": {
-            "field": "name.{{ localeCode }}",
+            "field": {{ ('name.' ~ localeCode)|json_encode|raw }},
             "suggest_mode" : "missing"
         }
     }

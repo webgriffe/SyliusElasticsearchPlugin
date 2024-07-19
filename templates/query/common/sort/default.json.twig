@@ -1,5 +1,5 @@
 {
-    "{{ field }}": {
-        "order": "{{ order }}"
+    {{ field|json_encode|raw }}: {
+        "order": {{ order|json_encode|raw }}
     }
 }

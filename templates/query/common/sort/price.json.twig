@@ -1,5 +1,5 @@
 {
     "default-variant.price.price": {
-        "order": "{{ order }}"
+        "order": {{ order|json_encode|raw }}
     }
 }

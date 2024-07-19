@@ -1,11 +1,11 @@
 {
     "taxons.position": {
-        "order": "{{ order }}",
+        "order": {{ order|json_encode|raw }},
         "nested": {
             "path": "taxons",
             "filter": {
                 "term": {
-                    "taxons.sylius-id": "{{ taxon.id }}"
+                    "taxons.sylius-id": {{ taxon.id|json_encode|raw }}
                 }
             }
         }
