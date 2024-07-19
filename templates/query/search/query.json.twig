@@ -1,3 +1,4 @@
+{% set searchTerm = searchTerm|json_encode %}
 {
     "bool": {
         "filter": [
@@ -15,7 +16,7 @@
         "should": [
             {
                 "term": {
-                    "code": "{{ searchTerm }}"
+                    "code": {{ searchTerm|raw }}
                 }
             },
             {
@@ -23,7 +24,7 @@
                     "path": "variants",
                     "query": {
                         "term": {
-                            "variants.code": "{{ searchTerm }}"
+                            "variants.code": {{ searchTerm|raw }}
                         }
                     }
                 }
@@ -33,8 +34,8 @@
                     "path": "name",
                     "query": {
                         "match": {
-                            "name.{{ localeCode }}": {
-                                "query": "{{ searchTerm }}",
+                            {{ ('name.' ~ localeCode)|json_encode|raw }}: {
+                                "query": {{ searchTerm|raw }},
                                 "boost": 10,
                                 "fuzziness": "AUTO",
                                 "fuzzy_transpositions": true,
@@ -49,8 +50,8 @@
                     "path": "variants",
                     "query": {
                         "match": {
-                            "variants.name.{{ localeCode }}": {
-                                "query": "{{ searchTerm }}",
+                            {{ ('variants.name.' ~ localeCode)|json_encode|raw }}: {
+                                "query": {{ searchTerm|raw }},
                                 "boost": 9,
                                 "fuzziness": "AUTO",
                                 "fuzzy_transpositions": true,
@@ -65,8 +66,8 @@
                     "path": "description",
                     "query": {
                         "match": {
-                            "description.{{ localeCode }}": {
-                                "query": "{{ searchTerm }}",
+                            {{ ('description.' ~ localeCode)|json_encode|raw }}: {
+                                "query": {{ searchTerm|raw }},
                                 "boost": 8,
                                 "fuzziness": "AUTO",
                                 "fuzzy_transpositions": true,
@@ -81,8 +82,8 @@
                     "path": "short-description",
                     "query": {
                         "match": {
-                            "short-description.{{ localeCode }}": {
-                                "query": "{{ searchTerm }}",
+                            {{ ('short-description.' ~ localeCode)|json_encode|raw }}: {
+                                "query": {{ searchTerm|raw }},
                                 "boost": 7,
                                 "fuzziness": "AUTO",
                                 "fuzzy_transpositions": true,
@@ -97,8 +98,8 @@
                     "path": "slug",
                     "query": {
                         "match": {
-                            "slug.{{ localeCode }}": {
-                                "query": "{{ searchTerm }}",
+                            {{ ('slug.' ~ localeCode)|json_encode|raw }}: {
+                                "query": {{ searchTerm|raw }},
                                 "boost": 6,
                                 "fuzziness": "AUTO",
                                 "fuzzy_transpositions": true,
@@ -113,8 +114,8 @@
                     "path": "meta-description",
                     "query": {
                         "match": {
-                            "meta-description.{{ localeCode }}": {
-                                "query": "{{ searchTerm }}",
+                            {{ ('meta-description.' ~ localeCode)|json_encode|raw }}: {
+                                "query": {{ searchTerm|raw }},
                                 "boost": 5,
                                 "fuzziness": "AUTO",
                                 "fuzzy_transpositions": true,
@@ -129,8 +130,8 @@
                     "path": "meta-keywords",
                     "query": {
                         "match": {
-                            "meta-keywords.{{ localeCode }}": {
-                                "query": "{{ searchTerm }}",
+                            {{ ('meta-keywords.' ~ localeCode)|json_encode|raw }}: {
+                                "query": {{ searchTerm|raw }},
                                 "boost": 4,
                                 "fuzziness": "AUTO",
                                 "fuzzy_transpositions": true,
@@ -145,8 +146,8 @@
                     "path": "taxons",
                     "query": {
                         "match": {
-                            "taxons.name.{{ localeCode }}": {
-                                "query": "{{ searchTerm }}",
+                            {{ ('taxons.name.' ~ localeCode)|json_encode|raw }}: {
+                                "query": {{ searchTerm|raw }},
                                 "boost": 3,
                                 "fuzziness": "AUTO",
                                 "fuzzy_transpositions": true,
@@ -161,8 +162,8 @@
                     "path": "translated-attributes",
                     "query": {
                         "match": {
-                            "translated-attributes.values.{{ localeCode }}.text-value": {
-                                "query": "{{ searchTerm }}",
+                            {{ ('translated-attributes.values.' ~ localeCode ~ '.text-value')|json_encode|raw }}: {
+                                "query": {{ searchTerm|raw }},
                                 "boost": 3,
                                 "fuzziness": "AUTO",
                                 "fuzzy_transpositions": true,
@@ -178,7 +179,7 @@
                     "query": {
                         "match": {
                             "attributes.values.text-value": {
-                                "query": "{{ searchTerm }}",
+                                "query": {{ searchTerm|raw }},
                                 "boost": 3,
                                 "fuzziness": "AUTO",
                                 "fuzzy_transpositions": true,
@@ -193,8 +194,8 @@
                     "path": "product-options",
                     "query": {
                         "match": {
-                            "product-options.values.name.{{ localeCode }}": {
-                                "query": "{{ searchTerm }}",
+                            {{ ('product-options.values.name.' ~ localeCode)|json_encode|raw }}: {
+                                "query": {{ searchTerm|raw }},
                                 "boost": 3,
                                 "fuzziness": "AUTO",
                                 "fuzzy_transpositions": true,

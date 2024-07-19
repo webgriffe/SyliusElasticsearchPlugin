@@ -34,7 +34,7 @@
                                         "aggs": {
                                             "label": {
                                                 "terms": {
-                                                    "field": "product-options.values.name.{{localeCode}}"
+                                                    "field": {{ ('product-options.values.name.' ~ localeCode)|json_encode|raw }}
                                                 }
                                             }
                                         }
@@ -43,7 +43,7 @@
                             },
                             "label": {
                                 "terms": {
-                                    "field": "product-options.name.{{localeCode}}"
+                                    "field": {{ ('product-options.name.' ~ localeCode)|json_encode|raw }}
                                 }
                             }
                         }

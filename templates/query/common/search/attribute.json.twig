@@ -7,12 +7,12 @@
                     "filter": [
                         {
                             "term": {
-                                "attributes.code": "{{ filter.code }}"
+                                "attributes.code": {{ filter.code|json_encode|raw }}
                             }
                         },
                         {
                             "term": {
-                                "attributes.values.values": "{{ filter.value }}"
+                                "attributes.values.values": {{ filter.value|json_encode|raw }}
                             }
                         }
                     ]

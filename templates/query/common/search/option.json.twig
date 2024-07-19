@@ -12,7 +12,7 @@
                         },
                         {
                             "term": {
-                                "variants.options.value.code": "{{ filter.value }}"
+                                "variants.options.value.code": {{ filter.value|json_encode|raw }}
                             }
                         }
                     ]

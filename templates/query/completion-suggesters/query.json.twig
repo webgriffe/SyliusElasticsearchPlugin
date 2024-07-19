@@ -1,9 +1,9 @@
 {
     "suggest": {
-        "prefix": "{{ searchTerm }}",
+        "prefix": {{ searchTerm|json_encode|raw }},
         "completion": {
             "field": "suggest",
-            "size": {{ size }},
+            "size": {{ size|json_encode|raw }},
             "skip_duplicates": true,
             "fuzzy": {
                 "fuzziness": 1,
