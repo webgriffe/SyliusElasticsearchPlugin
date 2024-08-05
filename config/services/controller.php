@@ -24,6 +24,7 @@ return static function (ContainerConfigurator $containerConfigurator) {
             service('webgriffe.sylius_elasticsearch_plugin.builder.query'),
             service('webgriffe.sylius_elasticsearch_plugin.mapper.query_result'),
             service('webgriffe.sylius_elasticsearch_plugin.helper.sort'),
+            service('webgriffe.sylius_elasticsearch_plugin.validator.request'),
         ])
         ->call('setContainer', [service('service_container')])
         ->tag('controller.service_arguments')

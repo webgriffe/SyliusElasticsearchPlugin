@@ -21,6 +21,7 @@ use Webgriffe\SyliusElasticsearchPlugin\Mapper\QueryResultMapperInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Model\ResponseInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Pagerfanta\ElasticsearchSearchQueryAdapter;
 use Webgriffe\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Validator\RequestValidatorInterface;
 use Webmozart\Assert\Assert;
 
 /**
@@ -40,12 +41,15 @@ final class SearchController extends AbstractController implements SearchControl
         private readonly QueryBuilderInterface $queryBuilder,
         private readonly QueryResultMapperInterface $queryResultMapper,
         private readonly SortHelperInterface $sortHelper,
+        private readonly RequestValidatorInterface $requestValidator,
         private readonly int $searchDefaultPageLimit,
     ) {
     }
 
     public function __invoke(Request $request, ?string $query = null): Response
     {
+        $this->requestValidator->validate($request);
+
         $form = $this->formFactory->create(SearchType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
