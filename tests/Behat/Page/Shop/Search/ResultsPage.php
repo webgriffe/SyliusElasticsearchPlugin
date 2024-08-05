@@ -17,4 +17,11 @@ final class ResultsPage extends SymfonyPage implements ResultsPageInterface
     {
         return count($this->getDocument()->findAll('css', '[data-test-result]'));
     }
+
+    public function isBadRequest(): bool
+    {
+        $statusCode = $this->getSession()->getStatusCode();
+
+        return $statusCode === 400;
+    }
 }
