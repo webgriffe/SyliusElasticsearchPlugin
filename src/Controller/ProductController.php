@@ -25,6 +25,7 @@ use Webgriffe\SyliusElasticsearchPlugin\Helper\SortHelperInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Mapper\QueryResultMapperInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Pagerfanta\ElasticsearchTaxonQueryAdapter;
 use Webgriffe\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Validator\RequestValidatorInterface;
 use Webmozart\Assert\Assert;
 
 /**
@@ -48,12 +49,15 @@ final class ProductController extends AbstractController implements ProductContr
         private readonly QueryResultMapperInterface $queryResultMapper,
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly SortHelperInterface $sortHelper,
+        private readonly RequestValidatorInterface $requestValidator,
         private readonly int $taxonDefaultPageLimit,
     ) {
     }
 
     public function __invoke(Request $request, string $slug): Response
     {
+        $this->requestValidator->validate($request);
+
         $localeCode = $this->localeContext->getLocaleCode();
         $taxon = $this->taxonRepository->findOneBySlug($slug, $localeCode);
         if (!$taxon instanceof TaxonInterface) {

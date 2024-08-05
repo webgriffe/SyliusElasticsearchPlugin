@@ -30,6 +30,13 @@ final class IndexPage extends BaseIndexPage implements IndexPageInterface
         $this->getElement('filter-value', ['%filterName%' => $filterName, '%filterValue%' => $filterValue])->click();
     }
 
+    public function isBadRequest(): bool
+    {
+        $statusCode = $this->getSession()->getStatusCode();
+
+        return $statusCode === 400;
+    }
+
     protected function getDefinedElements(): array
     {
         return array_merge(

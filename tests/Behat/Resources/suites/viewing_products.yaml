@@ -46,6 +46,7 @@ default:
                 - sylius.behat.context.ui.shop.product
                 - sylius.behat.context.ui.shop.product_attribute
                 - sylius.behat.context.ui.shop.browsing_product
+                - webgriffe.sylius_elasticsearch_plugin.behat.context.ui.shop.product
 
             filters:
                 tags: "@viewing_products&&@ui"
