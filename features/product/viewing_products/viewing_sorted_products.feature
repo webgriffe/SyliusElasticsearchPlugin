@@ -68,3 +68,8 @@ Feature: Sorting listed products
         Then I should see 4 products in the list
         And the first product on the list should have name "Xtreme Pug"
         And the last product on the list should have name "Berserk Pug"
+
+    @ui
+    Scenario: Sorting products with a not valid direction
+        When I try to browse products from taxon "Fluffy Pets" with sorting "createdAt" and direction "not valid"
+        Then I should see a bad request index page

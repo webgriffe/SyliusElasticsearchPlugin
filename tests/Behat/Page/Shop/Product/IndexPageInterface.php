@@ -15,4 +15,6 @@ interface IndexPageInterface extends BaseIndexPageInterface
     public function getFilterValueCounter(string $filterName, string $filterValue): int;
 
     public function filterBy(string $filterName, string $filterValue): void;
+
+    public function isBadRequest(): bool;
 }

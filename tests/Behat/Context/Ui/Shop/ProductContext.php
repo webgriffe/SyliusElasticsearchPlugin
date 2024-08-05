@@ -8,6 +8,7 @@ use Behat\Behat\Context\Context;
 use Sylius\Behat\Page\Shop\Product\ShowPageInterface;
 use Sylius\Behat\Service\SharedStorageInterface;
 use Sylius\Component\Core\Model\ProductInterface;
+use Sylius\Component\Core\Model\TaxonInterface;
 use Tests\Webgriffe\SyliusElasticsearchPlugin\Behat\Page\Shop\Product\IndexPageInterface;
 use Webmozart\Assert\Assert;
 
@@ -54,6 +55,27 @@ final readonly class ProductContext implements Context
         $currentLocaleCode = $this->sharedStorage->get('current_locale_code');
         $productTranslation = $product->getTranslation($currentLocaleCode);
 
-        Assert::true($this->showPage->isOpen(['_locale' => $currentLocaleCode, 'slug' => $productTranslation->getSlug()]));
+        Assert::true(
+            $this->showPage->isOpen(['_locale' => $currentLocaleCode, 'slug' => $productTranslation->getSlug()]),
+        );
+    }
+
+    /**
+     * @When I try to browse products from taxon :taxon with sorting :sorting and direction :direction
+     */
+    public function iTryToBrowseProductsFromTaxonWithSortingAndDirection(
+        TaxonInterface $taxon,
+        string $sorting,
+        string $direction,
+    ): void {
+        $this->indexPage->tryToOpen(['slug' => $taxon->getSlug(), 'sorting' => [$sorting => $direction]]);
+    }
+
+    /**
+     * @Then I should see a bad request index page
+     */
+    public function iShouldSeeABadRequestIndexPage(): void
+    {
+        Assert::true($this->indexPage->isBadRequest());
     }
 }
