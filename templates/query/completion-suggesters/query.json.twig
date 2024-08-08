@@ -1,6 +1,8 @@
 {
+    {% block query_suggest %}
     "suggest": {
         "prefix": {{ searchTerm|json_encode|raw }},
+        {% block query_suggest_suggest_completion %}
         "completion": {
             "field": "suggest",
             "size": {{ size|json_encode|raw }},
@@ -10,6 +12,12 @@
                 "transpositions": true,
                 "min_length": 4
             }
+            {% block query_suggest_suggest_completion_extra %}
+            {% endblock %}
         }
+        {% endblock %}
     }
+    {% endblock %}
+    {% block query_extra %}
+    {% endblock %}
 }

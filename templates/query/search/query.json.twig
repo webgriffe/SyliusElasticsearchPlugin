@@ -1,24 +1,36 @@
 {% set searchTerm = searchTerm|json_encode %}
 {
+    {% block query_bool %}
     "bool": {
+        {% block query_bool_filter %}
         "filter": [
+            {% block query_bool_filter_enabled %}
             {
                 "term": {
                     "enabled": true
                 }
             }
+            {% endblock %}
+            {% block query_bool_filter_filters %}
             {% for filterType, filters in filters %}
                 {% if filters|length > 0 %}
                     ,{% include '@WebgriffeSyliusElasticsearchPlugin/query/search/search/' ~ filterType ~ '.json.twig' %}
                 {% endif %}
-            {% endfor %}{% block extra_filter_fields %}{% endblock %}
+            {% endfor %}
+            {% endblock %}
+            {% block query_bool_filter_extra %}{% endblock %}
         ],
+        {% endblock %}
+        {% block query_bool_should %}
         "should": [
+            {% block query_bool_should_product_code %}
             {
                 "term": {
                     "code": {{ searchTerm|raw }}
                 }
             },
+            {% endblock %}
+            {% block query_bool_should_variant_codes %}
             {
                 "nested": {
                     "path": "variants",
@@ -29,6 +41,8 @@
                     }
                 }
             },
+            {% endblock %}
+            {% block query_bool_should_product_name %}
             {
                 "nested": {
                     "path": "name",
@@ -45,6 +59,8 @@
                     }
                 }
             },
+            {% endblock %}
+            {% block query_bool_should_product_variant_names %}
             {
                 "nested": {
                     "path": "variants",
@@ -61,6 +77,8 @@
                     }
                 }
             },
+            {% endblock %}
+            {% block query_bool_should_product_description %}
             {
                 "nested": {
                     "path": "description",
@@ -77,6 +95,8 @@
                     }
                 }
             },
+            {% endblock %}
+            {% block query_bool_should_product_short_description %}
             {
                 "nested": {
                     "path": "short-description",
@@ -93,6 +113,8 @@
                     }
                 }
             },
+            {% endblock %}
+            {% block query_bool_should_product_slug %}
             {
                 "nested": {
                     "path": "slug",
@@ -109,6 +131,8 @@
                     }
                 }
             },
+            {% endblock %}
+            {% block query_bool_should_product_meta_description %}
             {
                 "nested": {
                     "path": "meta-description",
@@ -125,6 +149,8 @@
                     }
                 }
             },
+            {% endblock %}
+            {% block query_bool_should_product_meta_keywords %}
             {
                 "nested": {
                     "path": "meta-keywords",
@@ -141,6 +167,8 @@
                     }
                 }
             },
+            {% endblock %}
+            {% block query_bool_should_product_taxon_names %}
             {
                 "nested": {
                     "path": "taxons",
@@ -157,6 +185,8 @@
                     }
                 }
             },
+            {% endblock %}
+            {% block query_bool_should_product_translated_attribute_values %}
             {
                 "nested": {
                     "path": "translated-attributes",
@@ -173,6 +203,8 @@
                     }
                 }
             },
+            {% endblock %}
+            {% block query_bool_should_product_attribute_values %}
             {
                 "nested": {
                     "path": "attributes",
@@ -189,6 +221,8 @@
                     }
                 }
             },
+            {% endblock %}
+            {% block query_bool_should_product_option_values %}
             {
                 "nested": {
                     "path": "product-options",
@@ -204,7 +238,16 @@
                         }
                     }
                 }
-            }{% block extra_should_fields %}{% endblock %}
+            }
+            {% endblock %}
+            {% block query_bool_should_extra %}
+            {% endblock %}
         ]
+        {% endblock %}
+        {% block query_bool_extra %}
+        {% endblock %}
     }
+    {% endblock %}
+    {% block query_extra %}
+    {% endblock %}
 }

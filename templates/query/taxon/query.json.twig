@@ -1,11 +1,16 @@
 {
+    {% block query_bool %}
     "bool": {
+        {% block query_bool_filter %}
         "filter": [
+            {% block query_bool_filter_enabled %}
             {
                 "term": {
                     "enabled": true
                 }
             },
+            {% endblock %}
+            {% block query_bool_filter_taxon %}
             {
                 "nested": {
                     "path": "taxons",
@@ -22,11 +27,21 @@
                     }
                 }
             }
+            {% endblock %}
+            {% block query_bool_filter_filters %}
             {% for filterType, filters in filters %}
                 {% if filters|length > 0 %}
                     ,{% include '@WebgriffeSyliusElasticsearchPlugin/query/taxon/search/' ~ filterType ~ '.json.twig' %}
                 {% endif %}
-            {% endfor %}{% block extra_filter_fields %}{% endblock %}
+            {% endfor %}
+            {% endblock %}
+            {% block query_bool_filter_extra %}{% endblock %}
         ]
+        {% endblock %}
+        {% block query_bool_extra %}
+        {% endblock %}
     }
+    {% endblock %}
+    {% block query_extra %}
+    {% endblock %}
 }

@@ -1,9 +1,17 @@
 {
+    {% block query_suggest %}
     "suggest": {
         "text": {{ searchTerm|json_encode|raw }},
+        {% block query_suggest_text_term %}
         "term": {
             "field": {{ ('name.' ~ localeCode)|json_encode|raw }},
             "suggest_mode" : "missing"
+            {% block query_suggest_text_term_extra %}
+            {% endblock %}
         }
+        {% endblock %}
     }
+    {% endblock %}
+    {% block query_extra %}
+    {% endblock %}
 }
