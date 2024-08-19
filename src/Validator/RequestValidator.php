@@ -72,6 +72,18 @@ final class RequestValidator implements RequestValidatorInterface
     private function validateFilters(Request $request): void
     {
         // this will throw if the filters parameter is not an array
-        $request->query->all('filters');
+        /** @var array<string, array<array-key, array{code?: string, value?: string}>> $allFiltersByType */
+        $allFiltersByType = $request->query->all('filters');
+        foreach ($allFiltersByType as $filtersByType) {
+            foreach ($filtersByType as $filter) {
+                if (!array_key_exists('code', $filter) ||
+                    !array_key_exists('value', $filter) ||
+                    $filter['code'] === '' ||
+                    $filter['value'] === ''
+                ) {
+                    throw new BadRequestException('Invalid filter format');
+                }
+            }
+        }
     }
 }
