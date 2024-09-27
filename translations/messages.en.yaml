@@ -1,0 +1,9 @@
+webgriffe_sylius_elasticsearch_plugin:
+    form:
+        filterable:
+            label: 'Use as filter in category and search pages'
+    ui:
+        maybe_you_were_looking_for: 'Maybe you were looking for:'
+        results_for_query: 'Results for "{query}":'
+        search: 'Search'
+        reset_filters: 'Reset filters'
