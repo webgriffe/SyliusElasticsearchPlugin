@@ -5,7 +5,7 @@ services:
     mysql:
         command: --max_allowed_packet=1073741824
         ports:
-            - "13306:3306"
+            - "3306:3306"
 
     elasticsearch:
         ports:
@@ -14,15 +14,15 @@ services:
 
     elastichq:
         environment:
-            - HQ_DEFAULT_URL=http://elasticsearch:9200
+            - HQ_DEFAULT_URL=http://127.0.0.1:9200
         ports:
             - "5000:5000"
 
     #For development only
-    mailhog:
-        image: mailhog/mailhog
+    mailpit:
+        image: axllent/mailpit
         labels:
             com.symfony.server.service-prefix: 'MAILER'
         ports:
-            - "11025:1025"
-            - "18025:8025"
+            - "1025:1025"
+            - "8025:8025"
