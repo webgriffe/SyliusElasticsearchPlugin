@@ -25,7 +25,6 @@ use Sylius\Component\Product\Model\ProductOptionValueTranslationInterface;
 use Sylius\Component\Product\Resolver\ProductVariantResolverInterface;
 use Sylius\Component\Taxonomy\Model\TaxonTranslationInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\SerializerInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Event\ProductDocumentType\ProductDocumentTypeProductNormalizeEvent;
 use Webgriffe\SyliusElasticsearchPlugin\Model\FilterableInterface;
 use Webmozart\Assert\Assert;
@@ -46,7 +45,7 @@ class ProductNormalizer implements NormalizerInterface
     public function __construct(
         private readonly ProductVariantResolverInterface $productVariantResolver,
         private readonly EventDispatcherInterface $eventDispatcher,
-        private readonly SerializerInterface&NormalizerInterface $serializer,
+        private readonly NormalizerInterface $serializer,
         private readonly string $systemDefaultLocaleCode,
     ) {
     }

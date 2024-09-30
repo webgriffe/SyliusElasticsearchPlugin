@@ -12,7 +12,6 @@ use Sylius\Component\Core\Model\ProductVariantInterface;
 use Sylius\Component\Product\Model\ProductOptionInterface;
 use Sylius\Component\Product\Model\ProductOptionTranslationInterface;
 use Sylius\Component\Product\Model\ProductOptionValueInterface;
-use Sylius\Component\Product\Model\ProductOptionValueTranslationInterface;
 use Sylius\Component\Product\Model\ProductVariantTranslationInterface;
 use Sylius\Component\Promotion\Model\CatalogPromotionTranslationInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -20,10 +19,14 @@ use Webgriffe\SyliusElasticsearchPlugin\Event\ProductDocumentType\ProductDocumen
 use Webgriffe\SyliusElasticsearchPlugin\Model\FilterableInterface;
 use Webmozart\Assert\Assert;
 
-final class ProductVariantNormalizer implements NormalizerInterface
+/**
+ * @final
+ */
+class ProductVariantNormalizer implements NormalizerInterface
 {
     public function __construct(
         private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly NormalizerInterface $serializer,
     ) {
     }
 
@@ -76,6 +79,8 @@ final class ProductVariantNormalizer implements NormalizerInterface
             $normalizedVariant['options'][] = $this->normalizeProductOptionAndProductOptionValue(
                 $optionAndValue['option'],
                 $optionAndValue['value'],
+                $format,
+                $context,
             );
         }
 
@@ -148,6 +153,8 @@ final class ProductVariantNormalizer implements NormalizerInterface
     private function normalizeProductOptionAndProductOptionValue(
         ProductOptionInterface $option,
         ProductOptionValueInterface $optionValue,
+        ?string $format = null,
+        array $context = [],
     ): array {
         $filterable = false;
         if ($option instanceof FilterableInterface) {
@@ -158,7 +165,7 @@ final class ProductVariantNormalizer implements NormalizerInterface
             'code' => $option->getCode(),
             'name' => [],
             'filterable' => $filterable,
-            'value' => $this->normalizeProductOptionValue($optionValue),
+            'value' => $this->serializer->normalize($optionValue, $format, $context),
         ];
         /** @var ProductOptionTranslationInterface $optionTranslation */
         foreach ($option->getTranslations() as $optionTranslation) {
@@ -170,25 +177,5 @@ final class ProductVariantNormalizer implements NormalizerInterface
         }
 
         return $normalizedOption;
-    }
-
-    private function normalizeProductOptionValue(ProductOptionValueInterface $optionValue): array
-    {
-        $normalizedOptionValue = [
-            'sylius-id' => $optionValue->getId(),
-            'code' => $optionValue->getCode(),
-            'value' => $optionValue->getValue(),
-            'name' => [],
-        ];
-        /** @var ProductOptionValueTranslationInterface $optionValueTranslation */
-        foreach ($optionValue->getTranslations() as $optionValueTranslation) {
-            $localeCode = $optionValueTranslation->getLocale();
-            Assert::string($localeCode);
-            $normalizedOptionValue['name'][] = [
-                $localeCode => $optionValueTranslation->getValue(),
-            ];
-        }
-
-        return $normalizedOptionValue;
     }
 }

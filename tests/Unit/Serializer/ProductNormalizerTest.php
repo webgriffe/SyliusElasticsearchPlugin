@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Webgriffe\SyliusElasticsearchPlugin\Unit\Serializer;
 
 use PHPUnit\Framework\TestCase;
@@ -11,6 +13,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
 use Webgriffe\SyliusElasticsearchPlugin\Serializer\ProductNormalizer;
+use Webgriffe\SyliusElasticsearchPlugin\Serializer\ProductOptionValueNormalizer;
 use Webgriffe\SyliusElasticsearchPlugin\Serializer\ProductVariantNormalizer;
 
 class ProductNormalizerTest extends TestCase
@@ -23,10 +26,11 @@ class ProductNormalizerTest extends TestCase
     protected function setUp(): void
     {
         $eventDispatcher = new EventDispatcher();
+        $serializer = new Serializer([new ProductVariantNormalizer($eventDispatcher, new Serializer([new ProductOptionValueNormalizer($eventDispatcher)]))]);
         $this->productNormalizer = new ProductNormalizer(
             new DefaultProductVariantResolver(),
             $eventDispatcher,
-            new Serializer([new ProductVariantNormalizer($eventDispatcher)]),
+            $serializer,
             'en_US',
         );
 
@@ -79,7 +83,7 @@ class ProductNormalizerTest extends TestCase
 
     public function testItNormalizeProduct(): void
     {
-        $productNormalized = $this->productNormalizer->normalize($this->productToNormalize, null, ['channel' => $this->channel]);
+        $productNormalized = $this->productNormalizer->normalize($this->productToNormalize, null, ['channel' => $this->channel, 'type' => 'webgriffe_sylius_elasticsearch_plugin']);
         $this->assertIsArray($productNormalized);
 
         $this->assertEquals(1, $productNormalized['sylius-id']);
