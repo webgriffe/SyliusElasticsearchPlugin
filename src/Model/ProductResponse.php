@@ -6,6 +6,9 @@ namespace Webgriffe\SyliusElasticsearchPlugin\Model;
 
 use Sylius\Component\Core\Model\Product;
 
+/**
+ * @psalm-suppress PropertyNotSetInConstructor translations property is set in the parent class
+ */
 final class ProductResponse extends Product implements ProductResponseInterface
 {
     public function getRouteName(): string

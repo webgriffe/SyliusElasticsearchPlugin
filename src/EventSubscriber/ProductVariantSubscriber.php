@@ -54,6 +54,7 @@ final readonly class ProductVariantSubscriber implements EventSubscriberInterfac
         }
 
         try {
+            /** @var ChannelInterface[] $allChannels */
             $allChannels = $this->channelRepository->findAll();
             $productChannels = $product->getChannels();
             foreach ($allChannels as $channel) {
@@ -97,6 +98,7 @@ final readonly class ProductVariantSubscriber implements EventSubscriberInterfac
         }
 
         try {
+            /** @var ChannelInterface[] $allChannels */
             $allChannels = $this->channelRepository->findAll();
             foreach ($allChannels as $channel) {
                 $channelId = $channel->getId();

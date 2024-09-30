@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Webgriffe\SyliusElasticsearchPlugin\Parser;
 
+if (!interface_exists(\Sylius\Resource\Factory\FactoryInterface::class)) {
+    class_alias(\Sylius\Resource\Factory\FactoryInterface::class, \Sylius\Component\Resource\Factory\FactoryInterface::class);
+}
 use DateTime;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use RuntimeException;
@@ -21,7 +24,7 @@ use Sylius\Component\Product\Model\ProductAttributeInterface;
 use Sylius\Component\Product\Model\ProductAttributeValueInterface;
 use Sylius\Component\Product\Model\ProductOptionInterface;
 use Sylius\Component\Product\Model\ProductOptionValueInterface;
-use Sylius\Component\Resource\Factory\FactoryInterface;
+use Sylius\Resource\Factory\FactoryInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Event\ProductDocumentParser\ProductAttributeDocumentParserEvent;
 use Webgriffe\SyliusElasticsearchPlugin\Event\ProductDocumentParser\ProductAttributeValueDocumentParserEvent;
 use Webgriffe\SyliusElasticsearchPlugin\Event\ProductDocumentParser\ProductDocumentParserEvent;

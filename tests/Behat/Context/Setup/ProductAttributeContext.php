@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Webgriffe\SyliusElasticsearchPlugin\Behat\Context\Setup;
 
+if (!interface_exists(\Sylius\Resource\Doctrine\Persistence\RepositoryInterface::class)) {
+    class_alias(\Sylius\Resource\Doctrine\Persistence\RepositoryInterface::class, \Sylius\Component\Resource\Repository\RepositoryInterface::class);
+}
+if (!interface_exists(\Sylius\Resource\Factory\FactoryInterface::class)) {
+    class_alias(\Sylius\Resource\Factory\FactoryInterface::class, \Sylius\Component\Resource\Factory\FactoryInterface::class);
+}
 use Behat\Behat\Context\Context;
 use Doctrine\Persistence\ObjectManager;
 use Sylius\Behat\Service\SharedStorageInterface;
@@ -13,8 +19,8 @@ use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Product\Model\ProductAttributeInterface;
 use Sylius\Component\Product\Model\ProductAttributeTranslationInterface;
 use Sylius\Component\Product\Model\ProductAttributeValueInterface;
-use Sylius\Component\Resource\Factory\FactoryInterface;
-use Sylius\Component\Resource\Repository\RepositoryInterface;
+use Sylius\Resource\Doctrine\Persistence\RepositoryInterface;
+use Sylius\Resource\Factory\FactoryInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Model\FilterableInterface;
 use Webmozart\Assert\Assert;
 

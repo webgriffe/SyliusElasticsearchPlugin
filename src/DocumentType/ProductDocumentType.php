@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Webgriffe\SyliusElasticsearchPlugin\DocumentType;
 
+if (!interface_exists(\Sylius\Resource\Doctrine\Persistence\RepositoryInterface::class)) {
+    class_alias(\Sylius\Resource\Doctrine\Persistence\RepositoryInterface::class, \Sylius\Component\Resource\Repository\RepositoryInterface::class);
+}
 use InvalidArgumentException;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Locale\Model\LocaleInterface;
-use Sylius\Component\Resource\Repository\RepositoryInterface;
+use Sylius\Resource\Doctrine\Persistence\RepositoryInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Event\ProductDocumentType\ProductDocumentTypeMappingsEvent;
