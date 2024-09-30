@@ -7,6 +7,9 @@ namespace Tests\Webgriffe\SyliusElasticsearchPlugin\Behat\Context\Setup;
 use Behat\Behat\Context\Context;
 use Doctrine\Persistence\ObjectManager;
 use Sylius\Component\Core\Model\ProductInterface;
+use Sylius\Component\Core\Model\ProductTranslationInterface;
+use Sylius\Resource\Model\TranslationInterface;
+use Webmozart\Assert\Assert;
 
 final readonly class ProductContext implements Context
 {
@@ -20,7 +23,9 @@ final readonly class ProductContext implements Context
      */
     public function descriptionOfProductIsInTheLocale(ProductInterface $product, string $description, string $locale): void
     {
+        /** @var ProductTranslationInterface|TranslationInterface $productTranslation */
         $productTranslation = $product->getTranslation($locale);
+        Assert::isInstanceOf($productTranslation, ProductTranslationInterface::class);
         $productTranslation->setDescription($description);
 
         $this->objectManager->flush();
@@ -31,7 +36,9 @@ final readonly class ProductContext implements Context
      */
     public function shortDescriptionOfProductIsInTheLocale(ProductInterface $product, string $shortDescription, string $locale): void
     {
+        /** @var ProductTranslationInterface|TranslationInterface $productTranslation */
         $productTranslation = $product->getTranslation($locale);
+        Assert::isInstanceOf($productTranslation, ProductTranslationInterface::class);
         $productTranslation->setShortDescription($shortDescription);
 
         $this->objectManager->flush();
@@ -42,7 +49,9 @@ final readonly class ProductContext implements Context
      */
     public function slugOfProductIsInTheLocale(ProductInterface $product, string $slug, string $locale): void
     {
+        /** @var ProductTranslationInterface|TranslationInterface $productTranslation */
         $productTranslation = $product->getTranslation($locale);
+        Assert::isInstanceOf($productTranslation, ProductTranslationInterface::class);
         $productTranslation->setSlug($slug);
 
         $this->objectManager->flush();
@@ -53,7 +62,9 @@ final readonly class ProductContext implements Context
      */
     public function metaDescriptionOfProductIsInTheLocale(ProductInterface $product, string $metaDescription, string $locale): void
     {
+        /** @var ProductTranslationInterface|TranslationInterface $productTranslation */
         $productTranslation = $product->getTranslation($locale);
+        Assert::isInstanceOf($productTranslation, ProductTranslationInterface::class);
         $productTranslation->setMetaDescription($metaDescription);
 
         $this->objectManager->flush();
@@ -64,7 +75,9 @@ final readonly class ProductContext implements Context
      */
     public function metaKeywordsOfProductIsInTheLocale(ProductInterface $product, string $metaKeywords, string $locale): void
     {
+        /** @var ProductTranslationInterface|TranslationInterface $productTranslation */
         $productTranslation = $product->getTranslation($locale);
+        Assert::isInstanceOf($productTranslation, ProductTranslationInterface::class);
         $productTranslation->setMetaKeywords($metaKeywords);
 
         $this->objectManager->flush();

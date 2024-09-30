@@ -8,7 +8,9 @@ use Behat\Behat\Context\Context;
 use Sylius\Behat\Page\Shop\Product\ShowPageInterface;
 use Sylius\Behat\Service\SharedStorageInterface;
 use Sylius\Component\Core\Model\ProductInterface;
+use Sylius\Component\Core\Model\ProductTranslationInterface;
 use Sylius\Component\Core\Model\TaxonInterface;
+use Sylius\Resource\Model\TranslationInterface;
 use Tests\Webgriffe\SyliusElasticsearchPlugin\Behat\Page\Shop\Product\IndexPageInterface;
 use Webmozart\Assert\Assert;
 
@@ -53,7 +55,9 @@ final readonly class ProductContext implements Context
     public function iShouldBeRedirectedToTheProductPage(ProductInterface $product): void
     {
         $currentLocaleCode = $this->sharedStorage->get('current_locale_code');
+        /** @var ProductTranslationInterface|TranslationInterface $productTranslation */
         $productTranslation = $product->getTranslation($currentLocaleCode);
+        Assert::isInstanceOf($productTranslation, ProductTranslationInterface::class);
 
         Assert::true(
             $this->showPage->isOpen(['_locale' => $currentLocaleCode, 'slug' => $productTranslation->getSlug()]),
