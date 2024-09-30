@@ -42,10 +42,12 @@ final class ProductNormalizer implements NormalizerInterface
     /** @var array<array-key, array{input: string, weight: positive-int}> */
     private array $productSuggesters = [];
 
+    private ?string $channelDefaultLocaleCode = null;
+
     public function __construct(
         private readonly ProductVariantResolverInterface $productVariantResolver,
         private readonly EventDispatcherInterface $eventDispatcher,
-        private string $defaultLocaleCode,
+        private readonly string $systemDefaultLocaleCode,
     ) {
     }
 
@@ -66,10 +68,7 @@ final class ProductNormalizer implements NormalizerInterface
         }
         $channelDefaultLocale = $channel->getDefaultLocale();
         if ($channelDefaultLocale !== null) {
-            $channelDefaultLocaleCode = $channelDefaultLocale->getCode();
-            if ($channelDefaultLocaleCode !== null) {
-                $this->defaultLocaleCode = $channelDefaultLocaleCode;
-            }
+            $this->channelDefaultLocaleCode = $channelDefaultLocale->getCode();
         }
         $this->productSuggesters = [];
 
@@ -373,7 +372,10 @@ final class ProductNormalizer implements NormalizerInterface
                 Assert::string($localeCode);
                 $value = $this->normalizeAttributeValue($attributeValue);
                 $normalizedAttributeValue['values'][$localeCode][] = $value;
-                if ($localeCode === $this->defaultLocaleCode) {
+                if ($localeCode === $this->channelDefaultLocaleCode) {
+                    $fallbackValue = $value;
+                }
+                if ($fallbackValue === null && $localeCode === $this->systemDefaultLocaleCode) {
                     $fallbackValue = $value;
                 }
             } else {
@@ -413,15 +415,19 @@ final class ProductNormalizer implements NormalizerInterface
                         $allAttributeValues[$value][$localeCode] !== null
                     ) {
                         $attributeValueToIndex[] = $allAttributeValues[$value][$localeCode];
+                    } elseif ($this->channelDefaultLocaleCode !== null && array_key_exists($this->channelDefaultLocaleCode, $allAttributeValues[$value])) {
+                        $attributeValueToIndex[] = $allAttributeValues[$value][$this->channelDefaultLocaleCode];
                     } else {
-                        $attributeValueToIndex[] = $allAttributeValues[$value][$this->defaultLocaleCode];
+                        $attributeValueToIndex[] = $allAttributeValues[$value][$this->systemDefaultLocaleCode];
                     }
                 }
             } else {
                 if ($localeCode !== null && $allAttributeValues[$attributeValueValues][$localeCode] !== null) {
                     $attributeValueToIndex[] = $allAttributeValues[$attributeValueValues][$localeCode] . ', ';
-                } elseif ($allAttributeValues[$attributeValueValues][$this->defaultLocaleCode] !== null) {
-                    $attributeValueToIndex[] = $allAttributeValues[$attributeValueValues][$this->defaultLocaleCode];
+                } elseif ($this->channelDefaultLocaleCode !== null && $allAttributeValues[$attributeValueValues][$this->channelDefaultLocaleCode] !== null) {
+                    $attributeValueToIndex[] = $allAttributeValues[$attributeValueValues][$this->channelDefaultLocaleCode];
+                } else {
+                    $attributeValueToIndex[] = $allAttributeValues[$attributeValueValues][$this->systemDefaultLocaleCode];
                 }
             }
         } elseif ($storageType === AttributeValueInterface::STORAGE_DATE) {
