@@ -12,18 +12,29 @@ sylius_fixtures:
                                 translations:
                                     en_US:
                                         name: 'Category'
+                                    en_150:
+                                        name: 'Category'
                                     it_IT:
                                         name: 'Categoria'
+                                    fr_FR:
+                                        name: 'Catégorie'
                                 children:
                                     -
                                         code: 'caps'
                                         name: 'Caps'
-                                        slug: 'caps'
                                         translations:
                                             en_US:
                                                 name: 'Caps'
+                                                slug: 'caps'
+                                            en_150:
+                                                name: 'Caps'
+                                                slug: 'caps'
                                             it_IT:
                                                 name: 'Cappelli'
+                                                slug: 'cappelli'
+                                            fr_FR:
+                                                name: 'Casquettes'
+                                                slug: 'casquettes'
                                         children:
                                             -
                                                 code: 'simple_caps'
@@ -31,9 +42,15 @@ sylius_fixtures:
                                                     en_US:
                                                         name: 'Simple'
                                                         slug: 'caps/simple'
+                                                    en_150:
+                                                        name: 'Simple'
+                                                        slug: 'caps/simple'
                                                     it_IT:
                                                         name: 'Semplice'
                                                         slug: 'cappelli/semplice'
+                                                    fr_FR:
+                                                        name: 'Simple'
+                                                        slug: 'casquettes/simple'
 
                                             -
                                                 code: 'caps_with_pompons'
@@ -41,9 +58,15 @@ sylius_fixtures:
                                                     en_US:
                                                         name: 'With pompons'
                                                         slug: 'caps/with-pompons'
+                                                    en_150:
+                                                        name: 'With pompons'
+                                                        slug: 'caps/with-pompons'
                                                     it_IT:
                                                         name: 'Con pon pon'
                                                         slug: 'bonnets/con-pon-pon'
+                                                    fr_FR:
+                                                        name: 'Avec pompons'
+                                                        slug: 'casquettes/avec-pompons'
 
                 cap_attribute:
                     name: product_attribute
@@ -53,27 +76,62 @@ sylius_fixtures:
                                 name: 'Cap brand'
                                 code: 'cap_brand'
                                 type: 'text'
+                                translations:
+                                    en_US:
+                                        name: 'Cap brand'
+                                    en_150:
+                                        name: 'Cap brand'
+                                    it_IT:
+                                        name: 'Marca del cappello'
+                                    fr_FR:
+                                        name: 'Marque de la casquette'
 
                             -
                                 name: 'Cap collection'
                                 code: 'cap_collection'
                                 type: 'text'
+                                translations:
+                                    en_US:
+                                        name: 'Cap collection'
+                                    en_150:
+                                        name: 'Cap collection'
+                                    it_IT:
+                                        name: 'Collezione del cappello'
+                                    fr_FR:
+                                        name: 'Collection de la casquette'
 
                             -
                                 name: 'Cap material'
                                 code: 'cap_material'
                                 type: 'text'
+                                translations:
+                                    en_US:
+                                        name: 'Cap material'
+                                    en_150:
+                                        name: 'Cap material'
+                                    it_IT:
+                                        name: 'Materiale del cappello'
+                                    fr_FR:
+                                        name: 'Matériau de la casquette'
 
                 cap_product:
                     name: product
                     options:
                         custom:
                             -
-                                name: 'Knitted burgundy winter cap'
+                                translations:
+                                    en_US:
+                                        name: 'Knitted burgundy winter cap'
+                                    en_150:
+                                        name: 'Knitted burgundy winter cap'
+                                    it_IT:
+                                        name: 'Cappello invernale rosso lavorato a maglia'
+                                    fr_FR:
+                                        name: 'Casquette d''hiver tricotée bordeaux'
                                 tax_category: 'other'
                                 channels:
                                     - 'US_STORE'
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                                 main_taxon: 'caps_with_pompons'
                                 taxons:
                                     - 'caps'
@@ -90,7 +148,7 @@ sylius_fixtures:
                                 tax_category: 'other'
                                 channels:
                                     - 'US_STORE'
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                                 main_taxon: 'simple_caps'
                                 taxons:
                                     - 'caps'
@@ -107,7 +165,7 @@ sylius_fixtures:
                                 tax_category: 'other'
                                 channels:
                                     - 'US_STORE'
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                                 main_taxon: 'caps_with_pompons'
                                 taxons:
                                     - 'caps'
@@ -124,7 +182,7 @@ sylius_fixtures:
                                 tax_category: 'other'
                                 channels:
                                     - 'US_STORE'
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                                 main_taxon: 'simple_caps'
                                 taxons:
                                     - 'caps'

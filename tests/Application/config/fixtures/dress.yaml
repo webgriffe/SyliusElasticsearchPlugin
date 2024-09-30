@@ -178,7 +178,7 @@ sylius_fixtures:
                                 name: 'Beige strappy summer dress'
                                 tax_category: 'clothing'
                                 channels:
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                                     - 'US_STORE'
                                 main_taxon: 'dresses'
                                 taxons:
@@ -211,7 +211,7 @@ sylius_fixtures:
                                 name: 'Off shoulder boho dress'
                                 tax_category: 'clothing'
                                 channels:
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                                     - 'US_STORE'
                                 main_taxon: 'dresses'
                                 taxons:
@@ -236,7 +236,7 @@ sylius_fixtures:
                                 name: 'Ruffle wrap festival dress'
                                 tax_category: 'clothing'
                                 channels:
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                                     - 'US_STORE'
                                 main_taxon: 'dresses'
                                 taxons:

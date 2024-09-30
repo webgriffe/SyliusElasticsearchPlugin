@@ -12,7 +12,7 @@ sylius_fixtures:
                                 name: 'Christmas'
                                 channels:
                                     - 'US_STORE'
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                                 coupon_based: true
                                 coupons:
                                     -
@@ -29,12 +29,12 @@ sylius_fixtures:
                                 ends_at: '7 day'
                                 channels:
                                     - 'US_STORE'
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                                 rules:
                                     -
                                         type: 'item_total'
                                         configuration:
-                                            IT_STORE:
+                                            EU_STORE:
                                                 amount: 100.00
                                             US_STORE:
                                                 amount: 100.00
@@ -42,7 +42,7 @@ sylius_fixtures:
                                     -
                                         type: 'order_fixed_discount'
                                         configuration:
-                                            IT_STORE:
+                                            EU_STORE:
                                                 amount: 10.00
                                             US_STORE:
                                                 amount: 10.00
@@ -55,7 +55,7 @@ sylius_fixtures:
                                 name: 'Winter sale'
                                 channels:
                                     - 'US_STORE'
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                                 priority: 1
                                 scopes:
                                     -
@@ -75,7 +75,7 @@ sylius_fixtures:
                                 name: 'Spring sale'
                                 channels:
                                     - 'US_STORE'
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                                 priority: 3
                                 scopes:
                                     -
@@ -87,7 +87,7 @@ sylius_fixtures:
                                     -
                                         type: 'fixed_discount'
                                         configuration:
-                                            IT_STORE:
+                                            EU_STORE:
                                                 amount: 3.00
                                             US_STORE:
                                                 amount: 3.00
@@ -96,7 +96,7 @@ sylius_fixtures:
                                 name: 'Summer sale'
                                 channels:
                                     - 'US_STORE'
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                                 exclusive: true
                                 priority: 4
                                 scopes:
@@ -117,7 +117,7 @@ sylius_fixtures:
                                 end_date: '10 days'
                                 channels:
                                     - 'US_STORE'
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                                 priority: 2
                                 scopes:
                                     -

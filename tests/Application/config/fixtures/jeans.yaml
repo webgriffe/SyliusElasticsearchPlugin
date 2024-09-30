@@ -87,7 +87,7 @@ sylius_fixtures:
                                 tax_category: 'clothing'
                                 channels:
                                     - 'US_STORE'
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                                 main_taxon: 'mens_jeans'
                                 taxons:
                                     - 'jeans'
@@ -106,7 +106,7 @@ sylius_fixtures:
                                 tax_category: 'clothing'
                                 channels:
                                     - 'US_STORE'
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                                 main_taxon: 'mens_jeans'
                                 taxons:
                                     - 'jeans'
@@ -125,7 +125,7 @@ sylius_fixtures:
                                 tax_category: 'clothing'
                                 channels:
                                     - 'US_STORE'
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                                 main_taxon: 'mens_jeans'
                                 taxons:
                                     - 'jeans'
@@ -144,7 +144,7 @@ sylius_fixtures:
                                 tax_category: 'clothing'
                                 channels:
                                     - 'US_STORE'
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                                 main_taxon: 'mens_jeans'
                                 taxons:
                                     - 'jeans'
@@ -163,7 +163,7 @@ sylius_fixtures:
                                 tax_category: 'clothing'
                                 channels:
                                     - 'US_STORE'
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                                 main_taxon: 'womens_jeans'
                                 taxons:
                                     - 'jeans'
@@ -182,7 +182,7 @@ sylius_fixtures:
                                 tax_category: 'clothing'
                                 channels:
                                     - 'US_STORE'
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                                 main_taxon: 'womens_jeans'
                                 taxons:
                                     - 'jeans'
@@ -201,7 +201,7 @@ sylius_fixtures:
                                 tax_category: 'clothing'
                                 channels:
                                     - 'US_STORE'
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                                 main_taxon: 'womens_jeans'
                                 taxons:
                                     - 'jeans'
@@ -220,7 +220,7 @@ sylius_fixtures:
                                 tax_category: 'clothing'
                                 channels:
                                     - 'US_STORE'
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                                 main_taxon: 'womens_jeans'
                                 taxons:
                                     - 'jeans'

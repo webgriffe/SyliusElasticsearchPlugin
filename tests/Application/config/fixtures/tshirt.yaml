@@ -93,7 +93,7 @@ sylius_fixtures:
                                 tax_category: 'clothing'
                                 channels:
                                     - 'US_STORE'
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                                 main_taxon: 'womens_t_shirts'
                                 taxons:
                                     - 't_shirts'
@@ -113,7 +113,7 @@ sylius_fixtures:
                                 tax_category: 'clothing'
                                 channels:
                                     - 'US_STORE'
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                                 main_taxon: 'womens_t_shirts'
                                 taxons:
                                     - 't_shirts'
@@ -132,7 +132,7 @@ sylius_fixtures:
                                 tax_category: 'clothing'
                                 channels:
                                     - 'US_STORE'
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                                 main_taxon: 'womens_t_shirts'
                                 taxons:
                                     - 't_shirts'
@@ -151,7 +151,7 @@ sylius_fixtures:
                                 tax_category: 'clothing'
                                 channels:
                                     - 'US_STORE'
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                                 main_taxon: 'mens_t_shirts'
                                 taxons:
                                     - 't_shirts'
@@ -170,7 +170,7 @@ sylius_fixtures:
                                 tax_category: 'clothing'
                                 channels:
                                     - 'US_STORE'
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                                 main_taxon: 'mens_t_shirts'
                                 taxons:
                                     - 't_shirts'
@@ -189,7 +189,7 @@ sylius_fixtures:
                                 tax_category: 'clothing'
                                 channels:
                                     - 'US_STORE'
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                                 main_taxon: 'mens_t_shirts'
                                 taxons:
                                     - 't_shirts'

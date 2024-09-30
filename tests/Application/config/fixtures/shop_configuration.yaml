@@ -13,6 +13,8 @@ sylius_fixtures:
                         locales:
                             - 'en_US'
                             - 'it_IT'
+                            - 'en_150'
+                            - 'fr_FR'
                 currency:
                     priority: 1000
                     options:
@@ -26,15 +28,19 @@ sylius_fixtures:
                         countries:
                             - 'US'
                             - 'IT'
+                            - 'FR'
+                            - 'DE'
                         zones:
                             US:
                                 name: 'United States of America'
                                 countries:
                                     - 'US'
-                            IT:
-                                name: 'Italy'
+                            EU:
+                                name: 'Europe'
                                 countries:
                                     - 'IT'
+                                    - 'FR'
+                                    - 'DE'
 
                 menu_taxon:
                     name: taxon
@@ -49,6 +55,10 @@ sylius_fixtures:
                                         name: 'Category'
                                     it_IT:
                                         name: 'Categoria'
+                                    en_150:
+                                        name: 'Category'
+                                    fr_FR:
+                                        name: 'Catégorie'
 
                 channel:
                     priority: 1000
@@ -59,10 +69,11 @@ sylius_fixtures:
                                 code: 'US_STORE'
                                 locales:
                                     - 'en_US'
+                                default_locale: 'en_US'
                                 currencies:
                                     - 'USD'
                                 enabled: true
-                                hostname: '%env(resolve:SYLIUS_FIXTURES_HOSTNAME)%'
+                                hostname: '%env(resolve:SYLIUS_FIXTURES_US_HOSTNAME)%'
                                 theme_name: '%env(resolve:SYLIUS_FIXTURES_THEME_NAME)%'
                                 shop_billing_data:
                                     company: 'Sylius'
@@ -74,15 +85,18 @@ sylius_fixtures:
                                 menu_taxon: 'MENU_CATEGORY'
                                 contact_phone_number: '+41 123 456 789'
                                 contact_email: 'contact@example.com'
-                            it_store:
-                                name: 'Italy Store'
-                                code: 'IT_STORE'
+                            eu_store:
+                                name: 'Europe Store'
+                                code: 'EU_STORE'
                                 locales:
+                                    - 'en_150'
                                     - 'it_IT'
+                                    - 'fr_FR'
+                                default_locale: 'en_150'
                                 currencies:
                                     - 'EUR'
                                 enabled: true
-                                hostname: '%env(resolve:SYLIUS_FIXTURES_HOSTNAME)%'
+                                hostname: '%env(resolve:SYLIUS_FIXTURES_EU_HOSTNAME)%'
                                 theme_name: '%env(resolve:SYLIUS_FIXTURES_THEME_NAME)%'
                                 shop_billing_data:
                                     company: 'Sylius'
@@ -104,13 +118,13 @@ sylius_fixtures:
                                 name: 'Cash on delivery'
                                 channels:
                                     - 'US_STORE'
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                             bank_transfer:
                                 code: 'bank_transfer'
                                 name: 'Bank transfer'
                                 channels:
                                     - 'US_STORE'
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                                 enabled: true
 
                 shipping_method:
@@ -123,19 +137,19 @@ sylius_fixtures:
                                 enabled: true
                                 channels:
                                     - 'US_STORE'
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                             dhl_express:
                                 code: 'dhl_express'
                                 name: 'DHL Express'
                                 channels:
                                     - 'US_STORE'
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
                             fedex:
                                 code: 'fedex'
                                 name: 'FedEx'
                                 channels:
                                     - 'US_STORE'
-                                    - 'IT_STORE'
+                                    - 'EU_STORE'
 
                 customer_group:
                     priority: 1000

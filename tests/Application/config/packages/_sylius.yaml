@@ -11,6 +11,9 @@ imports:
 
 parameters:
     sylius_core.public_dir: '%kernel.project_dir%/public'
+    env(SYLIUS_FIXTURES_US_HOSTNAME): 'localhost'
+    env(SYLIUS_FIXTURES_EU_HOSTNAME): 'localhost'
+    env(SYLIUS_FIXTURES_THEME_NAME): ~
 
 sylius_shop:
     product_grid:
