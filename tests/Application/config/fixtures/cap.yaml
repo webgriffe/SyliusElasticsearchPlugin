@@ -76,58 +76,23 @@ sylius_fixtures:
                                 name: 'Cap brand'
                                 code: 'cap_brand'
                                 type: 'text'
-                                translations:
-                                    en_US:
-                                        name: 'Cap brand'
-                                    en_150:
-                                        name: 'Cap brand'
-                                    it_IT:
-                                        name: 'Marca del cappello'
-                                    fr_FR:
-                                        name: 'Marque de la casquette'
 
                             -
                                 name: 'Cap collection'
                                 code: 'cap_collection'
                                 type: 'text'
-                                translations:
-                                    en_US:
-                                        name: 'Cap collection'
-                                    en_150:
-                                        name: 'Cap collection'
-                                    it_IT:
-                                        name: 'Collezione del cappello'
-                                    fr_FR:
-                                        name: 'Collection de la casquette'
 
                             -
                                 name: 'Cap material'
                                 code: 'cap_material'
                                 type: 'text'
-                                translations:
-                                    en_US:
-                                        name: 'Cap material'
-                                    en_150:
-                                        name: 'Cap material'
-                                    it_IT:
-                                        name: 'Materiale del cappello'
-                                    fr_FR:
-                                        name: 'Matériau de la casquette'
 
                 cap_product:
                     name: product
                     options:
                         custom:
                             -
-                                translations:
-                                    en_US:
-                                        name: 'Knitted burgundy winter cap'
-                                    en_150:
-                                        name: 'Knitted burgundy winter cap'
-                                    it_IT:
-                                        name: 'Cappello invernale rosso lavorato a maglia'
-                                    fr_FR:
-                                        name: 'Casquette d''hiver tricotée bordeaux'
+                                name: 'Knitted burgundy winter cap'
                                 tax_category: 'other'
                                 channels:
                                     - 'US_STORE'
