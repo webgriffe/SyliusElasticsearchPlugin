@@ -9,7 +9,9 @@ use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Product\Resolver\DefaultProductVariantResolver;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 use Webgriffe\SyliusElasticsearchPlugin\Serializer\ProductNormalizer;
+use Webgriffe\SyliusElasticsearchPlugin\Serializer\ProductVariantNormalizer;
 
 class ProductNormalizerTest extends TestCase
 {
@@ -20,9 +22,11 @@ class ProductNormalizerTest extends TestCase
 
     protected function setUp(): void
     {
+        $eventDispatcher = new EventDispatcher();
         $this->productNormalizer = new ProductNormalizer(
             new DefaultProductVariantResolver(),
-            new EventDispatcher(),
+            $eventDispatcher,
+            new Serializer([new ProductVariantNormalizer($eventDispatcher)]),
             'en_US',
         );
 

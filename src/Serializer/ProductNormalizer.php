@@ -8,9 +8,7 @@ use DateTimeInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use RuntimeException;
 use Sylius\Component\Attribute\Model\AttributeValueInterface;
-use Sylius\Component\Core\Model\CatalogPromotionInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
-use Sylius\Component\Core\Model\ChannelPricingInterface;
 use Sylius\Component\Core\Model\ProductImageInterface;
 use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Core\Model\ProductTaxonInterface;
@@ -24,17 +22,18 @@ use Sylius\Component\Product\Model\ProductOptionInterface;
 use Sylius\Component\Product\Model\ProductOptionTranslationInterface;
 use Sylius\Component\Product\Model\ProductOptionValueInterface;
 use Sylius\Component\Product\Model\ProductOptionValueTranslationInterface;
-use Sylius\Component\Product\Model\ProductVariantTranslationInterface;
 use Sylius\Component\Product\Resolver\ProductVariantResolverInterface;
-use Sylius\Component\Promotion\Model\CatalogPromotionTranslationInterface;
 use Sylius\Component\Taxonomy\Model\TaxonTranslationInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Event\ProductDocumentType\ProductDocumentTypeProductNormalizeEvent;
-use Webgriffe\SyliusElasticsearchPlugin\Event\ProductDocumentType\ProductDocumentTypeProductVariantNormalizeEvent;
 use Webgriffe\SyliusElasticsearchPlugin\Model\FilterableInterface;
 use Webmozart\Assert\Assert;
 
-final class ProductNormalizer implements NormalizerInterface
+/**
+ * @final
+ */
+class ProductNormalizer implements NormalizerInterface
 {
     /** @var string[] */
     private array $localeCodes = [];
@@ -47,6 +46,7 @@ final class ProductNormalizer implements NormalizerInterface
     public function __construct(
         private readonly ProductVariantResolverInterface $productVariantResolver,
         private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly SerializerInterface&NormalizerInterface $serializer,
         private readonly string $systemDefaultLocaleCode,
     ) {
     }
@@ -127,7 +127,7 @@ final class ProductNormalizer implements NormalizerInterface
         }
         $defaultVariant = $this->productVariantResolver->getVariant($product);
         if ($defaultVariant instanceof ProductVariantInterface) {
-            $normalizedProduct['default-variant'] = $this->normalizeProductVariant($defaultVariant, $channel);
+            $normalizedProduct['default-variant'] = $this->serializer->normalize($defaultVariant, $format, $context);
         }
         $mainTaxon = $product->getMainTaxon();
         if ($mainTaxon instanceof TaxonInterface) {
@@ -138,7 +138,7 @@ final class ProductNormalizer implements NormalizerInterface
         }
         /** @var ProductVariantInterface $variant */
         foreach ($product->getVariants() as $variant) {
-            $normalizedProduct['variants'][] = $this->normalizeProductVariant($variant, $channel);
+            $normalizedProduct['variants'][] = $this->serializer->normalize($variant, $format, $context);
         }
 
         // Product attributes indexing for filters
@@ -275,64 +275,6 @@ final class ProductNormalizer implements NormalizerInterface
             $this->normalizeTaxon($taxon),
             ['position' => $productTaxon->getPosition()],
         );
-    }
-
-    private function normalizeProductVariant(ProductVariantInterface $variant, ChannelInterface $channel): array
-    {
-        $normalizedVariant = [
-            'sylius-id' => $variant->getId(),
-            'code' => $variant->getCode(),
-            'enabled' => $variant->isEnabled(),
-            'position' => $variant->getPosition(),
-            'weight' => $variant->getWeight(),
-            'width' => $variant->getWidth(),
-            'height' => $variant->getHeight(),
-            'depth' => $variant->getDepth(),
-            'shipping-required' => $variant->isShippingRequired(),
-            'name' => [],
-            'on-hand' => $variant->getOnHand(),
-            'on-hold' => $variant->getOnHold(),
-            'is-tracked' => $variant->isTracked(),
-            'price' => $this->normalizeChannelPricing($variant->getChannelPricingForChannel($channel)),
-            'options' => [],
-        ];
-        /** @var array<array-key, array{option: ProductOptionInterface, value: ProductOptionValueInterface}> $variantOptionsWithValue */
-        $variantOptionsWithValue = [];
-        foreach ($variant->getOptionValues() as $optionValue) {
-            $option = $optionValue->getOption();
-            Assert::isInstanceOf($option, ProductOptionInterface::class);
-            $optionId = $option->getId();
-            if (!is_string($optionId) && !is_int($optionId)) {
-                throw new RuntimeException('Option ID different from string or integer is not supported.');
-            }
-            if (array_key_exists($optionId, $variantOptionsWithValue)) {
-                throw new RuntimeException('Multiple values for the same option are not supported.');
-            }
-            $variantOptionsWithValue[$optionId] = [
-                'option' => $option,
-                'value' => $optionValue,
-            ];
-        }
-        foreach ($variantOptionsWithValue as $optionAndValue) {
-            $normalizedVariant['options'][] = $this->normalizeProductOptionAndProductOptionValue(
-                $optionAndValue['option'],
-                $optionAndValue['value'],
-            );
-        }
-
-        /** @var ProductVariantTranslationInterface $variantTranslation */
-        foreach ($variant->getTranslations() as $variantTranslation) {
-            $localeCode = $variantTranslation->getLocale();
-            Assert::string($localeCode);
-            $normalizedVariant['name'][] = [
-                $localeCode => $variantTranslation->getName(),
-            ];
-        }
-
-        $event = new ProductDocumentTypeProductVariantNormalizeEvent($variant, $channel, $normalizedVariant);
-        $this->eventDispatcher->dispatch($event);
-
-        return $event->getNormalizedProductVariant();
     }
 
     /**
@@ -477,69 +419,6 @@ final class ProductNormalizer implements NormalizerInterface
         }
 
         return $normalizedOptionValue;
-    }
-
-    private function normalizeProductOptionAndProductOptionValue(
-        ProductOptionInterface $option,
-        ProductOptionValueInterface $optionValue,
-    ): array {
-        $filterable = false;
-        if ($option instanceof FilterableInterface) {
-            $filterable = $option->isFilterable();
-        }
-        $normalizedOption = [
-            'sylius-id' => $option->getId(),
-            'code' => $option->getCode(),
-            'name' => [],
-            'filterable' => $filterable,
-            'value' => $this->normalizeProductOptionValue($optionValue),
-        ];
-        /** @var ProductOptionTranslationInterface $optionTranslation */
-        foreach ($option->getTranslations() as $optionTranslation) {
-            $localeCode = $optionTranslation->getLocale();
-            Assert::string($localeCode);
-            $normalizedOption['name'][] = [
-                $localeCode => $optionTranslation->getName(),
-            ];
-        }
-
-        return $normalizedOption;
-    }
-
-    private function normalizeChannelPricing(?ChannelPricingInterface $channelPricing): ?array
-    {
-        if ($channelPricing === null) {
-            return null;
-        }
-        $normalizedChannelPricing = [
-            'price' => $channelPricing->getPrice(),
-            'original-price' => $channelPricing->getOriginalPrice(),
-            'applied-promotions' => [],
-        ];
-        /** @var CatalogPromotionInterface $catalogPromotion */
-        foreach ($channelPricing->getAppliedPromotions() as $catalogPromotion) {
-            $normalizedCatalogPromotion = [
-                'sylius-id' => $catalogPromotion->getId(),
-                'code' => $catalogPromotion->getCode(),
-                'label' => [],
-                'description' => [],
-            ];
-            /** @var CatalogPromotionTranslationInterface $catalogPromotionTranslation */
-            foreach ($catalogPromotion->getTranslations() as $catalogPromotionTranslation) {
-                $localeCode = $catalogPromotionTranslation->getLocale();
-                Assert::string($localeCode);
-                $normalizedCatalogPromotion['label'][] = [
-                    $localeCode => $catalogPromotionTranslation->getLabel(),
-                ];
-                $normalizedCatalogPromotion['description'][] = [
-                    $localeCode => $catalogPromotionTranslation->getDescription(),
-                ];
-            }
-
-            $normalizedChannelPricing['applied-promotions'][] = $normalizedCatalogPromotion;
-        }
-
-        return $normalizedChannelPricing;
     }
 
     private function normalizeProductImage(ProductImageInterface $image): array
