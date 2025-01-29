@@ -121,9 +121,12 @@ class ProductVariantNormalizer implements NormalizerInterface
             'price' => $channelPricing->getPrice(),
             'original-price' => $channelPricing->getOriginalPrice(),
             'minimum-price' => $channelPricing->getMinimumPrice(),
-            'lowest-price-before-discount' => $channelPricing->getLowestPriceBeforeDiscount(),
+            'lowest-price-before-discount' => null,
             'applied-promotions' => [],
         ];
+        if (method_exists($channelPricing, 'getLowestPriceBeforeDiscount')) {
+            $normalizedChannelPricing['lowest-price-before-discount'] = $channelPricing->getLowestPriceBeforeDiscount();
+        }
         /** @var CatalogPromotionInterface $catalogPromotion */
         foreach ($channelPricing->getAppliedPromotions() as $catalogPromotion) {
             $normalizedCatalogPromotion = [
