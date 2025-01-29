@@ -9,8 +9,10 @@ use Sylius\Component\Core\Model\ChannelInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Builder\QueryBuilderInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Client\ClientInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Event\InstantSearchEvent;
 use Webgriffe\SyliusElasticsearchPlugin\Generator\IndexNameGeneratorInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Helper\SortHelperInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Mapper\QueryResultMapperInterface;
@@ -36,6 +38,7 @@ final class InstantSearchController extends AbstractController implements Instan
         private readonly QueryBuilderInterface $queryBuilder,
         private readonly QueryResultMapperInterface $queryResultMapper,
         private readonly SortHelperInterface $sortHelper,
+        private readonly EventDispatcherInterface $eventDispatcher,
         private readonly int $maxResults,
         private readonly int $completionSuggestersSize,
     ) {
@@ -72,6 +75,7 @@ final class InstantSearchController extends AbstractController implements Instan
             $indexAliasNames,
         );
         $queryResult = $this->queryResultMapper->map($esResult);
+        $this->eventDispatcher->dispatch(new InstantSearchEvent($query, $queryResult, $completionSuggesters));
 
         return $this->render('@WebgriffeSyliusElasticsearchPlugin/InstantSearch/results.html.twig', [
             'query' => $query,

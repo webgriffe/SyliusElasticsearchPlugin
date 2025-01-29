@@ -11,8 +11,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Builder\QueryBuilderInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Client\ClientInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Event\SearchEvent;
 use Webgriffe\SyliusElasticsearchPlugin\FilterHelper;
 use Webgriffe\SyliusElasticsearchPlugin\Form\Type\SearchType;
 use Webgriffe\SyliusElasticsearchPlugin\Generator\IndexNameGeneratorInterface;
@@ -42,6 +44,7 @@ final class SearchController extends AbstractController implements SearchControl
         private readonly QueryResultMapperInterface $queryResultMapper,
         private readonly SortHelperInterface $sortHelper,
         private readonly RequestValidatorInterface $requestValidator,
+        private readonly EventDispatcherInterface $eventDispatcher,
         private readonly int $searchDefaultPageLimit,
     ) {
     }
@@ -114,6 +117,7 @@ final class SearchController extends AbstractController implements SearchControl
             $this->queryBuilder->buildTermSuggestersQuery($query),
             $indexAliasNames,
         );
+        $this->eventDispatcher->dispatch(new SearchEvent($query, $paginator, $termSuggesters));
 
         return $this->render('@WebgriffeSyliusElasticsearchPlugin/Search/results.html.twig', [
             'query' => $query,
