@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Webgriffe\SyliusElasticsearchPlugin\Parser;
 
 if (!interface_exists(\Sylius\Resource\Factory\FactoryInterface::class)) {
-    class_alias(\Sylius\Resource\Factory\FactoryInterface::class, \Sylius\Component\Resource\Factory\FactoryInterface::class);
+    class_alias(\Sylius\Component\Resource\Factory\FactoryInterface::class, \Sylius\Resource\Factory\FactoryInterface::class);
 }
 use DateTime;
 use Psr\EventDispatcher\EventDispatcherInterface;
