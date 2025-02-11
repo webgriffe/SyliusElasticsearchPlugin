@@ -11,7 +11,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 final class ProductVariantDocumentParserEvent extends Event
 {
     /**
-     * @param array{sylius-id: int|string, code: ?string, enabled: ?bool, position: int, price: array{price: ?int, original-price: ?int, applied-promotions: array}, options: array, on-hand: ?int, on-hold: ?int, is-tracked: bool} $esVariant
+     * @param array{sylius-id: int|string, code: ?string, enabled: ?bool, position: int, price: ?array{price: ?int, original-price: ?int, applied-promotions: array}, options: array, on-hand: ?int, on-hold: ?int, is-tracked: bool} $esVariant
      */
     public function __construct(
         private readonly array $esVariant,
@@ -21,7 +21,7 @@ final class ProductVariantDocumentParserEvent extends Event
     }
 
     /**
-     * @return array{sylius-id: int|string, code: ?string, enabled: ?bool, position: int, price: array{price: ?int, original-price: ?int, applied-promotions: array}, options: array, on-hand: ?int, on-hold: ?int, is-tracked: bool}
+     * @return array{sylius-id: int|string, code: ?string, enabled: ?bool, position: int, price: ?array{price: ?int, original-price: ?int, applied-promotions: array}, options: array, on-hand: ?int, on-hold: ?int, is-tracked: bool}
      */
     public function getEsVariant(): array
     {

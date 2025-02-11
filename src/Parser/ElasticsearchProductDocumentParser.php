@@ -206,7 +206,7 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
 
         // Doing this sorting here could avoid to make any DB query to get the variants in the right order just for
         // getting the "default variant"
-        /** @var array<array-key, array{sylius-id: int|string, code: ?string, enabled: ?bool, position: int, price: array{price: ?int, original-price: ?int, applied-promotions: array}, options: array, on-hand: ?int, on-hold: ?int, is-tracked: bool}> $sortedVariants */
+        /** @var array<array-key, array{sylius-id: int|string, code: ?string, enabled: ?bool, position: int, price: ?array{price: ?int, original-price: ?int, applied-promotions: array}, options: array, on-hand: ?int, on-hold: ?int, is-tracked: bool}> $sortedVariants */
         $sortedVariants = $source['variants'];
         usort(
             $sortedVariants,
@@ -226,19 +226,21 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
             $productVariant->setTracked($esVariant['is-tracked']);
             $this->productVariants[$esVariant['sylius-id']] = $productVariant;
 
-            $channelPricing = $this->channelPricingFactory->createNew();
-            $channelPricing->setPrice($esVariant['price']['price']);
-            $channelPricing->setOriginalPrice($esVariant['price']['original-price']);
-            $channelPricing->setChannelCode($channel->getCode());
-            /** @var array{label: LocalizedField} $esAppliedPromotion */
-            foreach ($esVariant['price']['applied-promotions'] as $esAppliedPromotion) {
-                $catalogPromotion = $this->catalogPromotionFactory->createNew();
-                $catalogPromotion->setCurrentLocale($localeCode);
-                $catalogPromotion->setLabel($this->getValueFromLocalizedField($esAppliedPromotion['label'], $localeCode));
+            if ($esVariant['price'] !== null) {
+                $channelPricing = $this->channelPricingFactory->createNew();
+                $channelPricing->setChannelCode($channel->getCode());
+                $channelPricing->setPrice($esVariant['price']['price']);
+                $channelPricing->setOriginalPrice($esVariant['price']['original-price']);
+                /** @var array{label: LocalizedField} $esAppliedPromotion */
+                foreach ($esVariant['price']['applied-promotions'] as $esAppliedPromotion) {
+                    $catalogPromotion = $this->catalogPromotionFactory->createNew();
+                    $catalogPromotion->setCurrentLocale($localeCode);
+                    $catalogPromotion->setLabel($this->getValueFromLocalizedField($esAppliedPromotion['label'], $localeCode));
 
-                $channelPricing->addAppliedPromotion($catalogPromotion);
+                    $channelPricing->addAppliedPromotion($catalogPromotion);
+                }
+                $productVariant->addChannelPricing($channelPricing);
             }
-            $productVariant->addChannelPricing($channelPricing);
 
             /** @var array{sylius-id: int|string, code: string, name: array, filterable: bool, value: array{sylius-id: int|string, code: string, value: string, name: array}} $esOption */
             foreach ($esVariant['options'] as $esOption) {
