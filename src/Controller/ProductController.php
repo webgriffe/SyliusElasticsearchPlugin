@@ -9,8 +9,6 @@ use Sylius\Component\Channel\Context\ChannelContextInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Core\Model\TaxonInterface;
-use Sylius\Component\Locale\Context\LocaleContextInterface;
-use Sylius\Component\Taxonomy\Repository\TaxonRepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,6 +23,7 @@ use Webgriffe\SyliusElasticsearchPlugin\Helper\SortHelperInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Mapper\QueryResultMapperInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Pagerfanta\ElasticsearchTaxonQueryAdapter;
 use Webgriffe\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Resolver\RequestTaxonResolverInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Validator\RequestValidatorInterface;
 use Webmozart\Assert\Assert;
 
@@ -35,12 +34,7 @@ use Webmozart\Assert\Assert;
  */
 final class ProductController extends AbstractController implements ProductControllerInterface
 {
-    /**
-     * @param TaxonRepositoryInterface<TaxonInterface> $taxonRepository
-     */
     public function __construct(
-        private readonly TaxonRepositoryInterface $taxonRepository,
-        private readonly LocaleContextInterface $localeContext,
         private readonly ClientInterface $client,
         private readonly ChannelContextInterface $channelContext,
         private readonly IndexNameGeneratorInterface $indexNameGenerator,
@@ -50,6 +44,7 @@ final class ProductController extends AbstractController implements ProductContr
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly SortHelperInterface $sortHelper,
         private readonly RequestValidatorInterface $requestValidator,
+        private readonly RequestTaxonResolverInterface $requestTaxonResolver,
         private readonly int $taxonDefaultPageLimit,
     ) {
     }
@@ -58,8 +53,7 @@ final class ProductController extends AbstractController implements ProductContr
     {
         $this->requestValidator->validate($request);
 
-        $localeCode = $this->localeContext->getLocaleCode();
-        $taxon = $this->taxonRepository->findOneBySlug($slug, $localeCode);
+        $taxon = $this->requestTaxonResolver->resolve($request, $slug);
         if (!$taxon instanceof TaxonInterface) {
             throw $this->createNotFoundException();
         }

@@ -52,8 +52,6 @@ return static function (ContainerConfigurator $containerConfigurator) {
 
     $services->set('webgriffe.sylius_elasticsearch_plugin.controller.product', ProductController::class)
         ->args([
-            service('sylius.repository.taxon'),
-            service('sylius.context.locale'),
             service('webgriffe.sylius_elasticsearch_plugin.client'),
             service('sylius.context.channel'),
             service('webgriffe.sylius_elasticsearch_plugin.generator.index_name'),
@@ -63,6 +61,7 @@ return static function (ContainerConfigurator $containerConfigurator) {
             service('event_dispatcher'),
             service('webgriffe.sylius_elasticsearch_plugin.helper.sort'),
             service('webgriffe.sylius_elasticsearch_plugin.validator.request'),
+            service('webgriffe.sylius_elasticsearch_plugin.resolver.request_taxon'),
         ])
         ->call('setContainer', [service('service_container')])
         ->tag('controller.service_arguments')
