@@ -267,6 +267,7 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
                 }
                 $productVariant = $this->productVariants[$esVariantImage['sylius-id']];
                 $productImage->addProductVariant($productVariant);
+                $productVariant->addImage($productImage);
             }
             $event = new ProductImageDocumentParserEvent($esImage, $productImage, $productResponse);
             $this->eventDispatcher->dispatch($event);
