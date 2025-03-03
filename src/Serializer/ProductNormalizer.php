@@ -343,7 +343,6 @@ class ProductNormalizer implements NormalizerInterface
         Assert::stringNotEmpty($storageType);
 
         $attributeValueValue = $attributeValue->getValue();
-        $attributeValueToIndex = [$attributeValueValue];
         if ($storageType === AttributeValueInterface::STORAGE_JSON) {
             $attributeValueToIndex = [];
             /** @var array<string, array<string, ?string>> $allAttributeValues */
@@ -377,6 +376,12 @@ class ProductNormalizer implements NormalizerInterface
         } elseif ($storageType === AttributeValueInterface::STORAGE_DATETIME) {
             Assert::isInstanceOf($attributeValueValue, DateTimeInterface::class);
             $attributeValueToIndex = [$attributeValueValue->format('Y-m-d H:i:s')];
+        } else {
+            // Limit the length of the attribute value to 32766 bytes to avoid Elasticsearch error
+            if (is_string($attributeValueValue) && function_exists('mb_strcut')) {
+                $attributeValueValue = mb_strcut($attributeValueValue, 0, 32766, 'UTF-8');
+            }
+            $attributeValueToIndex = [$attributeValueValue];
         }
 
         return [
