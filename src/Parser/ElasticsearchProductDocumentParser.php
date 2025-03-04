@@ -130,6 +130,13 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
 
         /** @var array{sylius-id: int|string, code: string, type: string, storage-type: string, position: int, translatable: bool, filterable: bool, name: array<array-key, array<string, string>>, values: array} $esTranslatedAttribute */
         foreach ($source['translated-attributes'] as $esTranslatedAttribute) {
+            // Check if it exists at least one locale available for the current request
+            if (!array_key_exists($localeCode, $esTranslatedAttribute['values']) &&
+                !array_key_exists($this->defaultLocaleCode, $esTranslatedAttribute['values']) &&
+                !array_key_exists($this->fallbackLocaleCode, $esTranslatedAttribute['values'])
+            ) {
+                continue;
+            }
             $productAttribute = $this->productAttributeFactory->createNew();
             $productAttribute->setCode($esTranslatedAttribute['code']);
             $productAttribute->setStorageType($esTranslatedAttribute['storage-type']);
@@ -141,20 +148,15 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
             $event = new ProductAttributeDocumentParserEvent($esTranslatedAttribute, $productAttribute, $productResponse);
             $this->eventDispatcher->dispatch($event);
 
-            if (!array_key_exists($this->defaultLocaleCode, $esTranslatedAttribute['values'])) {
-                /** @var array<array-key, array{sylius-id: int|string, code: string, locale: string, values: array<array-key, string>}> $attributeValues */
-                $attributeValues = $esTranslatedAttribute['values'][$this->fallbackLocaleCode];
-                $usedLocale = $this->fallbackLocaleCode;
-            } else {
-                /** @var array<array-key, array{sylius-id: int|string, code: string, locale: string, values: array<array-key, string>}> $attributeValues */
-                $attributeValues = $esTranslatedAttribute['values'][$this->defaultLocaleCode];
+            $usedLocale = $this->fallbackLocaleCode;
+            if (array_key_exists($this->defaultLocaleCode, $esTranslatedAttribute['values'])) {
                 $usedLocale = $this->defaultLocaleCode;
             }
             if (array_key_exists($localeCode, $esTranslatedAttribute['values'])) {
                 $usedLocale = $localeCode;
-                /** @var array<array-key, array{sylius-id: int|string, code: string, locale: string, values: array<array-key, string>}> $attributeValues */
-                $attributeValues = $esTranslatedAttribute['values'][$localeCode];
             }
+            /** @var array<array-key, array{sylius-id: int|string, code: string, locale: string, values: array<array-key, string>}> $attributeValues */
+            $attributeValues = $esTranslatedAttribute['values'][$usedLocale];
 
             foreach ($attributeValues as $esProductAttributeValue) {
                 $productAttributeValue = $this->productAttributeValueFactory->createNew();
