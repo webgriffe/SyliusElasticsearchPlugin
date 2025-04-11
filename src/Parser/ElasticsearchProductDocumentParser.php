@@ -289,7 +289,7 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
         }
 
         $this->taxons = [];
-        /** @var array{taxon: array{sylius-id: int|string, code: ?string, name: array<array-key, array<string, string>>}, position: ?int} $esProductTaxon */
+        /** @var array{taxon: array{sylius-id: int|string, code?: ?string, enabled: bool, left: ?int, right: ?int, level: ?int, position: ?int, root: ?array, parent: ?array, children: array[], name: array<array-key, array<string, string>>, slug: array<array-key, array<string, string>>, description: array<array-key, array<string, string>>}, position: ?int} $esProductTaxon */
         foreach ($source['product-taxons'] as $esProductTaxon) {
             $taxon = $this->getOrCreateTaxon($esProductTaxon['taxon'], $localeCode);
 
@@ -364,7 +364,9 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
     }
 
     /**
-     * @param array{sylius-id: int|string, code: ?string, name: array<array-key, array<string, string>>} $esTaxon
+     * @psalm-suppress MixedArgumentTypeCoercion
+     *
+     * @param array{sylius-id: int|string, code?: ?string, enabled: bool, left: ?int, right: ?int, level: ?int, position: ?int, root: ?array, parent: ?array, children: array[], name: array<array-key, array<string, string>>, slug: array<array-key, array<string, string>>, description: array<array-key, array<string, string>>} $esTaxon
      */
     private function getOrCreateTaxon(array $esTaxon, string $localeCode): TaxonInterface
     {
@@ -372,14 +374,37 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
             $taxon = $this->taxons[$esTaxon['sylius-id']];
         } else {
             $taxon = $this->taxonFactory->createNew();
-            $taxon->setCode($esTaxon['code']);
-            $taxon->setName($this->getValueFromLocalizedField($esTaxon['name'], $localeCode));
-
-            $event = new TaxonDocumentParserEvent($esTaxon, $taxon);
-            $this->eventDispatcher->dispatch($event);
-
             $this->taxons[$esTaxon['sylius-id']] = $taxon;
         }
+        if (!array_key_exists('code', $esTaxon)) {
+            return $taxon;
+        }
+        $taxon->setCode($esTaxon['code']);
+        $taxon->setName($this->getValueFromLocalizedField($esTaxon['name'], $localeCode));
+        $taxon->setSlug($this->getValueFromLocalizedField($esTaxon['slug'], $localeCode));
+        $taxon->setDescription($this->getValueFromLocalizedField($esTaxon['description'], $localeCode));
+        $taxon->setEnabled($esTaxon['enabled']);
+        $taxon->setLeft($esTaxon['left']);
+        $taxon->setRight($esTaxon['right']);
+        $taxon->setLevel($esTaxon['level']);
+        $taxon->setPosition($esTaxon['position']);
+        if ($esTaxon['root'] !== null) {
+            $reflectionClass = new \ReflectionClass($taxon::class);
+            $rootProperty = $reflectionClass->getProperty('root');
+            // @phpstan-ignore-next-line
+            $rootProperty->setValue($taxon, $this->getOrCreateTaxon($esTaxon['root'], $localeCode));
+        }
+        if ($esTaxon['parent'] !== null) {
+            // @phpstan-ignore-next-line
+            $taxon->setParent($this->getOrCreateTaxon($esTaxon['parent'], $localeCode));
+        }
+        foreach ($esTaxon['children'] as $child) {
+            // @phpstan-ignore-next-line
+            $taxon->addChild($this->getOrCreateTaxon($child, $localeCode));
+        }
+
+        $event = new TaxonDocumentParserEvent($esTaxon, $taxon);
+        $this->eventDispatcher->dispatch($event);
 
         return $taxon;
     }

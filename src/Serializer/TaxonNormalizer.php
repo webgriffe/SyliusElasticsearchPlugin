@@ -12,10 +12,14 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Event\ProductDocumentType\ProductDocumentTypeTaxonNormalizeEvent;
 use Webmozart\Assert\Assert;
 
-final readonly class TaxonNormalizer implements NormalizerInterface
+/**
+ * @final
+ */
+readonly class TaxonNormalizer implements NormalizerInterface
 {
     public function __construct(
         private EventDispatcherInterface $eventDispatcher,
+        private NormalizerInterface $serializer,
     ) {
     }
 
@@ -29,17 +33,60 @@ final readonly class TaxonNormalizer implements NormalizerInterface
         Assert::isInstanceOf($taxon, TaxonInterface::class);
         Assert::isInstanceOf($channel, ChannelInterface::class);
 
+        /** @var array<int|string> $alreadyNormalizedTaxons */
+        $alreadyNormalizedTaxons = $context['already_normalized_taxons'] ?? [];
+
+        $taxonId = $taxon->getId();
+        if (!is_string($taxonId) && !is_int($taxonId)) {
+            throw new \InvalidArgumentException('Taxon ID must be a string or an integer.');
+        }
+        if (in_array($taxonId, $alreadyNormalizedTaxons, true)) {
+            return [
+                'sylius-id' => $taxonId,
+            ];
+        }
+
+        $alreadyNormalizedTaxons[] = $taxonId;
+        $context['already_normalized_taxons'] = $alreadyNormalizedTaxons;
+
         $normalizedTaxon = [
-            'sylius-id' => $taxon->getId(),
+            'sylius-id' => $taxonId,
             'code' => $taxon->getCode(),
+            'enabled' => $taxon->isEnabled(),
+            'left' => $taxon->getLeft(),
+            'right' => $taxon->getRight(),
+            'level' => $taxon->getLevel(),
+            'position' => $taxon->getPosition(),
+            'root' => null,
+            'parent' => null,
+            'children' => [],
             'name' => [],
+            'slug' => [],
+            'description' => [],
         ];
+        $root = $taxon->getRoot();
+        if ($root !== null) {
+            $normalizedTaxon['root'] = $this->serializer->normalize($root, $format, $context);
+        }
+        $parent = $taxon->getParent();
+        if ($parent !== null) {
+            $normalizedTaxon['parent'] = $this->serializer->normalize($parent, $format, $context);
+        }
+        foreach ($taxon->getChildren() as $child) {
+            $normalizedTaxon['children'][] = $this->serializer->normalize($child, $format, $context);
+        }
         /** @var TaxonTranslationInterface $taxonTranslation */
         foreach ($taxon->getTranslations() as $taxonTranslation) {
             $localeCode = $taxonTranslation->getLocale();
             Assert::string($localeCode);
             $normalizedTaxon['name'][] = [
                 $localeCode => $taxonTranslation->getName(),
+            ];
+            $normalizedTaxon['slug'][] = [
+                $localeCode => $taxonTranslation->getSlug(),
+            ];
+            $normalizedTaxon['description'][] = [
+                $localeCode => $taxonTranslation->getDescription(),
             ];
         }
 

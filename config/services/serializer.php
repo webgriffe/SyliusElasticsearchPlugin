@@ -41,8 +41,10 @@ return static function (ContainerConfigurator $containerConfigurator) {
     ;
 
     $services->set('webgriffe.sylius_elasticsearch_plugin.serializer.taxon_normalizer', TaxonNormalizer::class)
+        ->lazy()
         ->args([
             service('event_dispatcher'),
+            service('serializer'),
         ])
         ->tag('serializer.normalizer', ['priority' => 200])
     ;

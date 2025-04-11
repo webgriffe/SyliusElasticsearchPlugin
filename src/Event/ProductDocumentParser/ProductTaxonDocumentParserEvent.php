@@ -11,7 +11,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 final class ProductTaxonDocumentParserEvent extends Event
 {
     /**
-     * @param array{taxon: array{sylius-id: int|string, code: ?string, name: array<array-key, array<string, string>>}, position: ?int} $esProductTaxon
+     * @param array{taxon: array{sylius-id: int|string, code?: ?string, enabled: bool, left: ?int, right: ?int, level: ?int, position: ?int, root: ?array, parent: ?array, children: array[], name: array<array-key, array<string, string>>, slug: array<array-key, array<string, string>>, description: array<array-key, array<string, string>>}, position: ?int} $esProductTaxon
      */
     public function __construct(
         private readonly array $esProductTaxon,
@@ -21,7 +21,7 @@ final class ProductTaxonDocumentParserEvent extends Event
     }
 
     /**
-     * @return array{taxon: array{sylius-id: int|string, code: ?string, name: array<array-key, array<string, string>>}, position: ?int}
+     * @return array{taxon: array{sylius-id: int|string, code?: ?string, enabled: bool, left: ?int, right: ?int, level: ?int, position: ?int, root: ?array, parent: ?array, children: array[], name: array<array-key, array<string, string>>, slug: array<array-key, array<string, string>>, description: array<array-key, array<string, string>>}, position: ?int}
      */
     public function getEsProductTaxon(): array
     {

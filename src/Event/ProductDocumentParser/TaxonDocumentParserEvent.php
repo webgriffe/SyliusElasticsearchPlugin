@@ -10,7 +10,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 final class TaxonDocumentParserEvent extends Event
 {
     /**
-     * @param array{sylius-id: int|string, code: ?string, name: array<array-key, array<string, string>>} $esTaxon
+     * @param array{sylius-id: int|string, code?: ?string, enabled: bool, left: ?int, right: ?int, level: ?int, position: ?int, root: ?array, parent: ?array, children: array[], name: array<array-key, array<string, string>>, slug: array<array-key, array<string, string>>, description: array<array-key, array<string, string>>} $esTaxon
      */
     public function __construct(
         private readonly array $esTaxon,
@@ -19,7 +19,7 @@ final class TaxonDocumentParserEvent extends Event
     }
 
     /**
-     * @return array{sylius-id: int|string, code: ?string, name: array<array-key, array<string, string>>}
+     * @return array{sylius-id: int|string, code?: ?string, enabled: bool, left: ?int, right: ?int, level: ?int, position: ?int, root: ?array, parent: ?array, children: array[], name: array<array-key, array<string, string>>, slug: array<array-key, array<string, string>>, description: array<array-key, array<string, string>>}
      */
     public function getEsTaxon(): array
     {
