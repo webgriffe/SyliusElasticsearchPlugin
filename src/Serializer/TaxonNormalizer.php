@@ -14,6 +14,7 @@ use Webmozart\Assert\Assert;
 
 /**
  * @final
+ *
  * @readonly
  */
 class TaxonNormalizer implements NormalizerInterface
