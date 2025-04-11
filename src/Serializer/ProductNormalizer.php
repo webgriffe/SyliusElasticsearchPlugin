@@ -40,6 +40,9 @@ class ProductNormalizer implements NormalizerInterface
     /** @var array<array-key, array{input: string, weight: positive-int}> */
     private array $productSuggesters = [];
 
+    /** @var array<string|int, array> */
+    private array $serializedTaxon = [];
+
     private ?string $channelDefaultLocaleCode = null;
 
     public function __construct(
@@ -70,6 +73,7 @@ class ProductNormalizer implements NormalizerInterface
             $this->channelDefaultLocaleCode = $channelDefaultLocale->getCode();
         }
         $this->productSuggesters = [];
+        $this->serializedTaxon = [];
 
         $normalizedProduct = [
             'sylius-id' => $product->getId(),
@@ -130,10 +134,10 @@ class ProductNormalizer implements NormalizerInterface
         }
         $mainTaxon = $product->getMainTaxon();
         if ($mainTaxon instanceof TaxonInterface) {
-            $normalizedProduct['main-taxon'] = $this->normalizeTaxon($mainTaxon);
+            $normalizedProduct['main-taxon'] = $this->normalizeTaxon($mainTaxon, $format, $context);
         }
         foreach ($product->getProductTaxons() as $productTaxon) {
-            $normalizedProduct['taxons'][] = $this->normalizeProductTaxon($productTaxon);
+            $normalizedProduct['product-taxons'][] = $this->normalizeProductTaxon($productTaxon, $format, $context);
         }
         /** @var ProductVariantInterface $variant */
         foreach ($product->getVariants() as $variant) {
@@ -245,35 +249,38 @@ class ProductNormalizer implements NormalizerInterface
         ;
     }
 
-    private function normalizeTaxon(TaxonInterface $taxon): array
+    private function normalizeTaxon(TaxonInterface $taxon, ?string $format = null, array $context = []): array
     {
-        $normalizedTaxon = [
-            'sylius-id' => $taxon->getId(),
-            'code' => $taxon->getCode(),
-            'name' => [],
-        ];
+        $taxonId = $taxon->getId();
+        if (!is_string($taxonId) && !is_int($taxonId)) {
+            throw new RuntimeException('Taxon ID different from string or integer is not supported.');
+        }
+        if (array_key_exists($taxonId, $this->serializedTaxon)) {
+            return $this->serializedTaxon[$taxonId];
+        }
+        $normalizedTaxon = $this->serializer->normalize($taxon, $format, $context);
+        Assert::isArray($normalizedTaxon);
+        $this->serializedTaxon[$taxonId] = $normalizedTaxon;
         /** @var TaxonTranslationInterface $taxonTranslation */
         foreach ($taxon->getTranslations() as $taxonTranslation) {
-            $localeCode = $taxonTranslation->getLocale();
-            Assert::string($localeCode);
-            $normalizedTaxon['name'][] = [
-                $localeCode => $taxonTranslation->getName(),
-            ];
             $this->productSuggesters[] = ['input' => (string) $taxonTranslation->getName(), 'weight' => 10];
         }
 
-        return $normalizedTaxon;
+        return $this->serializedTaxon[$taxonId];
     }
 
-    private function normalizeProductTaxon(ProductTaxonInterface $productTaxon): array
-    {
+    private function normalizeProductTaxon(
+        ProductTaxonInterface $productTaxon,
+        ?string $format = null,
+        array $context = [],
+    ): array {
         $taxon = $productTaxon->getTaxon();
         Assert::isInstanceOf($taxon, TaxonInterface::class);
 
-        return array_merge(
-            $this->normalizeTaxon($taxon),
-            ['position' => $productTaxon->getPosition()],
-        );
+        return [
+            'taxon' => $this->normalizeTaxon($taxon, $format, $context),
+            'position' => $productTaxon->getPosition(),
+        ];
     }
 
     /**

@@ -16,7 +16,9 @@ use Sylius\Component\Core\Model\CatalogPromotionInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Sylius\Component\Core\Model\ChannelPricingInterface;
 use Sylius\Component\Core\Model\ProductImageInterface;
+use Sylius\Component\Core\Model\ProductTaxonInterface;
 use Sylius\Component\Core\Model\ProductVariantInterface;
+use Sylius\Component\Core\Model\TaxonInterface;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
 use Sylius\Component\Locale\Model\LocaleInterface;
 use Sylius\Component\Product\Factory\ProductVariantFactoryInterface;
@@ -31,7 +33,9 @@ use Webgriffe\SyliusElasticsearchPlugin\Event\ProductDocumentParser\ProductDocum
 use Webgriffe\SyliusElasticsearchPlugin\Event\ProductDocumentParser\ProductImageDocumentParserEvent;
 use Webgriffe\SyliusElasticsearchPlugin\Event\ProductDocumentParser\ProductOptionDocumentParserEvent;
 use Webgriffe\SyliusElasticsearchPlugin\Event\ProductDocumentParser\ProductOptionValueDocumentParserEvent;
+use Webgriffe\SyliusElasticsearchPlugin\Event\ProductDocumentParser\ProductTaxonDocumentParserEvent;
 use Webgriffe\SyliusElasticsearchPlugin\Event\ProductDocumentParser\ProductVariantDocumentParserEvent;
+use Webgriffe\SyliusElasticsearchPlugin\Event\ProductDocumentParser\TaxonDocumentParserEvent;
 use Webgriffe\SyliusElasticsearchPlugin\Factory\ProductResponseFactoryInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Model\ProductResponseInterface;
 use Webmozart\Assert\Assert;
@@ -49,6 +53,9 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
     /** @var array<string|int, ProductOptionValueInterface> */
     private array $productOptionValues = [];
 
+    /** @var array<string|int, TaxonInterface> */
+    private array $taxons = [];
+
     /**
      * @param FactoryInterface<ProductImageInterface> $productImageFactory
      * @param ProductVariantFactoryInterface<ProductVariantInterface> $productVariantFactory
@@ -58,6 +65,8 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
      * @param FactoryInterface<ProductOptionValueInterface> $productOptionValueFactory
      * @param FactoryInterface<ProductAttributeInterface> $productAttributeFactory
      * @param FactoryInterface<ProductAttributeValueInterface> $productAttributeValueFactory
+     * @param FactoryInterface<ProductTaxonInterface> $productTaxonFactory
+     * @param FactoryInterface<TaxonInterface> $taxonFactory
      */
     public function __construct(
         private readonly ProductResponseFactoryInterface $productResponseFactory,
@@ -71,6 +80,8 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
         private readonly FactoryInterface $productOptionValueFactory,
         private readonly FactoryInterface $productAttributeFactory,
         private readonly FactoryInterface $productAttributeValueFactory,
+        private readonly FactoryInterface $productTaxonFactory,
+        private readonly FactoryInterface $taxonFactory,
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly string $fallbackLocaleCode,
     ) {
@@ -88,7 +99,7 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
                 $this->defaultLocaleCode = $defaultLocaleCode;
             }
         }
-        /** @var array{sylius-id: int, code: string, name: LocalizedField, description: LocalizedField, short-description: LocalizedField, taxons: array, main_taxon: array, slug: LocalizedField, images: array, variants: array, product-options: array, translated-attributes: array, attributes: array} $source */
+        /** @var array{sylius-id: int, code: string, name: LocalizedField, description: LocalizedField, short-description: LocalizedField, product-taxons: array, main-taxon: array, slug: LocalizedField, images: array, variants: array, product-options: array, translated-attributes: array, attributes: array} $source */
         $source = $document['_source'];
         $localeCode = $this->localeContext->getLocaleCode();
         $productResponse = $this->productResponseFactory->createNew();
@@ -277,6 +288,22 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
             $productResponse->addImage($productImage);
         }
 
+        $this->taxons = [];
+        /** @var array{taxon: array{sylius-id: int|string, code: ?string, name: array<array-key, array<string, string>>}, position: ?int} $esProductTaxon */
+        foreach ($source['product-taxons'] as $esProductTaxon) {
+            $taxon = $this->getOrCreateTaxon($esProductTaxon['taxon'], $localeCode);
+
+            $productTaxon = $this->productTaxonFactory->createNew();
+            $productTaxon->setTaxon($taxon);
+            $productTaxon->setProduct($productResponse);
+            $productTaxon->setPosition($esProductTaxon['position']);
+
+            $event = new ProductTaxonDocumentParserEvent($esProductTaxon, $productTaxon, $productResponse);
+            $this->eventDispatcher->dispatch($event);
+
+            $productResponse->addProductTaxon($productTaxon);
+        }
+
         $event = new ProductDocumentParserEvent($source, $productResponse);
         $this->eventDispatcher->dispatch($event);
 
@@ -334,5 +361,26 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
         }
 
         return $firstValue;
+    }
+
+    /**
+     * @param array{sylius-id: int|string, code: ?string, name: array<array-key, array<string, string>>} $esTaxon
+     */
+    private function getOrCreateTaxon(array $esTaxon, string $localeCode): TaxonInterface
+    {
+        if (array_key_exists($esTaxon['sylius-id'], $this->taxons)) {
+            $taxon = $this->taxons[$esTaxon['sylius-id']];
+        } else {
+            $taxon = $this->taxonFactory->createNew();
+            $taxon->setCode($esTaxon['code']);
+            $taxon->setName($this->getValueFromLocalizedField($esTaxon['name'], $localeCode));
+
+            $event = new TaxonDocumentParserEvent($esTaxon, $taxon);
+            $this->eventDispatcher->dispatch($event);
+
+            $this->taxons[$esTaxon['sylius-id']] = $taxon;
+        }
+
+        return $taxon;
     }
 }

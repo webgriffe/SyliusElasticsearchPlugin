@@ -171,7 +171,7 @@
             {% block query_bool_should_product_taxon_names %}
             {
                 "nested": {
-                    "path": "taxons",
+                    "path": "product-taxons",
                     "query": {
                         "match": {
                             {{ ('taxons.name.' ~ localeCode)|json_encode|raw }}: {

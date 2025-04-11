@@ -10,16 +10,16 @@
                 }
             },
             {% endblock %}
-            {% block query_bool_filter_taxon %}
+            {% block query_bool_filter_product_taxon %}
             {
                 "nested": {
-                    "path": "taxons",
+                    "path": "product-taxons",
                     "query": {
                         "bool": {
                             "filter": [
                                 {
                                     "terms": {
-                                        "taxons.sylius-id": {{ taxonIdsToSearch|json_encode|raw }}
+                                        "product-taxons.taxon.sylius-id": {{ taxonIdsToSearch|json_encode|raw }}
                                     }
                                 }
                             ]

@@ -8,6 +8,7 @@ use Webgriffe\SyliusElasticsearchPlugin\Serializer\ProductNormalizer;
 use Webgriffe\SyliusElasticsearchPlugin\Serializer\ProductOptionValueNormalizer;
 use Webgriffe\SyliusElasticsearchPlugin\Serializer\ProductTranslationNormalizer;
 use Webgriffe\SyliusElasticsearchPlugin\Serializer\ProductVariantNormalizer;
+use Webgriffe\SyliusElasticsearchPlugin\Serializer\TaxonNormalizer;
 
 return static function (ContainerConfigurator $containerConfigurator) {
     $services = $containerConfigurator->services();
@@ -33,6 +34,13 @@ return static function (ContainerConfigurator $containerConfigurator) {
     ;
 
     $services->set('webgriffe.sylius_elasticsearch_plugin.serializer.product_option_value_normalizer', ProductOptionValueNormalizer::class)
+        ->args([
+            service('event_dispatcher'),
+        ])
+        ->tag('serializer.normalizer', ['priority' => 200])
+    ;
+
+    $services->set('webgriffe.sylius_elasticsearch_plugin.serializer.taxon_normalizer', TaxonNormalizer::class)
         ->args([
             service('event_dispatcher'),
         ])

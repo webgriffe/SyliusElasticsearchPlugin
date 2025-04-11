@@ -125,11 +125,20 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
                     // 'subobjects' => true, ES v8
                     'properties' => $this->taxonProperties(),
                 ],
-                'taxons' => [
+                'product-taxons' => [
                     'type' => 'nested',
                     'dynamic' => false,
                     'include_in_parent' => true,
-                    'properties' => $this->taxonProperties(),
+                    'properties' => [
+                        'taxon' => [
+                            'type' => 'object',
+                            'dynamic' => false,
+                            'enabled' => true,
+                            // 'subobjects' => true, ES v8
+                            'properties' => $this->taxonProperties(),
+                        ],
+                        'position' => $this->integer(false),
+                    ],
                 ],
                 'attributes' => [
                     'type' => 'nested',
