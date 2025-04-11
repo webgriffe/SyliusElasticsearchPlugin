@@ -14,12 +14,13 @@ use Webmozart\Assert\Assert;
 
 /**
  * @final
+ * @readonly
  */
-readonly class TaxonNormalizer implements NormalizerInterface
+class TaxonNormalizer implements NormalizerInterface
 {
     public function __construct(
-        private EventDispatcherInterface $eventDispatcher,
-        private NormalizerInterface $serializer,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly NormalizerInterface $serializer,
     ) {
     }
 

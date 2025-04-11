@@ -124,6 +124,7 @@ class ProductVariantNormalizer implements NormalizerInterface
             'lowest-price-before-discount' => null,
             'applied-promotions' => [],
         ];
+        // @phpstan-ignore-next-line
         if (method_exists($channelPricing, 'getLowestPriceBeforeDiscount')) {
             $normalizedChannelPricing['lowest-price-before-discount'] = $channelPricing->getLowestPriceBeforeDiscount();
         }
