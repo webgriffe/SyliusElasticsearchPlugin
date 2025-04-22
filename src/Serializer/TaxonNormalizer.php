@@ -74,9 +74,11 @@ class TaxonNormalizer implements NormalizerInterface
         if ($parent !== null) {
             $normalizedTaxon['parent'] = $this->serializer->normalize($parent, $format, $context);
         }
-        foreach ($taxon->getChildren() as $child) {
-            $normalizedTaxon['children'][] = $this->serializer->normalize($child, $format, $context);
-        }
+        // This step is commented out because it causes an infinite loop
+        // @TODO Find a better way to handle this
+        //foreach ($taxon->getChildren() as $child) {
+        //    $normalizedTaxon['children'][] = $this->serializer->normalize($child, $format, $context);
+        //}
         /** @var TaxonTranslationInterface $taxonTranslation */
         foreach ($taxon->getTranslations() as $taxonTranslation) {
             $localeCode = $taxonTranslation->getLocale();
