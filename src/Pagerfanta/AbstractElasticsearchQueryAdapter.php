@@ -8,6 +8,7 @@ use Pagerfanta\Adapter\AdapterInterface;
 use RuntimeException;
 use Webgriffe\SyliusElasticsearchPlugin\Client\ClientInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Mapper\QueryResultMapperInterface;
+use Webgriffe\SyliusElasticsearchPlugin\Model\QueryResult;
 use Webgriffe\SyliusElasticsearchPlugin\Model\QueryResultInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Model\ResponseInterface;
 
@@ -85,7 +86,15 @@ abstract class AbstractElasticsearchQueryAdapter implements AdapterInterface
             return $this->queryResult;
         }
         $query = $this->getQuery($page, $size);
-        $esResult = $this->client->query($query, $this->indexes);
+
+        try {
+            $esResult = $this->client->query($query, $this->indexes);
+        } catch (\Throwable) {
+            $this->queryResult = new QueryResult(0, [], []);
+            $this->nbResults = 0;
+
+            return $this->queryResult;
+        }
         $this->queryResult = $this->queryResultMapper->map($esResult);
         $this->nbResults = max(0, $this->queryResult->getTotalHits());
 

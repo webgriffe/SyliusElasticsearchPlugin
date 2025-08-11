@@ -56,6 +56,8 @@ interface ClientInterface extends LoggerAwareInterface
      * @param string[] $indexes
      *
      * @return ESQueryResult
+     *
+     * @throws \Exception
      */
     public function query(
         array $query,
