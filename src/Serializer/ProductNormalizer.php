@@ -94,7 +94,6 @@ class ProductNormalizer implements NormalizerInterface
             'default-variant' => null,
             'main-taxon' => null,
             'attributes' => [],
-            'translated-attributes' => [],
             'product-options' => [],
             'images' => [],
             'suggest' => [],
@@ -148,8 +147,6 @@ class ProductNormalizer implements NormalizerInterface
 
         /** @var array<string|int, array{attribute: ProductAttributeInterface, values: ProductAttributeValueInterface[]}> $translatedAttributes */
         $translatedAttributes = [];
-        /** @var array<string|int, array{attribute: ProductAttributeInterface, values: ProductAttributeValueInterface[]}> $attributes */
-        $attributes = [];
 
         /** @var ProductAttributeValueInterface $attributeValue */
         foreach ($product->getAttributes() as $attributeValue) {
@@ -161,30 +158,15 @@ class ProductNormalizer implements NormalizerInterface
                 throw new RuntimeException('Attribute ID different from string or integer is not supported.');
             }
 
-            if ($attribute->isTranslatable()) {
-                if (!array_key_exists($attributeId, $translatedAttributes)) {
-                    $translatedAttributes[$attributeId] = [
-                        'attribute' => $attribute,
-                        'values' => [],
-                    ];
-                }
-                $translatedAttributes[$attributeId]['values'][] = $attributeValue;
-
-                continue;
-            }
-
-            if (!array_key_exists($attributeId, $attributes)) {
-                $attributes[$attributeId] = [
+            if (!array_key_exists($attributeId, $translatedAttributes)) {
+                $translatedAttributes[$attributeId] = [
                     'attribute' => $attribute,
                     'values' => [],
                 ];
             }
-            $attributes[$attributeId]['values'][] = $attributeValue;
+            $translatedAttributes[$attributeId]['values'][] = $attributeValue;
         }
         foreach ($translatedAttributes as $attribute) {
-            $normalizedProduct['translated-attributes'][] = $this->normalizeAttributeWithValues($attribute);
-        }
-        foreach ($attributes as $attribute) {
             $normalizedProduct['attributes'][] = $this->normalizeAttributeWithValues($attribute);
         }
 
@@ -316,21 +298,17 @@ class ProductNormalizer implements NormalizerInterface
         $fallbackValue = null;
         foreach ($attributeWithValues['values'] as $attributeValue) {
             $localeCode = $attributeValue->getLocaleCode();
-            if ($isTranslatable) {
-                Assert::string($localeCode);
-                $value = $this->normalizeAttributeValue($attributeValue);
-                $normalizedAttributeValue['values'][$localeCode][] = $value;
-                if ($localeCode === $this->channelDefaultLocaleCode) {
-                    $fallbackValue = $value;
-                }
-                if ($fallbackValue === null && $localeCode === $this->systemDefaultLocaleCode) {
-                    $fallbackValue = $value;
-                }
-            } else {
-                $normalizedAttributeValue['values'][] = $this->normalizeAttributeValue($attributeValue);
+            Assert::string($localeCode);
+            $value = $this->normalizeAttributeValue($attributeValue);
+            $normalizedAttributeValue['values'][$localeCode][] = $value;
+            if ($localeCode === $this->channelDefaultLocaleCode) {
+                $fallbackValue = $value;
+            }
+            if ($fallbackValue === null && $localeCode === $this->systemDefaultLocaleCode) {
+                $fallbackValue = $value;
             }
         }
-        if ($fallbackValue !== null && $isTranslatable) {
+        if ($fallbackValue !== null) {
             foreach ($this->localeCodes as $localeCode) {
                 if (!array_key_exists($localeCode, $normalizedAttributeValue['values'])) {
                     $normalizedAttributeValue['values'][$localeCode][] = $fallbackValue;

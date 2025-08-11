@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Webgriffe\SyliusElasticsearchPlugin;
+namespace Webgriffe\SyliusElasticsearchPlugin\Helper;
 
 use Webgriffe\SyliusElasticsearchPlugin\Builder\QueryBuilderInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Model\AttributeFilter;
 use Webgriffe\SyliusElasticsearchPlugin\Model\OptionFilter;
-use Webgriffe\SyliusElasticsearchPlugin\Model\TranslatedAttributeFilter;
 
 /**
  * @psalm-import-type QueryFilters from QueryBuilderInterface
@@ -23,7 +22,6 @@ final class FilterHelper
     {
         $filters = [
             AttributeFilter::TYPE => [],
-            TranslatedAttributeFilter::TYPE => [],
             OptionFilter::TYPE => [],
         ];
 

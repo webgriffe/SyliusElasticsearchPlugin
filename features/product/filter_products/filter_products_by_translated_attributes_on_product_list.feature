@@ -1,5 +1,5 @@
 @filter_products
-Feature: Filter products by translated attributes from a specific taxon
+Feature: Filter products by attributes from a specific taxon
     In order to find products that fits my needs
     As a Visitor
     I want to be able to filter products from a specific taxon

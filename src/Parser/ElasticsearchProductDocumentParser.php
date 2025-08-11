@@ -99,7 +99,7 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
                 $this->defaultLocaleCode = $defaultLocaleCode;
             }
         }
-        /** @var array{sylius-id: int, code: string, name: LocalizedField, description: LocalizedField, short-description: LocalizedField, product-taxons: array, main-taxon: array, slug: LocalizedField, images: array, variants: array, product-options: array, translated-attributes: array, attributes: array} $source */
+        /** @var array{sylius-id: int, code: string, name: LocalizedField, description: LocalizedField, short-description: LocalizedField, product-taxons: array, main-taxon: array, slug: LocalizedField, images: array, variants: array, product-options: array, attributes: array} $source */
         $source = $document['_source'];
         $localeCode = $this->localeContext->getLocaleCode();
         $productResponse = $this->productResponseFactory->createNew();
@@ -139,77 +139,42 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
             $productResponse->addOption($productOption);
         }
 
-        /** @var array{sylius-id: int|string, code: string, type: string, storage-type: string, position: int, translatable: bool, filterable: bool, name: array<array-key, array<string, string>>, values: array} $esTranslatedAttribute */
-        foreach ($source['translated-attributes'] as $esTranslatedAttribute) {
+        /** @var array{sylius-id: int|string, code: string, type: string, storage-type: string, position: int, translatable: bool, filterable: bool, name: array<array-key, array<string, string>>, values: array} $esAttribute */
+        foreach ($source['attributes'] as $esAttribute) {
             // Check if it exists at least one locale available for the current request
-            if (!array_key_exists($localeCode, $esTranslatedAttribute['values']) &&
-                !array_key_exists($this->defaultLocaleCode, $esTranslatedAttribute['values']) &&
-                !array_key_exists($this->fallbackLocaleCode, $esTranslatedAttribute['values'])
+            if (!array_key_exists($localeCode, $esAttribute['values']) &&
+                !array_key_exists($this->defaultLocaleCode, $esAttribute['values']) &&
+                !array_key_exists($this->fallbackLocaleCode, $esAttribute['values'])
             ) {
                 continue;
             }
             $productAttribute = $this->productAttributeFactory->createNew();
-            $productAttribute->setCode($esTranslatedAttribute['code']);
-            $productAttribute->setStorageType($esTranslatedAttribute['storage-type']);
-            $productAttribute->setType($esTranslatedAttribute['type']);
+            $productAttribute->setCode($esAttribute['code']);
+            $productAttribute->setStorageType($esAttribute['storage-type']);
+            $productAttribute->setType($esAttribute['type']);
             $productAttribute->setTranslatable(true);
-            $productAttribute->setPosition($esTranslatedAttribute['position']);
+            $productAttribute->setPosition($esAttribute['position']);
             $productAttribute->setCurrentLocale($localeCode);
-            $productAttribute->setName($this->getValueFromLocalizedField($esTranslatedAttribute['name'], $localeCode));
-            $event = new ProductAttributeDocumentParserEvent($esTranslatedAttribute, $productAttribute, $productResponse);
+            $productAttribute->setName($this->getValueFromLocalizedField($esAttribute['name'], $localeCode));
+            $event = new ProductAttributeDocumentParserEvent($esAttribute, $productAttribute, $productResponse);
             $this->eventDispatcher->dispatch($event);
 
             $usedLocale = $this->fallbackLocaleCode;
-            if (array_key_exists($this->defaultLocaleCode, $esTranslatedAttribute['values'])) {
+            if (array_key_exists($this->defaultLocaleCode, $esAttribute['values'])) {
                 $usedLocale = $this->defaultLocaleCode;
             }
-            if (array_key_exists($localeCode, $esTranslatedAttribute['values'])) {
+            if (array_key_exists($localeCode, $esAttribute['values'])) {
                 $usedLocale = $localeCode;
             }
             /** @var array<array-key, array{sylius-id: int|string, code: string, locale: string, values: array<array-key, string>}> $attributeValues */
-            $attributeValues = $esTranslatedAttribute['values'][$usedLocale];
+            $attributeValues = $esAttribute['values'][$usedLocale];
 
             foreach ($attributeValues as $esProductAttributeValue) {
                 $productAttributeValue = $this->productAttributeValueFactory->createNew();
                 $productAttributeValue->setAttribute($productAttribute);
                 $productAttributeValue->setLocaleCode($usedLocale);
                 $productAttributeValue->setSubject($productResponse);
-                $productAttributeValue->setValue($this->getAttributeValueByStorageType($esProductAttributeValue['values'], $esTranslatedAttribute['storage-type']));
-                $event = new ProductAttributeValueDocumentParserEvent($esProductAttributeValue, $productAttributeValue, $productAttribute, $productResponse);
-                $this->eventDispatcher->dispatch($event);
-
-                $productResponse->addAttribute($productAttributeValue);
-            }
-        }
-
-        /** @var array{sylius-id: int|string, code: string, type: string, storage-type: string, position: int, translatable: bool, filterable: bool, name: array<array-key, array<string, string>>, values: array} $esTranslatedAttribute */
-        foreach ($source['attributes'] as $esTranslatedAttribute) {
-            $productAttribute = $this->productAttributeFactory->createNew();
-            $productAttribute->setCode($esTranslatedAttribute['code']);
-            $productAttribute->setStorageType($esTranslatedAttribute['storage-type']);
-            $productAttribute->setType($esTranslatedAttribute['type']);
-            $productAttribute->setTranslatable(false);
-            $productAttribute->setPosition($esTranslatedAttribute['position']);
-            $productAttribute->setCurrentLocale($localeCode);
-            $productAttribute->setName($this->getValueFromLocalizedField($esTranslatedAttribute['name'], $localeCode));
-            $event = new ProductAttributeDocumentParserEvent($esTranslatedAttribute, $productAttribute, $productResponse);
-            $this->eventDispatcher->dispatch($event);
-
-            /** @var array{sylius-id: int|string, code: string, locale: string, values: array<array-key, string>} $esProductAttributeValue */
-            foreach ($esTranslatedAttribute['values'] as $esProductAttributeValue) {
-                $productAttributeValue = $this->productAttributeValueFactory->createNew();
-                $productAttributeValue->setAttribute($productAttribute);
-                $productAttributeValue->setLocaleCode($localeCode);
-                $productAttributeValue->setSubject($productResponse);
-                $firstValue = reset($esProductAttributeValue['values']);
-                if ($productAttribute->getStorageType() === AttributeValueInterface::STORAGE_DATETIME ||
-                    $productAttribute->getStorageType() === AttributeValueInterface::STORAGE_DATE
-                ) {
-                    $firstValue = new DateTime((string) $firstValue);
-                } elseif ($productAttribute->getStorageType() === AttributeValueInterface::STORAGE_JSON) {
-                    $firstValue = [$firstValue];
-                }
-                $productAttributeValue->setValue($firstValue);
+                $productAttributeValue->setValue($this->getAttributeValueByStorageType($esProductAttributeValue['values'], $esAttribute['storage-type']));
                 $event = new ProductAttributeValueDocumentParserEvent($esProductAttributeValue, $productAttributeValue, $productAttribute, $productResponse);
                 $this->eventDispatcher->dispatch($event);
 

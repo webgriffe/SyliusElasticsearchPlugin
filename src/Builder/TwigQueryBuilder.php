@@ -10,7 +10,7 @@ use RuntimeException;
 use Sylius\Component\Core\Model\TaxonInterface;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
 use Twig\Environment;
-use Webgriffe\SyliusElasticsearchPlugin\FilterHelper;
+use Webgriffe\SyliusElasticsearchPlugin\Helper\FilterHelper;
 
 final readonly class TwigQueryBuilder implements QueryBuilderInterface
 {
@@ -89,13 +89,6 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
             /** @var array $attributeAggregationNormalized */
             $attributeAggregationNormalized = json_decode($attributeAggregationRaw, true, 512, JSON_THROW_ON_ERROR);
 
-            $translatedAttributeAggregationRaw = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/taxon/aggs/translated-attributes.json.twig', [
-                'taxon' => $taxon,
-                'localeCode' => $localeCode,
-            ]);
-            /** @var array $translatedAttributeAggregationNormalized */
-            $translatedAttributeAggregationNormalized = json_decode($translatedAttributeAggregationRaw, true, 512, JSON_THROW_ON_ERROR);
-
             $optionAggregationRaw = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/taxon/aggs/options.json.twig', [
                 'taxon' => $taxon,
                 'localeCode' => $localeCode,
@@ -105,7 +98,6 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
 
             $taxonQuery['aggs'] = array_merge(
                 $attributeAggregationNormalized,
-                $translatedAttributeAggregationNormalized,
                 $optionAggregationNormalized,
             );
         }
@@ -170,13 +162,6 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
             /** @var array $attributeAggregationNormalized */
             $attributeAggregationNormalized = json_decode($attributeAggregationRaw, true, 512, JSON_THROW_ON_ERROR);
 
-            $translatedAttributeAggregationRaw = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/search/aggs/translated-attributes.json.twig', [
-                'searchTerm' => $searchTerm,
-                'localeCode' => $localeCode,
-            ]);
-            /** @var array $translatedAttributeAggregationNormalized */
-            $translatedAttributeAggregationNormalized = json_decode($translatedAttributeAggregationRaw, true, 512, JSON_THROW_ON_ERROR);
-
             $optionAggregationRaw = $this->twig->render('@WebgriffeSyliusElasticsearchPlugin/query/search/aggs/options.json.twig', [
                 'searchTerm' => $searchTerm,
                 'localeCode' => $localeCode,
@@ -186,7 +171,6 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
 
             $searchQuery['aggs'] = array_merge(
                 $attributeAggregationNormalized,
-                $translatedAttributeAggregationNormalized,
                 $optionAggregationNormalized,
             );
         }

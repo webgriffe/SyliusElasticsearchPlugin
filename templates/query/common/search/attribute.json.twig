@@ -12,7 +12,7 @@
                         },
                         {
                             "term": {
-                                "attributes.values.values": {{ filter.value|json_encode|raw }}
+                                {{ ('attributes.values.' ~ localeCode ~ '.values')|json_encode|raw }}: {{ filter.value|json_encode|raw }}
                             }
                         }
                     ]

@@ -13,7 +13,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 final class ProductDocumentParserEvent extends Event
 {
     /**
-     * @param array{sylius-id: int, code: string, name: LocalizedField, description: LocalizedField, short-description: LocalizedField, product-taxons: array, main-taxon: array, slug: LocalizedField, images: array, variants: array, product-options: array, translated-attributes: array, attributes: array} $esProduct
+     * @param array{sylius-id: int, code: string, name: LocalizedField, description: LocalizedField, short-description: LocalizedField, product-taxons: array, main-taxon: array, slug: LocalizedField, images: array, variants: array, product-options: array, attributes: array} $esProduct
      */
     public function __construct(
         private readonly array $esProduct,
@@ -22,7 +22,7 @@ final class ProductDocumentParserEvent extends Event
     }
 
     /**
-     * @return array{sylius-id: int, code: string, name: LocalizedField, description: LocalizedField, short-description: LocalizedField, product-taxons: array, main-taxon: array, slug: LocalizedField, images: array, variants: array, product-options: array, translated-attributes: array, attributes: array}
+     * @return array{sylius-id: int, code: string, name: LocalizedField, description: LocalizedField, short-description: LocalizedField, product-taxons: array, main-taxon: array, slug: LocalizedField, images: array, variants: array, product-options: array, attributes: array}
      */
     public function getEsProduct(): array
     {

@@ -189,30 +189,12 @@
             {% block query_bool_should_product_translated_attribute_values %}
             {
                 "nested": {
-                    "path": "translated-attributes",
-                    "query": {
-                        "match": {
-                            {{ ('translated-attributes.values.' ~ localeCode ~ '.text-value')|json_encode|raw }}: {
-                                "query": {{ searchTerm|raw }},
-                                "boost": {% block query_bool_should_product_translated_attribute_values_boost %}3{% endblock %},
-                                "fuzziness": "AUTO",
-                                "fuzzy_transpositions": true,
-                                "operator": "OR"
-                            }
-                        }
-                    }
-                }
-            },
-            {% endblock %}
-            {% block query_bool_should_product_attribute_values %}
-            {
-                "nested": {
                     "path": "attributes",
                     "query": {
                         "match": {
-                            "attributes.values.text-value": {
+                            {{ ('attributes.values.' ~ localeCode ~ '.text-value')|json_encode|raw }}: {
                                 "query": {{ searchTerm|raw }},
-                                "boost": {% block query_bool_should_product_attribute_values_boost %}3{% endblock %},
+                                "boost": {% block query_bool_should_product_translated_attribute_values_boost %}3{% endblock %},
                                 "fuzziness": "AUTO",
                                 "fuzzy_transpositions": true,
                                 "operator": "OR"

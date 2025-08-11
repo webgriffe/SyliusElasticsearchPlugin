@@ -19,17 +19,21 @@
                 "aggs": {
                     "attribute": {
                         "terms": {
-                            "field": "attributes.code"
+                            "field": "attributes.code",
+                            "size": 1000,
+                            "min_doc_count": 1
                         },
                         "aggs": {
                             "values": {
                                 "terms": {
-                                    "field": "attributes.values.values"
+                                    "field": {{ ('attributes.values.' ~ localeCode ~ '.values')|json_encode|raw }},
+                                    "size": 1000
                                 }
                             },
                             "label": {
                                 "terms": {
-                                    "field": {{ ('attributes.name.' ~ localeCode)|json_encode|raw }}
+                                    "field": {{ ('attributes.name.' ~ localeCode)|json_encode|raw }},
+                                    "size": 1
                                 }
                             }
                         }

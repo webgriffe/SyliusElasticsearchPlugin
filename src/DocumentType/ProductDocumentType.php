@@ -144,12 +144,6 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
                     'type' => 'nested',
                     'dynamic' => false,
                     'include_in_parent' => true,
-                    'properties' => $this->attributeProperties(),
-                ],
-                'translated-attributes' => [
-                    'type' => 'nested',
-                    'dynamic' => false,
-                    'include_in_parent' => true,
                     'properties' => $this->attributeProperties(true),
                 ],
                 'product-options' => [
