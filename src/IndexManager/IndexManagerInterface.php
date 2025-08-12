@@ -18,6 +18,8 @@ interface IndexManagerInterface
 
     /**
      * @return Generator<array-key, MessageInterface>
+     *
+     * @throws \RuntimeException If the alias for the index does not exist or is not set
      */
     public function upsertDocuments(
         ChannelInterface $channel,

@@ -92,4 +92,6 @@ interface ClientInterface extends LoggerAwareInterface
         array $query,
         array $indexes = [],
     ): array;
+
+    public function existsAlias(string $aliasName): bool;
 }

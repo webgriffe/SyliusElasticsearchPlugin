@@ -255,6 +255,11 @@ final class ElasticsearchClient implements ClientInterface
         return $result['suggest'];
     }
 
+    public function existsAlias(string $aliasName): bool
+    {
+        return $this->getClient()->indices()->existsAlias(['name' => $aliasName]);
+    }
+
     private function getClient(): Client
     {
         if ($this->client === null) {

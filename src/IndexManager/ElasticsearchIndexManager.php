@@ -64,6 +64,10 @@ final readonly class ElasticsearchIndexManager implements IndexManagerInterface
     ): Generator {
         $aliasName = $this->indexNameGenerator->generateAlias($channel, $documentType);
 
+        if (!$this->client->existsAlias($aliasName)) {
+            throw new \RuntimeException("Alias '$aliasName' does not exist. Please create the index first.");
+        }
+
         yield Message::createMessage('Retrieving normalized document to update the index.');
         $bulkActions = [];
         foreach ($identifiers as $identifier) {
