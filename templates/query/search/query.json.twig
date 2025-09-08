@@ -28,7 +28,8 @@
                 "term": {
                     "code": {
                         "value": {{ searchTerm|raw }},
-                        "case_insensitive": true
+                        "case_insensitive": true,
+                        "boost": 20
                     }
                 }
             },
@@ -41,7 +42,8 @@
                         "term": {
                             "variants.code": {
                                 "value": {{ searchTerm|raw }},
-                                "case_insensitive": true
+                                "case_insensitive": true,
+                                "boost": 20
                             }
                         }
                     }
