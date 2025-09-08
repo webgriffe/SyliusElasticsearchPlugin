@@ -26,7 +26,10 @@
             {% block query_bool_should_product_code %}
             {
                 "term": {
-                    "code": {{ searchTerm|raw }}
+                    "code": {
+                        "value": {{ searchTerm|raw }},
+                        "case_insensitive": true
+                    }
                 }
             },
             {% endblock %}
@@ -36,7 +39,10 @@
                     "path": "variants",
                     "query": {
                         "term": {
-                            "variants.code": {{ searchTerm|raw }}
+                            "variants.code": {
+                                "value": {{ searchTerm|raw }},
+                                "case_insensitive": true
+                            }
                         }
                     }
                 }
