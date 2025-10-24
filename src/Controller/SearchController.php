@@ -116,7 +116,7 @@ final class SearchController extends AbstractController implements SearchControl
          * @var ResponseInterface[] $results
          */
         $results = $paginator->getCurrentPageResults();
-        if (count($results) === 1) {
+        if ($paginator->getNbResults() === 1) {
             $result = $results[0];
 
             return $this->redirectToRoute($result->getRouteName(), $result->getRouteParams());
