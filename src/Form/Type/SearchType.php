@@ -35,6 +35,7 @@ final class SearchType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => null,
+            'csrf_protection' => false,
             'action' => $this->router->generate('sylius_shop_search'),
             'method' => 'POST',
         ]);

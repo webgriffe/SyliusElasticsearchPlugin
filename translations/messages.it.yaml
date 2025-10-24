@@ -7,3 +7,4 @@ webgriffe_sylius_elasticsearch_plugin:
         results_for_query: 'Risultati per "{query}":'
         search: 'Ricerca'
         reset_filters: 'Resetta filtri'
+        some_error_occurred_during_search: 'Siamo spiacenti, si è verificato qualche errore imprevisto durante la ricerca. Ti invitiamo a riprovare.'

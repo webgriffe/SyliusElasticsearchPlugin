@@ -12,6 +12,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Builder\QueryBuilderInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Client\ClientInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Event\SearchEvent;
@@ -45,6 +46,7 @@ final class SearchController extends AbstractController implements SearchControl
         private readonly SortHelperInterface $sortHelper,
         private readonly RequestValidatorInterface $requestValidator,
         private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly TranslatorInterface $translator,
         private readonly int $searchDefaultPageLimit,
     ) {
     }
@@ -55,7 +57,13 @@ final class SearchController extends AbstractController implements SearchControl
 
         $form = $this->formFactory->create(SearchType::class);
         $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted()) {
+            if (!$form->isValid()) {
+                // The result of a POST must always be a redirect to a GET, so redirect to the search page with errors
+                $this->addFlash('error', $this->translator->trans('webgriffe_sylius_elasticsearch_plugin.ui.some_error_occurred_during_search'));
+
+                return $this->redirectToRoute('sylius_shop_homepage');
+            }
             /** @var string $query */
             $query = $form->get('query')->getData();
 
