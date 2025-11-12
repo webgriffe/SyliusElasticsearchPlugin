@@ -298,6 +298,9 @@ class ProductNormalizer implements NormalizerInterface
         $fallbackValue = null;
         foreach ($attributeWithValues['values'] as $attributeValue) {
             $localeCode = $attributeValue->getLocaleCode();
+            if ($localeCode === null) {
+                $localeCode = $this->channelDefaultLocaleCode;
+            }
             Assert::string($localeCode);
             $value = $this->normalizeAttributeValue($attributeValue);
             $normalizedAttributeValue['values'][$localeCode][] = $value;
