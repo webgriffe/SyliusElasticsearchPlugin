@@ -1,0 +1,5 @@
+acme_sylius_example_admin:
+    resource: "@WebgriffeSyliusElasticsearchPlugin/config/admin_routing.php"
+
+acme_sylius_example_shop:
+    resource: "@WebgriffeSyliusElasticsearchPlugin/config/shop_routing.php"

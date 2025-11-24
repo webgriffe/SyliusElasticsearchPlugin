@@ -1,4 +1,0 @@
-suites:
-    main:
-        namespace: Webgriffe\SyliusElasticsearchPlugin
-        psr4_prefix: Webgriffe\SyliusElasticsearchPlugin
