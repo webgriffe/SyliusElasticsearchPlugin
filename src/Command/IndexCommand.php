@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use Sylius\Component\Channel\Repository\ChannelRepositoryInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Helper\ProgressIndicator;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,6 +21,8 @@ use Webgriffe\SyliusElasticsearchPlugin\Provider\DocumentTypeProviderInterface;
 
 final class IndexCommand extends Command
 {
+    use LockableTrait;
+
     /**
      * @param ChannelRepositoryInterface<ChannelInterface> $channelRepository
      */
@@ -49,6 +52,11 @@ final class IndexCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        if (!$this->lock('webgriffe-elasticsearch-index-command-lock')) {
+            $output->writeln('The command is already running in another process.');
+
+            return Command::FAILURE;
+        }
         /** @var bool $runAsynchronously */
         $runAsynchronously = $input->getOption('run-asynchronously');
 
@@ -90,6 +98,8 @@ final class IndexCommand extends Command
         if (!$runAsynchronously) {
             $progressIndicator->finish(sprintf('Finished creating indexes for %d channels and %d document types.', count($channels), count($documentTypes)));
         }
+
+        $this->release();
 
         return Command::SUCCESS;
     }

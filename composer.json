@@ -12,6 +12,8 @@
         "php": "^8.2",
         "elasticsearch/elasticsearch": "^7.17",
         "sylius/sylius": "^1.12 || ^1.13",
+        "symfony/console": "^6.4",
+        "symfony/lock": "^6.4",
         "symfony/webpack-encore-bundle": "^1.15"
     },
     "require-dev": {
