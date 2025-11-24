@@ -6,6 +6,7 @@ namespace Webgriffe\SyliusElasticsearchPlugin\IndexManager;
 
 use Generator;
 use Sylius\Component\Core\Model\ChannelInterface;
+use Symfony\Component\Lock\LockFactory;
 use Webgriffe\SyliusElasticsearchPlugin\Client\ClientInterface;
 use Webgriffe\SyliusElasticsearchPlugin\Client\Enum\Action;
 use Webgriffe\SyliusElasticsearchPlugin\Client\ValueObject\BulkAction;
@@ -18,11 +19,14 @@ final readonly class ElasticsearchIndexManager implements IndexManagerInterface
     public function __construct(
         private ClientInterface $client,
         private IndexNameGeneratorInterface $indexNameGenerator,
+        private LockFactory $lockFactory,
     ) {
     }
 
     public function create(ChannelInterface $channel, DocumentTypeInterface $documentType): Generator
     {
+        $lock = $this->lockFactory->createLock("webgriffe-elasticsearch-index-manager-{$channel->getCode()}-{$documentType->getCode()}");
+        $lock->acquire();
         $indexName = $this->indexNameGenerator->generateName($channel, $documentType);
         $aliasName = $this->indexNameGenerator->generateAlias($channel, $documentType);
         $indexesToRemoveWildcard = $this->indexNameGenerator->generateWildcardPattern($channel, $documentType);
@@ -55,6 +59,8 @@ final readonly class ElasticsearchIndexManager implements IndexManagerInterface
 
         yield Message::createMessage(sprintf('Removing old indexes responding to wildcard "%s".', $indexesToRemoveWildcard));
         $this->client->removeIndexes($indexesToRemoveWildcard, [$indexName]);
+
+        $lock->release();
     }
 
     public function upsertDocuments(

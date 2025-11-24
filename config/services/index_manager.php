@@ -13,6 +13,7 @@ return static function (ContainerConfigurator $containerConfigurator) {
         ->args([
             service('webgriffe.sylius_elasticsearch_plugin.client'),
             service('webgriffe.sylius_elasticsearch_plugin.generator.index_name'),
+            service('lock.factory'),
         ])
     ;
 };
