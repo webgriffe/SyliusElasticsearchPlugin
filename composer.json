@@ -55,6 +55,9 @@
             "dealerdirect/phpcodesniffer-composer-installer": false,
             "phpstan/extension-installer": true,
             "symfony/flex": true
+        },
+        "audit": {
+            "block-insecure": false
         }
     },
     "extra": {
