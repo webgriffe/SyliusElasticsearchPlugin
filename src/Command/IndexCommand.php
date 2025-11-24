@@ -9,6 +9,7 @@ use Sylius\Component\Channel\Repository\ChannelRepositoryInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressIndicator;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -37,6 +38,12 @@ final class IndexCommand extends Command
         $this
             ->setDescription('Creates the indexes for all the channels and document types.')
             ->addOption('run-asynchronously', 'async', InputOption::VALUE_OPTIONAL, 'Run the command asynchronously using the message bus.', false)
+            ->addArgument(
+                'channel-code',
+                InputArgument::OPTIONAL,
+                'The channel code to create the indexes for. If not provided, all channels will be used.',
+                null,
+            )
         ;
     }
 
@@ -45,7 +52,18 @@ final class IndexCommand extends Command
         /** @var bool $runAsynchronously */
         $runAsynchronously = $input->getOption('run-asynchronously');
 
-        $channels = $this->channelRepository->findAll();
+        $channelCode = $input->getArgument('channel-code');
+        if (is_string($channelCode) && $channelCode !== '') {
+            $channel = $this->channelRepository->findOneByCode($channelCode);
+            if (!$channel instanceof ChannelInterface) {
+                $output->writeln(sprintf('<error>Channel with code "%s" not found.</error>', $channelCode));
+
+                return Command::FAILURE;
+            }
+            $channels = [$channel];
+        } else {
+            $channels = $this->channelRepository->findAll();
+        }
         $documentTypes = $this->documentTypeProvider->getDocumentsType();
 
         $progressIndicator = new ProgressIndicator($output, null, 5);
