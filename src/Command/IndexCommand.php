@@ -60,6 +60,7 @@ final class IndexCommand extends Command
         /** @var bool $runAsynchronously */
         $runAsynchronously = $input->getOption('run-asynchronously');
 
+        /** @var string|null $channelCode */
         $channelCode = $input->getArgument('channel-code');
         if (is_string($channelCode) && $channelCode !== '') {
             $channel = $this->channelRepository->findOneByCode($channelCode);
