@@ -1,1 +1,1 @@
-import './js/greetings';
+import './js/instant-search';

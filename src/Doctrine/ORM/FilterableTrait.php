@@ -8,7 +8,6 @@ use Doctrine\ORM\Mapping as ORM;
 
 trait FilterableTrait
 {
-    /** @ORM\Column(name="filterable", type="boolean", nullable=false, options={"default"=false}) */
     #[ORM\Column(name: 'filterable', type: 'boolean', nullable: false, options: ['default' => false])]
     protected bool $filterable = false;
 
