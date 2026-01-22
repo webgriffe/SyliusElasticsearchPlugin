@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class RequestValidator implements RequestValidatorInterface
 {
+    #[\Override]
     public function validate(Request $request): void
     {
         $this->validateSorting($request);

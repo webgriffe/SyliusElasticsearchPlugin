@@ -17,16 +17,19 @@ final readonly class QueryResult implements QueryResultInterface
     ) {
     }
 
+    #[\Override]
     public function getTotalHits(): int
     {
         return $this->totalHints;
     }
 
+    #[\Override]
     public function getHints(int $offset, int $length): array
     {
         return $this->hints;
     }
 
+    #[\Override]
     public function getFilters(): array
     {
         return $this->filters;

@@ -29,6 +29,7 @@ final readonly class ProductVariantSubscriber implements EventSubscriberInterfac
     ) {
     }
 
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

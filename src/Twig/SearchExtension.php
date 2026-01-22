@@ -12,6 +12,7 @@ final class SearchExtension extends AbstractExtension
     /**
      * @psalm-suppress InvalidArgument
      */
+    #[\Override]
     public function getFunctions(): array
     {
         return [

@@ -16,6 +16,7 @@ final readonly class IndexNameGenerator implements IndexNameGeneratorInterface
     {
     }
 
+    #[\Override]
     public function generateName(
         ChannelInterface $channel,
         DocumentTypeInterface $documentType,
@@ -36,6 +37,7 @@ final readonly class IndexNameGenerator implements IndexNameGeneratorInterface
         );
     }
 
+    #[\Override]
     public function generateAlias(
         ChannelInterface $channel,
         DocumentTypeInterface $documentType,
@@ -47,6 +49,7 @@ final readonly class IndexNameGenerator implements IndexNameGeneratorInterface
         );
     }
 
+    #[\Override]
     public function generateWildcardPattern(
         ChannelInterface $channel,
         DocumentTypeInterface $documentType,

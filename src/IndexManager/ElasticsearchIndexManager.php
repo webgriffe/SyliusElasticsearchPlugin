@@ -23,6 +23,7 @@ final readonly class ElasticsearchIndexManager implements IndexManagerInterface
     ) {
     }
 
+    #[\Override]
     public function create(ChannelInterface $channel, DocumentTypeInterface $documentType): Generator
     {
         $lock = $this->lockFactory->createLock("webgriffe-elasticsearch-index-manager-{$channel->getCode()}-{$documentType->getCode()}");
@@ -63,6 +64,7 @@ final readonly class ElasticsearchIndexManager implements IndexManagerInterface
         $lock->release();
     }
 
+    #[\Override]
     public function upsertDocuments(
         ChannelInterface $channel,
         DocumentTypeInterface $documentType,
@@ -88,6 +90,7 @@ final readonly class ElasticsearchIndexManager implements IndexManagerInterface
         yield Message::createMessage(sprintf('Updated %d documents in alias "%s".', $countBulkActions, $aliasName));
     }
 
+    #[\Override]
     public function removeDocuments(
         ChannelInterface $channel,
         DocumentTypeInterface $documentType,

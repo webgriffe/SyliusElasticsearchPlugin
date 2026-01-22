@@ -87,6 +87,7 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
     ) {
     }
 
+    #[\Override]
     public function parse(array $document): ProductResponseInterface
     {
         /** @var ChannelInterface $channel */

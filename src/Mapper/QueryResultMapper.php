@@ -24,6 +24,7 @@ final readonly class QueryResultMapper implements QueryResultMapperInterface
     ) {
     }
 
+    #[\Override]
     public function map(array $queryResult): QueryResultInterface
     {
         $responses = [];

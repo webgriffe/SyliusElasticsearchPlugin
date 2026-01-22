@@ -41,6 +41,7 @@ abstract class AbstractElasticsearchQueryAdapter implements AdapterInterface
 
     abstract protected function getMinScore(): float;
 
+    #[\Override]
     public function getNbResults(): int
     {
         if ($this->nbResults !== null) {
@@ -55,6 +56,7 @@ abstract class AbstractElasticsearchQueryAdapter implements AdapterInterface
         return $this->nbResults;
     }
 
+    #[\Override]
     public function getSlice(int $offset, int $length): iterable
     {
         $queryResult = $this->doQuery(

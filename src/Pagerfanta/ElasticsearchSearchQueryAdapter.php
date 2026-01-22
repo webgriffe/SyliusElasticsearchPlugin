@@ -30,6 +30,7 @@ final class ElasticsearchSearchQueryAdapter extends AbstractElasticsearchQueryAd
         parent::__construct($client, $queryResultMapper, $indexes);
     }
 
+    #[\Override]
     protected function getCountQuery(): array
     {
         return $this->queryBuilder->buildSearchQuery(
@@ -42,11 +43,13 @@ final class ElasticsearchSearchQueryAdapter extends AbstractElasticsearchQueryAd
         );
     }
 
+    #[\Override]
     protected function getMinScore(): float
     {
         return 1;
     }
 
+    #[\Override]
     protected function getQuery(int $page, int $size): array
     {
         return $this->queryBuilder->buildSearchQuery(

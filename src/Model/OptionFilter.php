@@ -13,6 +13,7 @@ final readonly class OptionFilter extends Filter
 {
     public const TYPE = 'option';
 
+    #[\Override]
     public function getType(): string
     {
         return self::TYPE;
@@ -27,6 +28,7 @@ final readonly class OptionFilter extends Filter
      *
      * @return OptionFilter[]
      */
+    #[\Override]
     public static function resolveFromRawData(array $rawData): array
     {
         $filters = [];

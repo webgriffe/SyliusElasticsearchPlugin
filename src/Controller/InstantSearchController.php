@@ -44,6 +44,7 @@ final class InstantSearchController extends AbstractController implements Instan
     ) {
     }
 
+    #[\Override]
     public function __invoke(Request $request, string $query): Response
     {
         $channel = $this->channelContext->getChannel();

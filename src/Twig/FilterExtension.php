@@ -13,6 +13,7 @@ final class FilterExtension extends AbstractExtension
     /**
      * @psalm-suppress InvalidArgument
      */
+    #[\Override]
     public function getFilters(): array
     {
         return [
@@ -23,6 +24,7 @@ final class FilterExtension extends AbstractExtension
     /**
      * @psalm-suppress InvalidArgument
      */
+    #[\Override]
     public function getFunctions(): array
     {
         return [

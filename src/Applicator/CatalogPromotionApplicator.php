@@ -26,6 +26,7 @@ final readonly class CatalogPromotionApplicator implements CatalogPromotionAppli
     /**
      * @psalm-suppress UnusedForeachValue
      */
+    #[\Override]
     public function applyOnVariant(ProductVariantInterface $variant, CatalogPromotionInterface $catalogPromotion): void
     {
         $this->decoratedCatalogPromotionApplicator->applyOnVariant($variant, $catalogPromotion);

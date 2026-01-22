@@ -51,6 +51,7 @@ final class SearchController extends AbstractController implements SearchControl
     ) {
     }
 
+    #[\Override]
     public function __invoke(Request $request, ?string $query = null): Response
     {
         $this->requestValidator->validate($request);

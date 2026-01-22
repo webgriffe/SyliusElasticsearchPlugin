@@ -54,12 +54,14 @@ class ProductNormalizer implements NormalizerInterface
     }
 
     /**
-     * @param ProductInterface|mixed $object
+     * @param ProductInterface|mixed $data
+     * @param array<string, mixed> $context
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array
+    #[\Override]
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
         $channel = $context['channel'];
-        $product = $object;
+        $product = $data;
         Assert::isInstanceOf($product, ProductInterface::class);
         Assert::isInstanceOf($channel, ChannelInterface::class);
 
@@ -218,11 +220,13 @@ class ProductNormalizer implements NormalizerInterface
         return $event->getNormalizedProduct();
     }
 
+    #[\Override]
     public function getSupportedTypes(?string $format): array
     {
         return [ProductInterface::class => true];
     }
 
+    #[\Override]
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof ProductInterface &&
@@ -231,6 +235,9 @@ class ProductNormalizer implements NormalizerInterface
         ;
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     private function normalizeTaxon(TaxonInterface $taxon, ?string $format = null, array $context = []): array
     {
         $taxonId = $taxon->getId();
@@ -251,6 +258,9 @@ class ProductNormalizer implements NormalizerInterface
         return $this->serializedTaxon[$taxonId];
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     private function normalizeProductTaxon(
         ProductTaxonInterface $productTaxon,
         ?string $format = null,
