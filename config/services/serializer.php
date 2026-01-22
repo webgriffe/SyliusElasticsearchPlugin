@@ -16,7 +16,7 @@ return static function (ContainerConfigurator $containerConfigurator) {
     $services->set('webgriffe.sylius_elasticsearch_plugin.serializer.product_normalizer', ProductNormalizer::class)
         ->lazy()
         ->args([
-            service('sylius.product_variant_resolver.default'),
+            service('sylius.resolver.product_variant'),
             service('event_dispatcher'),
             service('serializer'),
             param('kernel.default_locale'),
