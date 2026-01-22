@@ -31,7 +31,7 @@ final class IndexCommand extends Command
         private readonly MessageBusInterface $messageBus,
         private readonly DocumentTypeProviderInterface $documentTypeProvider,
         private readonly IndexManagerInterface $indexManager,
-        string $name = null,
+        ?string $name = null,
     ) {
         parent::__construct($name);
     }
