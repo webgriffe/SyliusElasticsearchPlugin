@@ -1,6 +1,13 @@
 imports:
     - { resource: "@WebgriffeSyliusElasticsearchPlugin/config/config.php" }
     - { resource: "services_test.php" }
+    - { resource: 'fixtures/shop_configuration.yaml' }
+    - { resource: 'fixtures/cap.yaml' }
+    - { resource: 'fixtures/dress.yaml' }
+    - { resource: 'fixtures/jeans.yaml' }
+    - { resource: 'fixtures/tshirt.yaml' }
+    - { resource: 'fixtures/promotion.yaml' }
+    - { resource: 'fixtures/custom_fixtures.yaml' }
 
 twig:
     paths:
