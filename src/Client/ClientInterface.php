@@ -40,7 +40,7 @@ interface ClientInterface extends LoggerAwareInterface
      *
      * @throws RemoveIndexesException
      */
-    public function removeIndexes(string $wildcard = null, array $skips = []): void;
+    public function removeIndexes(?string $wildcard = null, array $skips = []): void;
 
     /**
      * @param BulkAction[] $actions

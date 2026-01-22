@@ -176,7 +176,7 @@ final class ElasticsearchClient implements ClientInterface
         }
     }
 
-    public function removeIndexes(string $wildcard = null, array $skips = []): void
+    public function removeIndexes(?string $wildcard = null, array $skips = []): void
     {
         /** @var array<string, array> $indexesToDelete */
         $indexesToDelete = $this->getClient()->indices()->get(['index' => $wildcard ?? '_all']);
