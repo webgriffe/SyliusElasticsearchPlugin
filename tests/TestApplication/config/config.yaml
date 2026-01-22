@@ -6,7 +6,6 @@ twig:
     paths:
         '%kernel.project_dir%/../../../tests/TestApplication/templates': ~
 
-# Remove if you do not need to extend entities
 doctrine:
     orm:
         entity_managers:
@@ -17,3 +16,19 @@ doctrine:
                         type: attribute
                         dir: '%kernel.project_dir%/../../../tests/TestApplication/src/Entity'
                         prefix: Tests\Webgriffe\SyliusElasticsearchPlugin
+
+sylius_product:
+    resources:
+        product:
+            classes:
+                repository: Tests\Webgriffe\SyliusElasticsearchPlugin\Doctrine\ORM\ProductRepository
+        product_option:
+            classes:
+                model: Tests\Webgriffe\SyliusElasticsearchPlugin\Entity\Product\ProductOption
+
+sylius_attribute:
+    resources:
+        product:
+            attribute:
+                classes:
+                    model: Tests\Webgriffe\SyliusElasticsearchPlugin\Entity\Product\ProductAttribute

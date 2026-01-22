@@ -1,5 +1,5 @@
 <?php
 
 return [
-    \Webgriffe\SyliusElasticsearchPlugin\WebgriffeSyliusElasticsearchPlugin::class => ['all' => true],
+    Webgriffe\SyliusElasticsearchPlugin\WebgriffeSyliusElasticsearchPlugin::class => ['all' => true],
 ];

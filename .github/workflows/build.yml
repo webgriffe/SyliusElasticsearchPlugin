@@ -6,7 +6,7 @@ on:
             - 'dependabot/**'
     pull_request: ~
     release:
-        types: [created]
+        types: [ created ]
     schedule:
         -
             cron: "0 1 * * 6" # Run at 1am every Saturday
@@ -21,11 +21,11 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                php: ["8.3", "8.4"]
-                symfony: ["^6.4", "^7.3"]
-                sylius: ["~2.0.0", "~2.1.0"]
-                node: ["22.x"]
-                mysql: ["8.4"]
+                php: [ "8.3", "8.4" ]
+                symfony: [ "^6.4", "^7.4" ]
+                sylius: [ "~2.1.10", "~2.2.1" ]
+                node: [ "22.x" ]
+                mysql: [ "8.4" ]
                 elasticsearch: [ "7.17.19", "8.8.2" ]
 
         env:
@@ -85,10 +85,6 @@ jobs:
                 run: php -v | head -n 1 | awk '{ print $2 }' > .php-version
 
             -
-                name: Install certificates
-                run: symfony server:ca:install || true
-
-            -
                 name: Get Composer cache directory
                 id: composer-cache
                 run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
@@ -118,6 +114,22 @@ jobs:
             -
                 name: Install PHP dependencies
                 run: composer install --no-interaction
+
+            -
+                name: RUN EasyCodingStandard
+                run: vendor/bin/ecs check
+
+            -
+                name: Run PHPStan
+                run: vendor/bin/phpstan analyse -c phpstan.neon -l max src/
+
+            -
+                name: Run Psalm
+                run: vendor/bin/psalm
+
+            -
+                name: Run PHPSpec
+                run: vendor/bin/phpspec run --ansi -f progress --no-interaction
 
             -
                 name: Run unit tests
@@ -170,24 +182,16 @@ jobs:
                 run: vendor/bin/console lint:container
 
             -
-                name: RUN EasyCodingStandard
-                run: vendor/bin/ecs check
-
-            -
-                name: Run PHPStan
-                run: vendor/bin/phpstan analyse
-
-            -
-                name: Run Psalm
-                run: vendor/bin/psalm
-
-            -
                 name: Run Non-unit PHPUnit tests
                 run: vendor/bin/phpunit --colors=always --testsuite=non-unit
 
             -
                 name: Run Chrome Headless
                 run: google-chrome-stable --enable-automation --disable-background-networking --no-default-browser-check --no-first-run --disable-popup-blocking --disable-default-apps --allow-insecure-localhost --disable-translate --disable-extensions --no-sandbox --enable-features=Metal --headless --remote-debugging-port=9222 --window-size=2880,1800 --proxy-server='direct://' --proxy-bypass-list='*' http://127.0.0.1 > /dev/null 2>&1 &
+
+            -
+                name: Install certificates
+                run: symfony server:ca:install || true
 
             -
                 name: Run webserver

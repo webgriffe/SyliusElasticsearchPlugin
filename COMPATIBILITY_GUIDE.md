@@ -5,7 +5,7 @@ This guide explains how to configure the Plugin to work with different versions 
 ## Supported Sylius Versions
 
 - Sylius 1.14.x
-- Sylius 2.0.x  
+- Sylius 2.0.x
 - Sylius 2.1.x
 
 ## Key Compatibility Changes

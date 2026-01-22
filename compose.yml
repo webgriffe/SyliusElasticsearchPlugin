@@ -16,13 +16,17 @@ services:
     nginx:
         image: ghcr.io/sylius/sylius-nginx:latest
         depends_on:
-            - php
+            -   php
     mailpit:
         # do not use in production!
         image: axllent/mailpit:latest
     elasticsearch:
-        build:
-            context: ./.docker/elasticsearch
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.11.2
+        command: >
+            bash -c "
+              bin/elasticsearch-plugin install --batch analysis-icu &&
+              /usr/local/bin/docker-entrypoint.sh eswrapper
+            "
         environment:
             - discovery.type=single-node
             - bootstrap.memory_lock=true

@@ -73,25 +73,25 @@ Common locations for example files in Sylius plugins:
 Use this checklist to ensure complete cleanup:
 
 1. **Delete files:**
-   - [ ] Controllers (`src/Controller/`)
-   - [ ] JavaScript files (`assets/*/js/`)
-   - [ ] Template directories (`templates/*/`)
-   - [ ] Feature files (`features/`)
-   - [ ] Behat test files (`tests/Behat/`)
+    - [ ] Controllers (`src/Controller/`)
+    - [ ] JavaScript files (`assets/*/js/`)
+    - [ ] Template directories (`templates/*/`)
+    - [ ] Feature files (`features/`)
+    - [ ] Behat test files (`tests/Behat/`)
 
 2. **Clean configurations:**
-   - [ ] Remove service definitions from `config/services.xml`
-   - [ ] Remove routes from `config/routes/*.yaml`
-   - [ ] Remove twig hooks from `config/twig_hooks/*.yaml` or remove entire directory if empty
-   - [ ] Remove broken imports from `config/config.yaml`
-   - [ ] Remove JavaScript imports from `assets/*/entrypoint.js`
-   - [ ] Remove test suites from `tests/Behat/Resources/suites.yml`
+    - [ ] Remove service definitions from `config/services.xml`
+    - [ ] Remove routes from `config/routes/*.yaml`
+    - [ ] Remove twig hooks from `config/twig_hooks/*.yaml` or remove entire directory if empty
+    - [ ] Remove broken imports from `config/config.yaml`
+    - [ ] Remove JavaScript imports from `assets/*/entrypoint.js`
+    - [ ] Remove test suites from `tests/Behat/Resources/suites.yml`
 
 3. **Additional cleanup:**
-   - [ ] Remove empty directories (e.g., `config/twig_hooks/` if only contains placeholder files)
-   - [ ] Check for unused dependencies in `composer.json`
-   - [ ] Check for unused npm packages in `package.json`
-   - [ ] Clear cache after cleanup
+    - [ ] Remove empty directories (e.g., `config/twig_hooks/` if only contains placeholder files)
+    - [ ] Check for unused dependencies in `composer.json`
+    - [ ] Check for unused npm packages in `package.json`
+    - [ ] Clear cache after cleanup
 
 ## Step 5: Verification
 
