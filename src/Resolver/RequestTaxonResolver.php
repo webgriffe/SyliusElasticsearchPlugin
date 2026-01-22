@@ -21,6 +21,7 @@ final readonly class RequestTaxonResolver implements RequestTaxonResolverInterfa
     ) {
     }
 
+    #[\Override]
     public function resolve(Request $request, string $taxonSlug): ?TaxonInterface
     {
         $localeCode = $this->localeContext->getLocaleCode();

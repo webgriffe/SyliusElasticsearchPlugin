@@ -13,16 +13,19 @@ final readonly class FilterValue implements FilterValueInterface
     ) {
     }
 
+    #[\Override]
     public function getKey(): string
     {
         return $this->key;
     }
 
+    #[\Override]
     public function getLabel(): string
     {
         return $this->label;
     }
 
+    #[\Override]
     public function getOccurrences(): int
     {
         return $this->occurrences;

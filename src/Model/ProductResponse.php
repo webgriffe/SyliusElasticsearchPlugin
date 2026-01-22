@@ -11,11 +11,13 @@ use Sylius\Component\Core\Model\Product;
  */
 final class ProductResponse extends Product implements ProductResponseInterface
 {
+    #[\Override]
     public function getRouteName(): string
     {
         return 'sylius_shop_product_show';
     }
 
+    #[\Override]
     public function getRouteParams(): array
     {
         return [

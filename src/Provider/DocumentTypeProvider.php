@@ -17,11 +17,13 @@ final class DocumentTypeProvider implements DocumentTypeProviderInterface
         $this->documentTypes[] = $documentType;
     }
 
+    #[\Override]
     public function getDocumentsType(): array
     {
         return $this->documentTypes;
     }
 
+    #[\Override]
     public function getDocumentType(string $code): DocumentTypeInterface
     {
         foreach ($this->documentTypes as $documentType) {

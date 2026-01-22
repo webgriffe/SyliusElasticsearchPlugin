@@ -23,6 +23,7 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
     ) {
     }
 
+    #[\Override]
     public function buildTaxonQuery(
         TaxonInterface $taxon,
         ?int $from = null,
@@ -107,6 +108,7 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
         return $taxonQuery;
     }
 
+    #[\Override]
     public function buildSearchQuery(
         string $searchTerm,
         ?int $from = null,
@@ -180,6 +182,7 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
         return $searchQuery;
     }
 
+    #[\Override]
     public function buildCompletionSuggestersQuery(
         string $searchTerm,
         ?string $source = 'suggest',
@@ -207,6 +210,7 @@ final readonly class TwigQueryBuilder implements QueryBuilderInterface
         return $completionSuggestersQuery;
     }
 
+    #[\Override]
     public function buildTermSuggestersQuery(
         string $searchTerm,
     ): array {

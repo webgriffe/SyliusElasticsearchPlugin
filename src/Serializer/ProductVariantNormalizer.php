@@ -31,12 +31,14 @@ class ProductVariantNormalizer implements NormalizerInterface
     }
 
     /**
-     * @param ProductVariantInterface|mixed $object
+     * @param ProductVariantInterface|mixed $data
+     * @param array<string, mixed> $context
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array
+    #[\Override]
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
         $channel = $context['channel'];
-        $variant = $object;
+        $variant = $data;
         Assert::isInstanceOf($variant, ProductVariantInterface::class);
         Assert::isInstanceOf($channel, ChannelInterface::class);
 
@@ -99,11 +101,13 @@ class ProductVariantNormalizer implements NormalizerInterface
         return $event->getNormalizedProductVariant();
     }
 
+    #[\Override]
     public function getSupportedTypes(?string $format): array
     {
         return [ProductVariantInterface::class => true];
     }
 
+    #[\Override]
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof ProductVariantInterface &&
@@ -154,6 +158,9 @@ class ProductVariantNormalizer implements NormalizerInterface
         return $normalizedChannelPricing;
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     private function normalizeProductOptionAndProductOptionValue(
         ProductOptionInterface $option,
         ProductOptionValueInterface $optionValue,

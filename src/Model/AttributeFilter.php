@@ -13,6 +13,7 @@ final readonly class AttributeFilter extends Filter
 {
     public const TYPE = 'attribute';
 
+    #[\Override]
     public function getType(): string
     {
         return self::TYPE;
@@ -27,6 +28,7 @@ final readonly class AttributeFilter extends Filter
      *
      * @return AttributeFilter[]
      */
+    #[\Override]
     public static function resolveFromRawData(array $rawData): array
     {
         $filters = [];

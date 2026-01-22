@@ -49,6 +49,7 @@ final class ProductController extends AbstractController implements ProductContr
     ) {
     }
 
+    #[\Override]
     public function __invoke(Request $request, string $slug): Response
     {
         $this->requestValidator->validate($request);

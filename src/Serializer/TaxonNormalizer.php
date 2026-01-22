@@ -26,12 +26,14 @@ class TaxonNormalizer implements NormalizerInterface
     }
 
     /**
-     * @param TaxonInterface|mixed $object
+     * @param TaxonInterface|mixed $data
+     * @param array<string, mixed> $context
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array
+    #[\Override]
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
         $channel = $context['channel'];
-        $taxon = $object;
+        $taxon = $data;
         Assert::isInstanceOf($taxon, TaxonInterface::class);
         Assert::isInstanceOf($channel, ChannelInterface::class);
 
@@ -100,11 +102,13 @@ class TaxonNormalizer implements NormalizerInterface
         return $event->getNormalizedTaxon();
     }
 
+    #[\Override]
     public function getSupportedTypes(?string $format): array
     {
         return [TaxonInterface::class => true];
     }
 
+    #[\Override]
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof TaxonInterface &&

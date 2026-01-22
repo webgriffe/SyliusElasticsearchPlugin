@@ -34,6 +34,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
     ) {
     }
 
+    #[\Override]
     public function getCode(): string
     {
         return self::CODE;
@@ -43,6 +44,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
      * @TODO Add custom method on repository to get products to index
      * @TODO Use serializer to transform product to array
      */
+    #[\Override]
     public function getDocuments(ChannelInterface $channel): array
     {
         $documents = [];
@@ -59,6 +61,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         return $documents;
     }
 
+    #[\Override]
     public function getDocument(string|int $identifier, ChannelInterface $channel): array
     {
         $product = $this->documentTypeRepository->findDocumentToIndex($identifier, $channel);
@@ -74,6 +77,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         return $result;
     }
 
+    #[\Override]
     public function getSettings(): array
     {
         $settings = [
@@ -94,6 +98,7 @@ final readonly class ProductDocumentType implements DocumentTypeInterface
         return $event->getSettings();
     }
 
+    #[\Override]
     public function getMappings(): array
     {
         $mappings = [

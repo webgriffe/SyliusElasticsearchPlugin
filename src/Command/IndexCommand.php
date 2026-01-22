@@ -36,6 +36,7 @@ final class IndexCommand extends Command
         parent::__construct($name);
     }
 
+    #[\Override]
     protected function configure(): void
     {
         $this
@@ -50,6 +51,7 @@ final class IndexCommand extends Command
         ;
     }
 
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!$this->lock('webgriffe-elasticsearch-index-command-lock')) {

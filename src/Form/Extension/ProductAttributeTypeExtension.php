@@ -11,6 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 final class ProductAttributeTypeExtension extends AbstractTypeExtension
 {
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -21,6 +22,7 @@ final class ProductAttributeTypeExtension extends AbstractTypeExtension
         ;
     }
 
+    #[\Override]
     public static function getExtendedTypes(): array
     {
         return [

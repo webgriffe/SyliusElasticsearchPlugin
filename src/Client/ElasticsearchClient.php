@@ -32,6 +32,7 @@ final class ElasticsearchClient implements ClientInterface
     ) {
     }
 
+    #[\Override]
     public function setLogger(?LoggerInterface $logger): void
     {
         $this->logger = $logger;
@@ -42,6 +43,7 @@ final class ElasticsearchClient implements ClientInterface
         return $this->logger;
     }
 
+    #[\Override]
     public function createIndex(string $name, array $mappings, array $settings): void
     {
         $params = [
@@ -68,6 +70,7 @@ final class ElasticsearchClient implements ClientInterface
         }
     }
 
+    #[\Override]
     public function bulk(string $indexName, array $actions): Generator
     {
         $params = ['body' => []];
@@ -127,6 +130,7 @@ final class ElasticsearchClient implements ClientInterface
         yield $totalCount;
     }
 
+    #[\Override]
     public function switchAlias(string $aliasName, string $toIndexName): void
     {
         $aliasExists = $this->getClient()->indices()->existsAlias([
@@ -176,6 +180,7 @@ final class ElasticsearchClient implements ClientInterface
         }
     }
 
+    #[\Override]
     public function removeIndexes(?string $wildcard = null, array $skips = []): void
     {
         /** @var array<string, array> $indexesToDelete */
@@ -199,6 +204,7 @@ final class ElasticsearchClient implements ClientInterface
         }
     }
 
+    #[\Override]
     public function query(
         array $query,
         array $indexes = [],
@@ -214,6 +220,7 @@ final class ElasticsearchClient implements ClientInterface
         return $results;
     }
 
+    #[\Override]
     public function count(
         array $query,
         array $indexes = [],
@@ -229,6 +236,7 @@ final class ElasticsearchClient implements ClientInterface
         return $result['count'];
     }
 
+    #[\Override]
     public function completionSuggesters(
         array $query,
         array $indexes = [],
@@ -242,6 +250,7 @@ final class ElasticsearchClient implements ClientInterface
         return $result['suggest'];
     }
 
+    #[\Override]
     public function termSuggesters(
         array $query,
         array $indexes = [],
@@ -255,6 +264,7 @@ final class ElasticsearchClient implements ClientInterface
         return $result['suggest'];
     }
 
+    #[\Override]
     public function existsAlias(string $aliasName): bool
     {
         return $this->getClient()->indices()->existsAlias(['name' => $aliasName]);

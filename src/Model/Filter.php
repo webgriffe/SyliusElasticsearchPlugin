@@ -16,21 +16,25 @@ abstract readonly class Filter implements FilterInterface
     ) {
     }
 
+    #[\Override]
     public function getName(): string
     {
         return $this->name;
     }
 
+    #[\Override]
     public function getValues(): array
     {
         return $this->values;
     }
 
+    #[\Override]
     public function getKeyCode(): string
     {
         return $this->keyCode;
     }
 
+    #[\Override]
     public function getQueryStringKey(): string
     {
         return sprintf('filters[%s][%s]', $this->getType(), $this->getKeyCode());

@@ -20,6 +20,7 @@ final readonly class ProductResponseFactory implements ProductResponseFactoryInt
     /**
      * @psalm-suppress MixedMethodCall
      */
+    #[\Override]
     public function createNew(): ProductResponseInterface
     {
         $response = new $this->responseClass();
