@@ -45,6 +45,13 @@ return static function (ContainerConfigurator $container): void {
                 ],
             ],
 
+            'sylius_shop.base.header.content' => [
+                'search' => [
+                    'template' => '@WebgriffeSyliusElasticsearchPlugin/shop/shared/layout/base/header/content/search.html.twig',
+                    'priority' => 250,
+                ],
+            ],
+
             'webgriffe_sylius_elasticsearch.product.index' => [
                 'content' => [
                     'template' => '@SyliusShop/product/index/content.html.twig',
