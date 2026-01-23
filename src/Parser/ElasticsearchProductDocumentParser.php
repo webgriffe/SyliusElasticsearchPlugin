@@ -105,6 +105,7 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
         $localeCode = $this->localeContext->getLocaleCode();
         $productResponse = $this->productResponseFactory->createNew();
         $productResponse->setCode($source['code']);
+        $productResponse->setFallbackLocale($this->fallbackLocaleCode);
         $productResponse->setCurrentLocale($localeCode);
         $productResponse->setName($this->getValueFromLocalizedField($source['name'], $localeCode));
         $productResponse->setSlug($this->getSlug($source['slug'], $localeCode));

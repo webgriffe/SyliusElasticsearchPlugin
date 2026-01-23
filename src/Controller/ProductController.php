@@ -100,9 +100,10 @@ final class ProductController extends AbstractController implements ProductContr
 
         $this->eventDispatcher->dispatch(new ProductIndexEvent($taxon, $paginator));
 
-        return $this->render('@WebgriffeSyliusElasticsearchPlugin/Product/index.html.twig', [
+        return $this->render('@WebgriffeSyliusElasticsearchPlugin/shop/product/index.html.twig', [
             'taxon' => $taxon,
             'products' => $paginator,
+            'resources' => $paginator,
             'filters' => $esTaxonQueryAdapter->getQueryResult()->getFilters(),
             'queryResult' => $esTaxonQueryAdapter->getQueryResult(),
         ]);
