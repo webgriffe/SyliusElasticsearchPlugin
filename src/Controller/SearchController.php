@@ -128,7 +128,7 @@ final class SearchController extends AbstractController implements SearchControl
         );
         $this->eventDispatcher->dispatch(new SearchEvent($query, $paginator, $termSuggesters));
 
-        return $this->render('@WebgriffeSyliusElasticsearchPlugin/Search/results.html.twig', [
+        return $this->render('@WebgriffeSyliusElasticsearchPlugin/shop/search/index.html.twig', [
             'query' => $query,
             'paginator' => $paginator,
             'filters' => $esSearchQueryAdapter->getQueryResult()->getFilters(),

@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 return static function (ContainerConfigurator $container): void {
-    $container->import('sylius_twig_hooks/*.php');
-
-    // Admin
     $container->extension('sylius_twig_hooks', [
         'hooks' => [
             'sylius_admin.product_attribute.create.content.form.general' => [

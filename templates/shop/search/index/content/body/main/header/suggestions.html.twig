@@ -1,0 +1,14 @@
+{% if hookable_metadata.context.termSuggesters|length > 0 %}
+    <div class="ui section header">
+        {{ 'webgriffe_sylius_elasticsearch_plugin.ui.maybe_you_were_looking_for'|trans }}
+        <ul>
+            {% for termSuggestKey, termSuggestHtml in hookable_metadata.context.termSuggesters %}
+                <li>
+                    <a href="{{ path('sylius_shop_search', {'query': termSuggestKey}) }}">
+                        {{ termSuggestHtml|raw }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}

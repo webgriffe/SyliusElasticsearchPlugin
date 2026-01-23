@@ -1,12 +1,12 @@
 {% import '@SyliusShop/shared/messages.html.twig' as messages %}
 
-{% set products = hookable_metadata.context.resources %}
+{% set results = hookable_metadata.context.paginator %}
 
-{% if products|length > 0 %}
-    <div class="products-grid" {{ sylius_test_html_attribute('products') }}>
-        {% for product in products %}
+{% if results|length > 0 %}
+    <div class="products-grid" {{ sylius_test_html_attribute('results') }}>
+        {% for result in results %}
             {{ component('sylius_shop:product:card', {
-                product: product,
+                product: result,
                 template: hookable_metadata.configuration.product_template|default('@SyliusShop/product/common/card.html.twig'),
                 hookableMetadata: hookable_metadata,
             }) }}

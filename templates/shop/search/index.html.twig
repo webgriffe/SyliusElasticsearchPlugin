@@ -1,0 +1,7 @@
+{% extends '@SyliusShop/shared/layout/base.html.twig' %}
+
+{% set prefixes = ['webgriffe_sylius_elasticsearch.search.index'] %}
+
+{% block content %}
+    {% hook 'webgriffe_sylius_elasticsearch.search.index' %}
+{% endblock %}
