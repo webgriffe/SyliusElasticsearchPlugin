@@ -11,7 +11,7 @@ use Sylius\Component\Product\Model\ProductOptionValueInterface;
 use Sylius\Component\Product\Model\ProductOptionValueTranslation;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Tests\Webgriffe\SyliusElasticsearchPlugin\App\Entity\Product\ProductOption;
+use Tests\Webgriffe\SyliusElasticsearchPlugin\Entity\Product\ProductOption;
 use Webgriffe\SyliusElasticsearchPlugin\Serializer\ProductOptionValueNormalizer;
 
 class ProductOptionValueNormalizerTest extends TestCase
