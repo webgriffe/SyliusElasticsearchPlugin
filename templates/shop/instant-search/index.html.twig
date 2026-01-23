@@ -19,6 +19,9 @@
 
 
     {% for result in queryResult.hints(1, 10) %}
-        {% include '@SyliusShop/Product/_box.html.twig' with {product: result} %}
+        {{ component('sylius_shop:product:card', {
+            product: result,
+            template: '@SyliusShop/product/common/card.html.twig',
+        }) }}
     {% endfor %}
 </div>

@@ -78,7 +78,7 @@ final class InstantSearchController extends AbstractController implements Instan
         $queryResult = $this->queryResultMapper->map($esResult);
         $this->eventDispatcher->dispatch(new InstantSearchEvent($query, $queryResult, $completionSuggesters));
 
-        return $this->render('@WebgriffeSyliusElasticsearchPlugin/InstantSearch/results.html.twig', [
+        return $this->render('@WebgriffeSyliusElasticsearchPlugin/shop/instant-search/index.html.twig', [
             'query' => $query,
             'queryResult' => $queryResult,
             'completionSuggesters' => $this->buildCompletionSuggesters($completionSuggesters),
