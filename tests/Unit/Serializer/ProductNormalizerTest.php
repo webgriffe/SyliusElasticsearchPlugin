@@ -8,10 +8,12 @@ use PHPUnit\Framework\TestCase;
 use Sylius\Component\Core\Model\Channel;
 use Sylius\Component\Core\Model\Product;
 use Sylius\Component\Core\Model\ProductInterface;
+use Sylius\Component\Core\Model\ProductVariantInterface;
 use Sylius\Component\Product\Resolver\DefaultProductVariantResolver;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
+use Tests\Webgriffe\SyliusElasticsearchPlugin\InMemory\Repository\ProductVariantRepository;
 use Webgriffe\SyliusElasticsearchPlugin\Serializer\ProductNormalizer;
 use Webgriffe\SyliusElasticsearchPlugin\Serializer\ProductOptionValueNormalizer;
 use Webgriffe\SyliusElasticsearchPlugin\Serializer\ProductVariantNormalizer;
@@ -28,7 +30,7 @@ class ProductNormalizerTest extends TestCase
         $eventDispatcher = new EventDispatcher();
         $serializer = new Serializer([new ProductVariantNormalizer($eventDispatcher, new Serializer([new ProductOptionValueNormalizer($eventDispatcher)]))]);
         $this->productNormalizer = new ProductNormalizer(
-            new DefaultProductVariantResolver(),
+            new DefaultProductVariantResolver(new ProductVariantRepository(ProductVariantInterface::class)),
             $eventDispatcher,
             $serializer,
             'en_US',
