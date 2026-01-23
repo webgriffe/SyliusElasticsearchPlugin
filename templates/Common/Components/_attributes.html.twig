@@ -1,4 +1,4 @@
-{# queryResult \Webgriffe\SyliusElasticsearchPlugin\Model\QueryResultInterface #}
+{# hookable_metadata.context.queryResult \Webgriffe\SyliusElasticsearchPlugin\Model\QueryResultInterface #}
 {# filter \Webgriffe\SyliusElasticsearchPlugin\Model\FilterInterface #}
 {# filterValue \Webgriffe\SyliusElasticsearchPlugin\Model\FilterValueInterface #}
 
@@ -10,7 +10,7 @@
         {{ 'webgriffe_sylius_elasticsearch_plugin.ui.reset_filters'|trans }}
     </a>
 
-    {% for filter in queryResult.filters %}
+    {% for filter in hookable_metadata.context.queryResult.filters %}
         <div {{ sylius_test_html_attribute('filter-name', filter.name) }} style="margin: 10px auto;">
             <h3>{{ filter.name }}</h3>
             <ul>
