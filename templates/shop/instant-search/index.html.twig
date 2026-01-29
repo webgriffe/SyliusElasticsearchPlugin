@@ -14,14 +14,33 @@
     </div>
 {% endif %}
 
-<div>
-    {{ 'webgriffe_sylius_elasticsearch_plugin.ui.results_for_query'|trans({'{query}': query}) }}
+{% if queryResult.totalHits > 0 %}
+    <div class="p-2">
+        <div class="px-2 py-2 small text-muted">
+            {{ 'webgriffe_sylius_elasticsearch_plugin.ui.results_for_query'|trans({'{query}': query}) }}
+        </div>
 
+        <div class="list-group list-group-flush">
+            {% for result in queryResult.hints(1, 10) %}
+                {{ component('sylius_shop:product:card', {
+                    product: result,
+                    template: '@SyliusShop/product/common/card.html.twig',
+                }) }}
+            {% endfor %}
+        </div>
 
-    {% for result in queryResult.hints(1, 10) %}
-        {{ component('sylius_shop:product:card', {
-            product: result,
-            template: '@SyliusShop/product/common/card.html.twig',
-        }) }}
-    {% endfor %}
-</div>
+        {% if queryResult.totalHits > 10 %}
+            <div class="px-2 pt-2">
+                <a class="btn btn-sm btn-outline-primary w-100" href="{{ path('sylius_shop_search', {'query': query}) }}">
+                    {{ 'sylius.ui.view_more'|trans }}
+                </a>
+            </div>
+        {% endif %}
+    </div>
+{% else %}
+    <div class="p-2">
+        <div class="px-2 py-2 small text-muted">
+            {{ 'sylius.ui.no_results_to_display'|trans }}
+        </div>
+    </div>
+{% endif %}

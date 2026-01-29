@@ -1,0 +1,23 @@
+{% set searchForm = get_search_form() %}
+
+{% form_theme searchForm '@SyliusShop/Form/theme.html.twig' %}
+
+<div class="collapse d-lg-none border-top" id="mobileSearchBar">
+    <div class="container py-3">
+
+        {{ form_start(searchForm, {
+            'attr': {
+                'class': 'position-relative',
+                'role': 'search',
+                'data-instant-search': 'form',
+            },
+        }) }}
+
+        {% hook 'form-group' %}
+
+        {% hook 'results' %}
+
+        {{ form_end(searchForm, {'render_rest': true}) }}
+
+    </div>
+</div>
