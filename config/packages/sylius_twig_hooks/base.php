@@ -15,9 +15,16 @@ return static function (ContainerConfigurator $container): void {
             ],
 
             'sylius_shop.base.header.content' => [
-                'search' => [
-                    'template' => '@WebgriffeSyliusElasticsearchPlugin/shop/shared/layout/base/header/content/search.html.twig',
+                'desktop-search' => [
+                    'template' => '@WebgriffeSyliusElasticsearchPlugin/shop/shared/layout/base/header/content/desktop-search.html.twig',
                     'priority' => 250,
+                ],
+            ],
+
+            'sylius_shop.base.header' => [
+                'mobile-search' => [
+                    'template' => '@WebgriffeSyliusElasticsearchPlugin/shop/shared/layout/base/header/mobile-search.html.twig',
+                    'priority' => 0,
                 ],
             ],
         ],

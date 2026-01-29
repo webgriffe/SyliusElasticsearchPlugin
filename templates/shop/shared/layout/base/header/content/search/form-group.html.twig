@@ -1,0 +1,25 @@
+<div class="input-group">
+
+    <span class="input-group-text bg-white border-end-0">
+        <svg viewBox="0 0 24 24" class="icon">
+            <path fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round"
+                  d="M11 19a8 8 0 1 1 0-16a8 8 0 0 1 0 16Zm10 2-4.35-4.35"/>
+        </svg>
+    </span>
+
+    {{ form_widget(hookable_metadata.context.searchForm.query, {
+        'attr': {
+            'class': 'form-control border-start-0',
+            'data-instant-search': 'input',
+        },
+    }) }}
+
+    {{ form_widget(hookable_metadata.context.searchForm.search, {
+        'attr': {
+            'class': 'btn btn-primary',
+            'data-instant-search': 'button',
+        },
+    }) }}
+
+</div>
