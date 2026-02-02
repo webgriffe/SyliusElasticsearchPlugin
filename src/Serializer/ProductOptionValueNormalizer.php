@@ -52,6 +52,7 @@ final class ProductOptionValueNormalizer implements NormalizerInterface
         return $event->getNormalizedProductOptionValue();
     }
 
+    #[\Override]
     public function getSupportedTypes(?string $format): array
     {
         return [ProductOptionValueInterface::class => true];
