@@ -101,7 +101,6 @@ class ProductVariantNormalizer implements NormalizerInterface
         return $event->getNormalizedProductVariant();
     }
 
-    #[\Override]
     public function getSupportedTypes(?string $format): array
     {
         return [ProductVariantInterface::class => true];

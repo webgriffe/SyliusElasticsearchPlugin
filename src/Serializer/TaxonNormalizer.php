@@ -102,7 +102,6 @@ class TaxonNormalizer implements NormalizerInterface
         return $event->getNormalizedTaxon();
     }
 
-    #[\Override]
     public function getSupportedTypes(?string $format): array
     {
         return [TaxonInterface::class => true];
