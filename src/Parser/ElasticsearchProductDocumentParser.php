@@ -118,6 +118,7 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
             $productOption = $this->productOptionFactory->createNew();
             $productOption->setCode($esProductOption['code']);
             $productOption->setPosition($esProductOption['position']);
+            $productOption->setFallbackLocale($this->fallbackLocaleCode);
             $productOption->setCurrentLocale($localeCode);
             $productOption->setName($this->getValueFromLocalizedField($esProductOption['name'], $localeCode));
 
@@ -126,6 +127,7 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
                 $productOptionValue = $this->productOptionValueFactory->createNew();
                 $productOptionValue->setCode($esProductOptionValue['code']);
                 $productOptionValue->setOption($productOption);
+                $productOptionValue->setFallbackLocale($this->fallbackLocaleCode);
                 $productOptionValue->setCurrentLocale($localeCode);
                 $productOptionValue->setFallbackLocale($this->fallbackLocaleCode);
                 $productOptionValue->setValue($esProductOptionValue['value']);
@@ -156,6 +158,7 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
             $productAttribute->setType($esAttribute['type']);
             $productAttribute->setTranslatable(true);
             $productAttribute->setPosition($esAttribute['position']);
+            $productAttribute->setFallbackLocale($this->fallbackLocaleCode);
             $productAttribute->setCurrentLocale($localeCode);
             $productAttribute->setName($this->getValueFromLocalizedField($esAttribute['name'], $localeCode));
             $event = new ProductAttributeDocumentParserEvent($esAttribute, $productAttribute, $productResponse);
@@ -214,6 +217,7 @@ final class ElasticsearchProductDocumentParser implements DocumentParserInterfac
                 /** @var array{label: LocalizedField} $esAppliedPromotion */
                 foreach ($esVariant['price']['applied-promotions'] as $esAppliedPromotion) {
                     $catalogPromotion = $this->catalogPromotionFactory->createNew();
+                    $catalogPromotion->setFallbackLocale($this->fallbackLocaleCode);
                     $catalogPromotion->setCurrentLocale($localeCode);
                     $catalogPromotion->setLabel($this->getValueFromLocalizedField($esAppliedPromotion['label'], $localeCode));
 
