@@ -220,6 +220,7 @@ class ProductNormalizer implements NormalizerInterface
         return $event->getNormalizedProduct();
     }
 
+    #[\Override]
     public function getSupportedTypes(?string $format): array
     {
         return [ProductInterface::class => true];
