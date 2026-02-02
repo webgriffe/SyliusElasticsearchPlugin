@@ -29,7 +29,7 @@
 4. Import the routes needed for cancelling the payments. Add the following to your config/routes.yaml file:
    ```yaml
    webgriffe_sylius_elasticsearch_plugin:
-       resource: "@WebgriffeSyliusElasticsearchPlugin/config/shop_routing.php"
+       resource: "@WebgriffeSyliusElasticsearchPlugin/config/routes/shop.php"
    ```
    **NB:** if you have locales prefix enabled you should prefix import with that.
 
