@@ -92,6 +92,7 @@ class ProductNormalizer implements NormalizerInterface
             'meta-keywords' => [],
             'meta-description' => [],
             'taxons' => [],
+            'product-taxons' => [],
             'variants' => [],
             'default-variant' => null,
             'main-taxon' => null,
