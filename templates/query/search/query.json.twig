@@ -182,7 +182,7 @@
                     "path": "product-taxons",
                     "query": {
                         "match": {
-                            {{ ('taxons.name.' ~ localeCode)|json_encode|raw }}: {
+                            {{ ('product-taxons.taxon.name.' ~ localeCode)|json_encode|raw }}: {
                                 "query": {{ searchTerm|raw }},
                                 "boost": {% block query_bool_should_product_taxon_names_boost %}3{% endblock %},
                                 "fuzziness": "AUTO",
